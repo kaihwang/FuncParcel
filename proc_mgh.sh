@@ -7,8 +7,8 @@ Source='/home/despoB/harvard_gsp/preprocessed/pipeline_three_pipelines__scrub'
 WD='/home/despoB/connectome-thalamus/MGH'
 
 
-
-for s in $(ls ${Source}); do
+cd ${Source}
+for s in $(ls -d Sub*); do
 
 	if [ ! -d ${WD}/${s} ]; then
 		mkdir ${WD}/${s}

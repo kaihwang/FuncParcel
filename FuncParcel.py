@@ -15,7 +15,7 @@
 # * 297 ROIs in cortical ROI file. 
 
 # In[86]:
-
+from __future__ import division, print_function
 import numpy as np
 import scipy as sp
 import scipy.io as sio
@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 import pickle
 import csv
 import glob
-from __future__ import division, print_function
+
 
 
 # Averaging

@@ -13,6 +13,9 @@ def average_corrmat(file_path):
 	'''
 	This is a short function to average correlation coefficient matrices.
 	example file_path = '/home/despoB/kaihwang/Rest/AdjMatrices/*Ses1_FIX_Striatalcortical_corrmat'
+
+	usage: average_corrmat(file_path)
+	it will return an averaged adjmat
 	'''
 	# Averaging
 	AdjMat_Files = glob.glob(file_path)
@@ -29,15 +32,24 @@ def average_corrmat(file_path):
 
 
 def parcel_subcortical_network(path_to_adjmat, path_to_list_of_subcorticalcortical_ROIs, path_to_list_of_subcortical_voxels, path_to_list_of_cortical_ROIs):
-	'''#Here try to do Striatalcortical parcellation in python
+	'''#Here try to do subcortical parcellation in python
 
 	The process works like this. 
 
-	* You will need a set of ROI that consists of: (1) the cortex, (2) a subcortical mask that you wish to parcellate based on its connectivity profile with the cortex, in this case the Striatal. 
-	* The cortical ROIs should be labeled as integer in a NIFTI file. The subcortical mask should also have each voxel labeled as different integer values. Note the values cannot overlap with corticla ROIs.
-	* This combined ROI set will then be used to generate a subcortical+cortical full correlation matrix (adjacency matrix). Essentially BOLD timesires from each ROI and subcortical voxel will be correlated with each other using 3dNetCorr.
-	* The output adjancency matrix from each subject can then be averaged. Alternatively it is possible to do this parcellation on a subject by subject basis, but its not implemented yet.
+	* You will need a set of ROI that consists of: (1) the cortex, (2) a subcortical mask that you wish to parcellate based 
+	on its connectivity profile with the cortex.
+
+	* The cortical ROIs should be labeled as integer in a NIFTI file. The subcortical mask should also have each voxel labeled 
+	as different integer values. Note the values cannot overlap with corticla ROIs.
+
+	* This combined ROI set will then be used to generate a subcortical+cortical full correlation matrix (adjacency matrix). 
+	Essentially BOLD timesires from each ROI and subcortical voxel will be correlated with each other using 3dNetCorr.
+
+	* The output adjancency matrix from each subject can then be averaged. Alternatively it is possible to do this parcellation 
+	on a subject by subject basis, but its not implemented yet.
+
 	* For each subcortical voxel, its connectivity strength with different cortical ROIs will then be sorted (ranked). 
+
 	* You can then classify the subcortical voxel based which cortical region (network, module) its most strongly connected to.
 
 	ROI used in the following example
@@ -45,11 +57,19 @@ def parcel_subcortical_network(path_to_adjmat, path_to_list_of_subcorticalcortic
 	* 3539 voxels in thalammic parcellation files
 	* 297 ROIs in cortical ROI file. 
 
+
+	To run this program give the following parameters:
+		parcel_subcortical_network(path_to_adjmat, path_to_list_of_subcorticalcortical_ROIs, ...
+			path_to_list_of_subcortical_voxels, path_to_list_of_cortical_ROIs)
+	it will return a dictionary "Subcorticalcortical_Targets". Where the key is the subcortical voxel index, and values are cortical
+	ROIs ranked by strength of conenction with the subcortical voxel
+
 	Example paths
 		path_to_adjmat = '/home/despoB/kaihwang/Rest/Striatum_parcel/StriatalCorticalAveMat'
 		path_to_list_of_subcorticalcortical_ROIs = '/home/despoB/kaihwang/bin/FuncParcel/Striatalcortical_ROIs_index'
 		path_to_list_of_subcortical_voxels = '/home/despoB/kaihwang/bin/FuncParcel/striatal_voxel_index'
 		path_to_list_of_cortical_ROIs = '/home/despoB/kaihwang/bin/FuncParcel/Cortical_ROI_index'
+
 	'''
 
 
@@ -93,8 +113,11 @@ def parcel_subcortical_network(path_to_adjmat, path_to_list_of_subcorticalcortic
 	return Subcorticalcortical_Targets
 
 
-def subcortical_patients_cortical_target_change(Subcorticalcortical_Targets, Patients):
+def subcortical_patients_cortical_target(Subcorticalcortical_Targets, Patients):
 	'''
+	function to identify lesioned subcortical voxels' cortical targets and non-targets
+	targets defined as top connected ROI
+	non-target defined as the least connecte d()
 	example patient vector: Patients = ['b117', 'b122', 'b138', 'b143', 'b153']
 	'''
 
@@ -112,12 +135,13 @@ def subcortical_patients_cortical_target_change(Subcorticalcortical_Targets, Pat
 	    # take out repetitions
 	    Cortical_Targets = np.unique(Cortical_Targets)
 	    Cortical_NonTargets = np.unique(Cortical_NonTargets)
+	    return Cortical_Targets, Cortical_NonTargets
 	    #Cortical_NonTargets = Subcorticalcortical_Targets[str(int(vox))][-1*len(Cortical_Targets):]
 	    # save data
-	    fn = "/home/despoB/kaihwang/bin/FuncParcel/%s_cortical_target" %sub
-	    np.savetxt(fn, Cortical_Targets.astype(int), fmt='%3.d')
-	    fn = "/home/despoB/kaihwang/bin/FuncParcel/%s_cortical_nontarget" %sub
-	    np.savetxt(fn, Cortical_NonTargets.astype(int), fmt='%3.d')
+	    #fn = "/home/despoB/kaihwang/bin/FuncParcel/%s_cortical_target" %sub
+	    #np.savetxt(fn, Cortical_Targets.astype(int), fmt='%3.d')
+	    #fn = "/home/despoB/kaihwang/bin/FuncParcel/%s_cortical_nontarget" %sub
+	    #np.savetxt(fn, Cortical_NonTargets.astype(int), fmt='%3.d')
 
 
 

@@ -191,9 +191,9 @@ def subcortical_patients_cortical_target(Subcorticalcortical_Targets, Patients):
 
 
 
-def convert_matlab_graph_str(graph_path, SubID):
+def convert_matlab_graph_str(graph_path, SubID, Cortical_ROIs):
 	'''
-	Function to load matlab graph.mat structure, convert its global graph metric content into a panda's dataframe 
+	Function to load matlab graph.mat structure, convert its global graph metric and nodal properties into a panda's dataframe format
 	
 	------
     Parameters
@@ -203,6 +203,8 @@ def convert_matlab_graph_str(graph_path, SubID):
     
     SubID: Subjet ID in string
     	example SubID = '176'
+
+    Cortical_ROIs: list of array indexing the ROI number	
 	
     ------
     Return
@@ -213,16 +215,14 @@ def convert_matlab_graph_str(graph_path, SubID):
 	------
 	Usage
     ------
-    usage: GlobalDataframe, NodalDataframe = convert_matlab_graph_str(graph_path)
+    usage: GlobalDataframe, NodalDataframe = convert_matlab_graph_str(graph_path, SubID, Cortical_ROIs)
 	
 	'''
-	mat_struct = sp.io.loadmat(graph_path)
+	mat_struct = sio.loadmat(graph_path)
 
-	# check density vector 
+	# check density vector is the same as what we think it is....
 	density_vector = np.arange(0.01, 0.255, 0.005)
-	len(mat_struct['Graph']['Full_Q'][0,0][0,0][0]) == len(density_vector)
-
-	rep_num = len(density_vector)
+	assert len(mat_struct['Graph']['Full_Q'][0,0][0,0][0]) == len(density_vector)
 	
 	# extract global graph metric from matlab struct, put in dictionary
 	tmp_dict = {}
@@ -233,25 +233,48 @@ def convert_matlab_graph_str(graph_path, SubID):
 	tmp_dict['CC'] = np.mean(mat_struct['Graph']['Full_CC'][0,0][0,0],1)
 	tmp_dict['left_CC'] = np.mean(mat_struct['Graph']['Left_CC'][0,0][0,0],1)
 	tmp_dict['right_CC'] = np.mean(mat_struct['Graph']['Right_CC'][0,0][0,0],1)
-	tmp_dict['Subject'] = [SubID] * rep_num
+	tmp_dict['Subject'] = [SubID] * len(density_vector)
 	
 	# conert dict to panda's dataframe
 	GlobalDataframe = pd.DataFrame(tmp_dict, columns=['Subject', 'Density', 'Q', 'left_Q', 'right_Q','CC', 'left_CC','right_CC'])
 	
 	# extract nodal properties
 	tmp_dict = {}
+
 	tmp = mat_struct['Graph']['Full_CC'][0,0][0,0]
 	tmp_dict['CC'] = tmp.ravel()
+
+	tmp = mat_struct['Graph']['Within_Module_Weight'][0,0][0,0]
+	tmp_dict['Within_Module_Weight'] = tmp.ravel()
+
+	tmp = mat_struct['Graph']['Out_Module_Weight'][0,0][0,0]
+	tmp_dict['Between_Module_Weight'] = tmp.ravel()
+
+	tmp = mat_struct['Graph']['P'][0,0][0,0]
+	tmp_dict['PC'] = tmp.ravel()
+
+	tmp = mat_struct['Graph']['Full_locE'][0,0][0,0]
+	tmp_dict['localE'] = tmp.ravel()
+
 	tmp_dict['Density'] = np.tile(density_vector,len(Cortical_ROIs))
 	tmp_dict['ROI'] = np.repeat(Cortical_ROIs,len(density_vector))
-	NodalDataframe = pd.DataFrame(tmp_dict, columns=['ROI', 'Density','CC'])
-	#tmp_dict['Density'] = density_vector
-	#tmp_dict['CC'] = mat_struct['Graph']['Full_CC'][0,0][0,0][:,1]
-	#pd.DataFrame(tmp_dict, columns=['Subject', 'Density', 'Q', 'left_Q', 'right_Q','CC', 'left_CC','right_CC'])
-	#return
-	return GlobalDataframe NodalDataframe
+	tmp_dict['Subject'] = [SubID] * len(tmp.ravel())
+	NodalDataframe = pd.DataFrame(tmp_dict, columns=['Subject', 'ROI', 'Density','CC', 'PC', 'localE', 'Between_Module_Weight','Within_Module_Weight'])
+
+	return GlobalDataframe, NodalDataframe
 
 
+def cal_graph_z_score(patient_ID, patient_graph_path, Cortical_ROIs, ControlDataframe, nodal_or_global, metric):
+	''' 
+	Function to load pateint's graph metric, convert that metric into z-score (stds relative to control subject's graph metric)
+	'''
+	NodalData, GlobalData = convert_matlab_graph_str(patient_graph_path, patient_ID, Cortical_ROIs)
+
+	if nodal_or_global:
+		return z_score = (GlobalData[metric] -ControlDataframe.groupby(['Density']).aggregate(np.mean).reset_index()[metric]) / ControlDataframe.groupby(['Density']).aggregate(np.std).reset_index()[metric]
+
+	else:
+		return z_score =  (NodalData[metric] - ControlDataframe.groupby(['ROI','Density']).aggregate(np.mean).reset_index()[metric]) / ControlDataframe.groupby(['ROI','Density']).aggregate(np.std).reset_index()[metric]
 
 
 

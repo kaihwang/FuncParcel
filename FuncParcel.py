@@ -265,7 +265,7 @@ def convert_matlab_graph_str(graph_path, SubID, Cortical_ROIs):
 	tmp_dict['Density'] = np.tile(density_vector,len(Cortical_ROIs))
 	tmp_dict['ROI'] = np.repeat(Cortical_ROIs,len(density_vector))
 	tmp_dict['Subject'] = [SubID] * len(tmp.ravel())
-	NodalDataframe = pd.DataFrame(tmp_dict, columns=['Subject', 'ROI', 'Density','CC', 'PC', 'localE', 'Between_Module_Weight','Within_Module_Weight'])
+	NodalDataframe = pd.DataFrame(tmp_dict, columns=['Subject', 'ROI', 'Density','CC', 'PC', 'localE', 'Between_Module_Weight','Within_Module_Weight', 'Between_Module_Degree','Within_Module_Degree'])
 
 	return GlobalDataframe, NodalDataframe
 
@@ -274,14 +274,15 @@ def cal_graph_z_score(patient_ID, patient_graph_path, Cortical_ROIs, ControlData
 	''' 
 	Function to load pateint's graph metric, convert that metric into z-score (stds relative to control subject's graph metric)
 	'''
-	NodalData, GlobalData = convert_matlab_graph_str(patient_graph_path, patient_ID, Cortical_ROIs)
+	GlobalData, NodalData = convert_matlab_graph_str(patient_graph_path, patient_ID, Cortical_ROIs)
 
 	if nodal_or_global:
-		return z_score = (GlobalData[metric] -ControlDataframe.groupby(['Density']).aggregate(np.mean).reset_index()[metric]) / ControlDataframe.groupby(['Density']).aggregate(np.std).reset_index()[metric]
+		z_score = (GlobalData[metric] -ControlDataframe.groupby(['Density']).aggregate(np.mean).reset_index()[metric]) / ControlDataframe.groupby(['Density']).aggregate(np.std).reset_index()[metric]
 
 	else:
-		return z_score =  (NodalData[metric] - ControlDataframe.groupby(['ROI','Density']).aggregate(np.mean).reset_index()[metric]) / ControlDataframe.groupby(['ROI','Density']).aggregate(np.std).reset_index()[metric]
+		z_score =  (NodalData[metric] - ControlDataframe.groupby(['ROI','Density']).aggregate(np.mean).reset_index()[metric]) / ControlDataframe.groupby(['ROI','Density']).aggregate(np.std).reset_index()[metric]
 
+	return z_score	
 
 
 

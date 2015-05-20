@@ -250,6 +250,12 @@ def convert_matlab_graph_str(graph_path, SubID, Cortical_ROIs):
 	tmp = mat_struct['Graph']['Out_Module_Weight'][0,0][0,0]
 	tmp_dict['Between_Module_Weight'] = tmp.ravel()
 
+	tmp = mat_struct['Graph']['Within_Module_Degree'][0,0][0,0]
+	tmp_dict['Within_Module_Degree'] = tmp.ravel()
+
+	tmp = mat_struct['Graph']['Out_Module_Degree'][0,0][0,0]
+	tmp_dict['Between_Module_Degree'] = tmp.ravel()
+
 	tmp = mat_struct['Graph']['P'][0,0][0,0]
 	tmp_dict['PC'] = tmp.ravel()
 

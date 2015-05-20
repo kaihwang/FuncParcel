@@ -34,4 +34,8 @@ for p in thalamic_patients:
 	fn = '/home/despoB/kaihwang/Rest/Graph/gsetCI_%s.mat' %p
 	NodalData, GlobalData = convert_matlab_graph_str(fn, p, Cortical_ROIs)
 	GlobalData['Q_zscore'] = cal_graph_z_score(p, fn, Cortical_ROIs, OlderControlGlobalData, 1, 'Q')
-
+	GlobalData['CC_zscore'] = cal_graph_z_score(p, fn, Cortical_ROIs, OlderControlGlobalData, 1, 'CC')
+	NodalData['PC_zscore'] = cal_graph_z_score(p, fn, Cortical_ROIs, OlderControlNodaData, 0, 'PC')
+	NodalData['localE_zscore'] = cal_graph_z_score(p, fn, Cortical_ROIs, OlderControlNodalData, 0, 'localE')
+	NodalData['Between_Module_Weight_zscore'] = cal_graph_z_score(p, fn, Cortical_ROIs, OlderControlNodaData, 0, 'Between_Module_Weight')
+	NodalData['Within_Module_Weight_zscore'] = cal_graph_z_score(p, fn, Cortical_ROIs, OlderControlNodaData, 0, 'Within_Module_Weight')

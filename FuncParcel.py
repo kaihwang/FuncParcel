@@ -270,18 +270,13 @@ def convert_matlab_graph_str(graph_path, SubID, Cortical_ROIs):
 	return GlobalDataframe, NodalDataframe
 
 
-def cal_graph_z_score(patient_ID, patient_graph_path, Cortical_ROIs, ControlDataframe, nodal_or_global, metric):
+def cal_graph_z_score(PatientDataframe, ControlDataframe, metric):
 	''' 
 	Function to load pateint's graph metric, convert that metric into z-score (stds relative to control subject's graph metric)
 	'''
-	GlobalData, NodalData = convert_matlab_graph_str(patient_graph_path, patient_ID, Cortical_ROIs)
+	#GlobalData, NodalData = convert_matlab_graph_str(patient_graph_path, patient_ID, Cortical_ROIs)
 
-	if nodal_or_global:
-		z_score = (GlobalData[metric] -ControlDataframe.groupby(['Density']).aggregate(np.mean).reset_index()[metric]) / ControlDataframe.groupby(['Density']).aggregate(np.std).reset_index()[metric]
-
-	else:
-		z_score =  (NodalData[metric] - ControlDataframe.groupby(['ROI','Density']).aggregate(np.mean).reset_index()[metric]) / ControlDataframe.groupby(['ROI','Density']).aggregate(np.std).reset_index()[metric]
-
+	z_score = (PatientDataframe[metric] -ControlDataframe.groupby(['Density']).aggregate(np.mean).reset_index()[metric]) / ControlDataframe.groupby(['Density']).aggregate(np.std).reset_index()[metric]
 	return z_score	
 
 

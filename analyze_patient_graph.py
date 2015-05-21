@@ -7,6 +7,7 @@ import pickle
 import csv
 import glob
 import pandas as pd
+import bct
 from ggplot import *
 
 # import functions
@@ -21,7 +22,7 @@ thalamic_patients = ['128', '162', '163', '168', '176']
 striatal_patients = ['b117', 'b122', 'b138', 'b143', 'b153']
 patients = thalamic_patients + striatal_patients
 
-if os.path.isfile('data/GraphGlobalData.csv') & os.path.isfile('data/GraphNodalData.csv'):
+if os.path.isfile('data/GraphGlobalData.csv') & os.path.isfile('data/GraphNodalData.csv') is False:
 	# create control's dataframe
 	OlderControlGlobalData = pd.DataFrame()
 	OlderControlNodalData = pd.DataFrame()
@@ -96,18 +97,29 @@ file_path = '/home/despoB/kaihwang/Rest/AdjMatrices/*Ses1_Full_WashU333_corrmat'
 AveMat = FuncParcel.average_corrmat(file_path)
 np.savetxt('Data/CorticalAveMat', AveMat)
 
-# threshold
-t = brainx.util.threshold_adjacency_matrix(AveMat, .05, 0,0)
-AveMatGraph = nx.from_numpy_matrix(t[0]*1
+# thresholding
+#m = bct.binarize(bct.threshold_proportional(AveMat, .05))
 
-# run partiion
-louvain = brainx.weighted_modularity.LouvainCommunityDetection(AveMatGraph)
-partitions = louvain.run()
+# run partiion across threshold on the ave mat
+MGH_template_partition = pd.DataFrame()
+row_count = 0
+for d in np.arange(0.01, 0.255, 0.005):
+	ci, q = bct.modularity_louvain_und(bct.binarize(bct.threshold_proportional(AveMat, d)))
+	for roi in np.arange(0, len(ci)):
+		MGH_template_partition.loc[row_count, 'Ci'] = ci[roi]
+		MGH_template_partition.loc[row_count, 'ROI'] = Cortical_ROIs[roi]
+		MGH_template_partition.loc[row_count, 'Density'] = d
+		row_count = row_count +1
+
+# calculate mutual information
+#from sklearn.metrics import normalized_mutual_info_score
+#nmi = normalized_mutual_info_score(ci, ci)
+
 
 
 # explore ggplot
-ggplot(aes(x = 'Density', y = 'Q_zscore', color = 'Subject'),data = GraphGlobalData[GraphGlobalData.Group == 'Thalamic_patients']) \
-+ geom_line() + xlim(0.05, 0.15)
+#ggplot(aes(x = 'Density', y = 'Q_zscore', color = 'Subject'),data = GraphGlobalData[GraphGlobalData.Group == 'Thalamic_patients']) \
+#+ geom_line() + xlim(0.05, 0.15)
 
 #cleanup
 #reset_selective GlobalData

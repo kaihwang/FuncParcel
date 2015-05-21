@@ -301,6 +301,17 @@ def cal_graph_z_score(PatientDataframe, ControlDataframe, metric):
 def convert_partition_to_dict(input_partition):
     '''
     Function to convert graph partitin output from brainx's louvain function into a dictionary. 
+
+    ----
+    Parameters
+    ----
+    input_partition: partition output from LouvainCommunityDetection
+
+
+    ----
+    Return
+    -----
+    Parition in dicitionary, each key is a community, value is a list of ROIs that belong to this community
     '''
     partition_dict = {}
     Communities = 0

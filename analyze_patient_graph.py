@@ -19,11 +19,13 @@ Cortical_ROIs = np.loadtxt('Data/Cortical_ROI_index')
 Control_Subj = ['1103', '1220', '1306', '1223', '1314', '1311', '1318', '1313', '1326', '1325', '1328', '1329', '1333', '1331', '1335', '1338', '1336', '1339', '1337', '1344', '1340']
 thalamic_patients = ['128', '162', '163', '168', '176']
 striatal_patients = ['b117', 'b122', 'b138', 'b143', 'b153']
+patients = thalamic_patients + striatal_patients
 
 if os.path.isfile('data/GraphGlobalData.csv') & os.path.isfile('data/GraphNodalData.csv'):
 	# create control's dataframe
 	OlderControlGlobalData = pd.DataFrame()
 	OlderControlNodalData = pd.DataFrame()
+	# load old controls
 	for s in Control_Subj:
 		fn = '/home/despoB/kaihwang/Rest/Graph/gsetCI_%s.mat' %s
 		GlobalData, NodalData = FuncParcel.convert_matlab_graph_str(fn, s, Cortical_ROIs)
@@ -31,6 +33,8 @@ if os.path.isfile('data/GraphGlobalData.csv') & os.path.isfile('data/GraphNodalD
 		OlderControlNodalData = OlderControlNodalData.append(NodalData)
 	OlderControlNodalData['Group'] = 'Control'
 	OlderControlGlobalData['Group'] = 'Control'
+
+	#load young controls
 
 	# convert patients' global graph metrics into z-score
 	PatientsGlobalData = pd.DataFrame()
@@ -80,6 +84,15 @@ if os.path.isfile('data/GraphGlobalData.csv') & os.path.isfile('data/GraphNodalD
 
 
 GraphGlobalData = pd.DataFrame.from_csv('data/GraphGlobalData.csv')
+
+# calculate hemispheric difference
+GraphGlobalData['RightvLeft_Q'] = GraphGlobalData['right_Q'] - GraphGlobalData['left_Q']
+GraphGlobalData['LeftvRight_Q'] = GraphGlobalData['left_Q'] - GraphGlobalData['right_Q']
+
+# explore ggplot
+ggplot(aes(x = 'Density', y = 'Q_zscore', color = 'Subject'),data = GraphGlobalData[GraphGlobalData.Group == 'Thalamic_patients']) \
++ geom_line() + xlim(0.05, 0.15)
+
 #cleanup
 #reset_selective GlobalData
 #reset_selective NodalData

@@ -18,7 +18,7 @@ def average_corrmat(file_path):
     Parameters
     ------
     file_path:
-		file_path: = '/home/despoB/kaihwang/Rest/AdjMatrices/*Ses1_FIX_Striatalcortical_corrmat'
+		file_path = '/home/despoB/kaihwang/Rest/AdjMatrices/*Ses1_Full_WashU333_corrmat'
 
 	usage: average_corrmat(file_path)
 
@@ -37,7 +37,7 @@ def average_corrmat(file_path):
 	    
 	    
 	AdjMat = sum(M_Sum)/len(AdjMat_Files)
-	np.savetxt('/home/despoB/kaihwang/Rest/Striatum_parcel/StriatalCorticalAveMat', AdjMat)
+	#np.savetxt('/home/despoB/kaihwang/Rest/Striatum_parcel/StriatalCorticalAveMat', AdjMat)
 	return AdjMat
 
 
@@ -272,7 +272,22 @@ def convert_matlab_graph_str(graph_path, SubID, Cortical_ROIs):
 
 def cal_graph_z_score(PatientDataframe, ControlDataframe, metric):
 	''' 
-	Function to load pateint's graph metric, convert that metric into z-score (stds relative to control subject's graph metric)
+	Function to load pateint's graph metric, convert that metric into z-score (stds relative to control subject's graph metric).
+
+	----
+	Parameters
+	----
+	PatientDataframe: Dataframe of graph metrics from a particular patient. Should be output from 'convert_matlab_graph_str'
+
+	ControlDataframe: Dataframe of graph metrics from control subjects. Note should be "ALL" control subjects, can use 'convert_matlab_graph_str' and append
+		results from each subject
+
+	metric: string of the graph metric you want to convert to z-score
+
+	----
+	Return
+	----
+	z_score of the graph metric	
 	'''
 	#GlobalData, NodalData = convert_matlab_graph_str(patient_graph_path, patient_ID, Cortical_ROIs)
 

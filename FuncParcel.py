@@ -262,17 +262,20 @@ def convert_matlab_graph_str(graph_path, SubID, Cortical_ROIs):
 	tmp = mat_struct['Graph']['Full_locE'][0,0][0,0]
 	tmp_dict['localE'] = tmp.ravel()
 
+	tmp = mat_struct['Graph']['Full_Ci'][0,0][0,0]
+	tmp_dict['Ci'] = tmp.ravel()
+
 	tmp_dict['Density'] = np.tile(density_vector,len(Cortical_ROIs))
 	tmp_dict['ROI'] = np.repeat(Cortical_ROIs,len(density_vector))
 	tmp_dict['Subject'] = [SubID] * len(tmp.ravel())
-	NodalDataframe = pd.DataFrame(tmp_dict, columns=['Subject', 'ROI', 'Density','CC', 'PC', 'localE', 'Between_Module_Weight','Within_Module_Weight', 'Between_Module_Degree','Within_Module_Degree'])
+	NodalDataframe = pd.DataFrame(tmp_dict, columns=['Subject', 'ROI', 'Density','CC', 'PC', 'Ci', 'localE', 'Between_Module_Weight','Within_Module_Weight', 'Between_Module_Degree','Within_Module_Degree'])
 
 	return GlobalDataframe, NodalDataframe
 
 
 def cal_graph_z_score(PatientDataframe, ControlDataframe, metric):
 	''' 
-	Function to load pateint's graph metric, convert that metric into z-score (stds relative to control subject's graph metric).
+	Function to load pateint's graph metric, convert that metric into z-score (number of stds relative to control subjects).
 
 	----
 	Parameters
@@ -295,4 +298,14 @@ def cal_graph_z_score(PatientDataframe, ControlDataframe, metric):
 	return z_score	
 
 
-
+def convert_partition_to_dict(input_partition):
+    '''
+    Function to convert graph partitin output from brainx's louvain function into a dictionary. 
+    '''
+    partition_dict = {}
+    Communities = 0
+    for ROIs in input_partition:
+        if len(list(ROIs)) != 1:
+        	partition_dict[Communities] = list(ROIs)
+        	Communities = Communities + 1
+    return partition_dict

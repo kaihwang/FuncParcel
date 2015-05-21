@@ -88,6 +88,22 @@ GraphGlobalData = pd.DataFrame.from_csv('data/GraphGlobalData.csv')
 # calculate hemispheric difference
 GraphGlobalData['RightvLeft_Q'] = GraphGlobalData['right_Q'] - GraphGlobalData['left_Q']
 GraphGlobalData['LeftvRight_Q'] = GraphGlobalData['left_Q'] - GraphGlobalData['right_Q']
+GraphGlobalData.to_csv('Data/GraphGlobalData.csv')
+
+
+# use BrainX to get MGH subjects partition and nodal roles...
+file_path = '/home/despoB/kaihwang/Rest/AdjMatrices/*Ses1_Full_WashU333_corrmat'
+AveMat = FuncParcel.average_corrmat(file_path)
+np.savetxt('Data/CorticalAveMat', AveMat)
+
+# threshold
+t = brainx.util.threshold_adjacency_matrix(AveMat, .05, 0,0)
+AveMatGraph = nx.from_numpy_matrix(t[0]*1
+
+# run partiion
+louvain = brainx.weighted_modularity.LouvainCommunityDetection(AveMatGraph)
+partitions = louvain.run()
+
 
 # explore ggplot
 ggplot(aes(x = 'Density', y = 'Q_zscore', color = 'Subject'),data = GraphGlobalData[GraphGlobalData.Group == 'Thalamic_patients']) \

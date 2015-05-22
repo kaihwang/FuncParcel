@@ -221,7 +221,7 @@ def convert_matlab_graph_str(graph_path, SubID, Cortical_ROIs):
 	mat_struct = sio.loadmat(graph_path)
 
 	# check density vector is the same as what we think it is....
-	density_vector = np.arange(0.01, 0.255, 0.005)
+	density_vector = np.linspace(0.01, 0.25, num = 49)
 	assert len(mat_struct['Graph']['Full_Q'][0,0][0,0][0]) == len(density_vector)
 	
 	# extract global graph metric from matlab struct, put in dictionary

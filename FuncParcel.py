@@ -273,7 +273,7 @@ def convert_matlab_graph_str(graph_path, SubID, Cortical_ROIs):
 	return GlobalDataframe, NodalDataframe
 
 
-def cal_graph_z_score(PatientDataframe, ControlDataframe, metric):
+def cal_graph_z_score(PatientDataframe, ControlDataframe, nodal, metric):
 	''' 
 	Function to load pateint's graph metric, convert that metric into z-score (number of stds relative to control subjects).
 
@@ -285,6 +285,8 @@ def cal_graph_z_score(PatientDataframe, ControlDataframe, metric):
 	ControlDataframe: Dataframe of graph metrics from control subjects. Note should be "ALL" control subjects, can use 'convert_matlab_graph_str' and append
 		results from each subject
 
+	nodal: logic, True if its nodal data
+
 	metric: string of the graph metric you want to convert to z-score
 
 	----
@@ -293,8 +295,10 @@ def cal_graph_z_score(PatientDataframe, ControlDataframe, metric):
 	z_score of the graph metric	
 	'''
 	#GlobalData, NodalData = convert_matlab_graph_str(patient_graph_path, patient_ID, Cortical_ROIs)
-
-	z_score = (PatientDataframe[metric] -ControlDataframe.groupby(['Density']).aggregate(np.nanmean).reset_index()[metric]) / ControlDataframe.groupby(['Density']).aggregate(np.nanstd).reset_index()[metric]
+	if nodal:
+		z_score = (PatientDataframe[metric] -ControlDataframe.groupby(['ROI','Density']).aggregate(np.nanmean).reset_index()[metric]) / ControlDataframe.groupby(['ROI','Density']).aggregate(np.nanstd).reset_index()[metric]
+	else:
+		z_score = (PatientDataframe[metric] -ControlDataframe.groupby(['Density']).aggregate(np.nanmean).reset_index()[metric]) / ControlDataframe.groupby(['Density']).aggregate(np.nanstd).reset_index()[metric]
 	return z_score	
 
 

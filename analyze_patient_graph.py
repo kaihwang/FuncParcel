@@ -57,12 +57,12 @@ if calculate_z_scores:
 		GlobalData['Q_zscore'] = FuncParcel.cal_graph_z_score(GlobalData, OlderControlGlobalData, 'Q')
 		GlobalData['CC_zscore'] = FuncParcel.cal_graph_z_score(GlobalData, OlderControlGlobalData, 'CC')
 		GlobalData['Group'] = 'Thalamic_patients'
-		NodalData['PC_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, 'PC')
-		NodalData['localE_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, 'localE')
-		NodalData['Between_Module_Weight_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, 'Between_Module_Weight')
-		NodalData['Within_Module_Weight_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, 'Within_Module_Weight')
-		NodalData['Between_Module_Degree_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, 'Between_Module_Degree')
-		NodalData['Within_Module_Degree_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, 'Within_Module_Degree')
+		NodalData['PC_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, True, 'PC')
+		NodalData['localE_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, True,'localE')
+		NodalData['Between_Module_Weight_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, True,'Between_Module_Weight')
+		NodalData['Within_Module_Weight_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, True,'Within_Module_Weight')
+		NodalData['Between_Module_Degree_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, True,'Between_Module_Degree')
+		NodalData['Within_Module_Degree_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, True,'Within_Module_Degree')
 		NodalData['Group'] = 'Thalamic_patients'
 		PatientsGlobalData = PatientsGlobalData.append(GlobalData)
 		PatientsNodalData = PatientsNodalData.append(NodalData)
@@ -73,12 +73,12 @@ if calculate_z_scores:
 		GlobalData['Q_zscore'] = FuncParcel.cal_graph_z_score(GlobalData, OlderControlGlobalData, 'Q')
 		GlobalData['CC_zscore'] = FuncParcel.cal_graph_z_score(GlobalData, OlderControlGlobalData, 'CC')
 		GlobalData['Group'] = 'Striatal_patients'
-		NodalData['PC_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, 'PC')
-		NodalData['localE_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, 'localE')
-		NodalData['Between_Module_Weight_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, 'Between_Module_Weight')
-		NodalData['Within_Module_Weight_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, 'Within_Module_Weight')
-		NodalData['Between_Module_Degree_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, 'Between_Module_Degree')
-		NodalData['Within_Module_Degree_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, 'Within_Module_Degree')
+		NodalData['PC_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, True,'PC')
+		NodalData['localE_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, True,'localE')
+		NodalData['Between_Module_Weight_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, True,'Between_Module_Weight')
+		NodalData['Within_Module_Weight_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, True,'Within_Module_Weight')
+		NodalData['Between_Module_Degree_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, True,'Between_Module_Degree')
+		NodalData['Within_Module_Degree_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, True,'Within_Module_Degree')
 		NodalData['Group'] = 'Striatal_patients'
 		PatientsGlobalData = PatientsGlobalData.append(GlobalData)
 		PatientsNodalData = PatientsNodalData.append(NodalData)
@@ -248,6 +248,7 @@ for p in patients:
 	patient_nontarget = patient_nontarget.astype(int)
 	GraphNodalData['target'].loc[(GraphNodalData['Subject']==p) & (GraphNodalData['ROI'].isin(patient_target))] = True
 	GraphNodalData['non_target'].loc[(GraphNodalData['Subject']==p) & (GraphNodalData['ROI'].isin(patient_nontarget))] = True
+
 GraphNodalData.to_csv('Data/GraphNodalData.csv')
 
 # explore ggplot

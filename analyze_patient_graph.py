@@ -9,10 +9,18 @@ import glob
 import pandas as pd
 import bct
 import os
-#from ggplot import *
-
-# import functions
+import surfer
+from surfer import Brain
+import bct
+import brewer2mpl
 import FuncParcel
+
+# what to do?
+calculate_z_scores = False
+calulate_template_partition = False
+visuazlie_template_partition = False
+visualize_patient_cortical_target = False
+visualize_hubs = False
 
 # vector of cortical ROI index
 Cortical_ROIs = np.loadtxt('Data/Cortical_ROI_index')
@@ -25,7 +33,7 @@ thalamic_patients = ['128', '162', '163', '168', '176']
 striatal_patients = ['b117', 'b122', 'b138', 'b143', 'b153']
 patients = thalamic_patients + striatal_patients
 
-if True:
+if calculate_z_scores:
 	# create control's dataframe
 	OlderControlGlobalData = pd.DataFrame()
 	OlderControlNodalData = pd.DataFrame()
@@ -85,73 +93,162 @@ if True:
 	GraphGlobalData.to_csv('Data/GraphGlobalData.csv')
 	GraphNodalData.to_csv('Data/GraphNodalData.csv')
 
+	# calculate hemispheric difference
+	GraphGlobalData['RightvLeft_Q'] = GraphGlobalData['right_Q'] - GraphGlobalData['left_Q']
+	GraphGlobalData['LeftvRight_Q'] = GraphGlobalData['left_Q'] - GraphGlobalData['right_Q']
+	GraphGlobalData.to_csv('Data/GraphGlobalData.csv')
 
-
-#GraphGlobalData = pd.DataFrame.from_csv('Data/GraphGlobalData.csv')
-
-# calculate hemispheric difference
-GraphGlobalData['RightvLeft_Q'] = GraphGlobalData['right_Q'] - GraphGlobalData['left_Q']
-GraphGlobalData['LeftvRight_Q'] = GraphGlobalData['left_Q'] - GraphGlobalData['right_Q']
-GraphGlobalData.to_csv('Data/GraphGlobalData.csv')
-
-
-# use BrainX to get MGH subjects partition and nodal roles...
-file_path = '/home/despoB/kaihwang/Rest/AdjMatrices/*Ses1_Full_WashU333_corrmat'
-AveMat = FuncParcel.average_corrmat(file_path)
-np.savetxt('Data/CorticalAveMat', AveMat)
 
 # thresholding
 #m = bct.binarize(bct.threshold_proportional(AveMat, .05))
 
 # run partiion across threshold on the MGH's avemat
-MGH_template_partition = pd.DataFrame()
-row_count = 0
-for d in np.unique(GraphNodalData.Density): #extracting density vectors from previosly created density values to avoid floating error....
-	ci, q = bct.modularity_und(bct.binarize(bct.threshold_proportional(AveMat, d)))
-	for roi in np.arange(0, len(ci)):
-		MGH_template_partition.loc[row_count, 'Ci'] = ci[roi]
-		MGH_template_partition.loc[row_count, 'ROI'] = Cortical_ROIs[roi]
-		MGH_template_partition.loc[row_count, 'Density'] = d
-		row_count = row_count +1
-MGH_template_partition.to_csv('Data/MGH_partition.csv')
-
-#run parition on subject data
-Subject_partition = pd.DataFrame()
-row_count = 0
-for d in np.unique(GraphNodalData.Density): #extracting density vectors from previosly created density values to avoid floating error....
-	for s in patients+Control_Subj:
-		fn = '/home/despoB/kaihwang/Rest/AdjMatrices/t%s_Full_WashU333_corrmat' %s
-		Mat = np.loadtxt(fn) 
-		ci, q = bct.modularity_und(bct.binarize(bct.threshold_proportional(Mat, d)))
-		for roi in np.arange(0, len(ci)):
-			Subject_partition.loc[row_count, 'Ci'] = ci[roi]
-			Subject_partition.loc[row_count, 'ROI'] = Cortical_ROIs[roi]
-			Subject_partition.loc[row_count, 'Density'] = d
-			Subject_partition.loc[row_count, 'Subject'] = s
-			row_count = row_count +1
-Subject_partition.to_csv('Data/Subject_partition.csv')
-
-# calculate mutual information
-from sklearn.metrics import normalized_mutual_info_score
-
-NMI_dataframe = pd.DataFrame()
-row_count = 0
-for d in np.unique(GraphNodalData.Density):
-	for s in patients+Control_Subj:
-		tmp_df = Subject_partition[Subject_partition.Density==d][['Subject','ROI','Ci']]
-		subject_ci = tmp_df[tmp_df.Subject==s]['Ci'].values
-		template_ci = MGH_template_partition[MGH_template_partition.Density == d]['Ci'].values
-		NMI_dataframe.loc[row_count,'NMI'] = normalized_mutual_info_score(subject_ci, template_ci)
-		NMI_dataframe.loc[row_count,'Subject'] = s
-		NMI_dataframe.loc[row_count,'Density'] = d
-		row_count = row_count+1
-NMI_dataframe.to_csv('Data/NMI_dataframe.csv')
+# MGH_template_partition = pd.DataFrame()
+# row_count = 0
+# for d in np.unique(GraphNodalData.Density): #extracting density vectors from previosly created density values to avoid floating error....
+# 	ci, q = bct.modularity_und(bct.binarize(bct.threshold_proportional(AveMat, d)))
+# 	for roi in np.arange(0, len(ci)):
+# 		MGH_template_partition.loc[row_count, 'Ci'] = ci[roi]
+# 		MGH_template_partition.loc[row_count, 'ROI'] = Cortical_ROIs[roi]
+# 		MGH_template_partition.loc[row_count, 'Density'] = d
+# 		row_count = row_count +1
+# MGH_template_partition.to_csv('Data/MGH_partition.csv')
 
 
-#nmi = normalized_mutual_info_score(ci, ci)
+# #run parition on subject data
+# Subject_partition = pd.DataFrame()
+# row_count = 0
+# for d in np.unique(GraphNodalData.Density): #extracting density vectors from previosly created density values to avoid floating error....
+# 	for s in patients+Control_Subj:
+# 		fn = '/home/despoB/kaihwang/Rest/AdjMatrices/t%s_Full_WashU333_corrmat' %s
+# 		Mat = np.loadtxt(fn) 
+# 		ci, q = bct.modularity_und(bct.binarize(bct.threshold_proportional(Mat, d)))
+# 		for roi in np.arange(0, len(ci)):
+# 			Subject_partition.loc[row_count, 'Ci'] = ci[roi]
+# 			Subject_partition.loc[row_count, 'ROI'] = Cortical_ROIs[roi]
+# 			Subject_partition.loc[row_count, 'Density'] = d
+# 			Subject_partition.loc[row_count, 'Subject'] = s
+# 			row_count = row_count +1
+# Subject_partition.to_csv('Data/Subject_partition.csv')
+
+# # calculate mutual information
+# from sklearn.metrics import normalized_mutual_info_score
+
+# NMI_dataframe = pd.DataFrame()
+# row_count = 0
+# for d in np.unique(GraphNodalData.Density):
+# 	for s in patients+Control_Subj:
+# 		tmp_df = Subject_partition[Subject_partition.Density==d][['Subject','ROI','Ci']]
+# 		subject_ci = tmp_df[tmp_df.Subject==s]['Ci'].values
+# 		template_ci = MGH_template_partition[MGH_template_partition.Density == d]['Ci'].values
+# 		NMI_dataframe.loc[row_count,'NMI'] = normalized_mutual_info_score(subject_ci, template_ci)
+# 		NMI_dataframe.loc[row_count,'Subject'] = s
+# 		NMI_dataframe.loc[row_count,'Density'] = d
+# 		row_count = row_count+1
+# NMI_dataframe.to_csv('Data/NMI_dataframe.csv')
+
+
+# gent template partion and nodal properties from MGH data
+if calulate_template_partition:
+	AveMat = np.loadtxt('Data/CorticalAveMat')
+
+	template_ci, template_q = bct.modularity_und(bct.binarize(bct.threshold_proportional(AveMat, 0.052))) #threshold at 0.075 cost
+	template_pc = bct.participation_coef(bct.binarize(bct.threshold_proportional(AveMat, 0.052)), template_ci)
+	template_wmd = bct.module_degree_zscore(bct.binarize(bct.threshold_proportional(AveMat, 0.052)), template_ci)
+
+	Cortical_ROI_Coordinate = np.loadtxt('Data/Cortical_ROI_Coordinate')
+	template_nodal_data = pd.DataFrame()
+	template_nodal_data['ROI'] = Cortical_ROIs
+	template_nodal_data['PC'] = template_pc
+	template_nodal_data['WMD'] = template_wmd
+	template_nodal_data['Ci'] = template_ci
+	#template_nodal_data['Coordinate'] = Cortical_ROI_Coordinate
+	template_nodal_data.to_csv('Data/template_nodal_data.csv')
+
+	connector_hubs =  template_nodal_data.ROI[template_nodal_data.PC>0.65].values
+	connector_hubs = connector_hubs.astype(int)
+	np.savetxt('Data/connector_hubs', connector_hubs)
+
+	provincial_hubs =  template_nodal_data.ROI[template_nodal_data.WMD>1.2].values
+	provincial_hubs = provincial_hubs.astype(int)
+	np.savetxt('Data/provincial_hubs', provincial_hubs)
+
+	both_hubs = np.intersect1d(provincial_hubs,connector_hubs)
+	np.savetxt('Data/both_hubs', both_hubs)
+
+
+#try to visulize template graph partition
+if visuazlie_template_partition:
+	subjects_dir = os.environ["SUBJECTS_DIR"]
+	subject_id, surface = 'fsaverage', 'inflated'
+	hemi = 'split'
+	brain = Brain(subject_id, hemi, surface,
+	              config_opts=dict(width=800, height=400, background="white"))
+
+	#bmap = brewer2mpl.get_map('Paired', 'Qualitative', 12)
+	colors = ['#00ffff', '#000000', '#0000ff', '#ff00ff', '#008000', '#808080', '#00ff00', '#800000', '#000080', '#808000', '#800080', '#ff0000', '#c0c0c0', '#008080', '#ffffff', '#ffff00']
+	c_i = 0
+	for i in range(1, int(np.max(template_ci)+1)):
+		coor = Cortical_ROI_Coordinate[template_ci==i]
+		print(coor)
+		if len(coor)>1:
+			brain.add_foci(coor[coor[:,0]<0], map_surface="white", color=colors[c_i], hemi="lh" )
+			brain.add_foci(coor[coor[:,0]>0], map_surface="white", color=colors[c_i], hemi="rh" )
+		c_i = c_i+1
 
 
 
+# visualize hubs
+if visualize_hubs:
+	subjects_dir = os.environ["SUBJECTS_DIR"]
+	subject_id, surface = 'fsaverage', 'inflated'
+	hemi = 'split'
+	brain2 = Brain(subject_id, hemi, surface,
+	              config_opts=dict(width=800, height=400, background="white"))
+	coor = Cortical_ROI_Coordinate[template_nodal_data['ROI'].isin(connector_hubs).values]
+	brain2.add_foci(coor[coor[:,0]<0], map_surface="white", color='red', hemi="lh" )
+	brain2.add_foci(coor[coor[:,0]>0], map_surface="white", color='red', hemi="rh" )
+	coor = Cortical_ROI_Coordinate[template_nodal_data['ROI'].isin(provincial_hubs).values]
+	brain2.add_foci(coor[coor[:,0]<0], map_surface="white", color='blue', hemi="lh" )
+	brain2.add_foci(coor[coor[:,0]>0], map_surface="white", color='blue', hemi="rh" )
+	coor = Cortical_ROI_Coordinate[template_nodal_data['ROI'].isin(both_hubs).values]
+	brain.add_foci(coor[coor[:,0]<0], map_surface="white", color='black', hemi="lh" )
+	brain.add_foci(coor[coor[:,0]>0], map_surface="white", color='black', hemi="rh" )
+
+#visualize patients cortical target
+if visualize_patient_cortical_target:
+	subjects_dir = os.environ["SUBJECTS_DIR"]
+	subject_id, surface = 'fsaverage', 'inflated'
+	hemi = 'split'
+	patient_target = np.loadtxt('Data/128_cortical_target')
+	patient_target = patient_target.astype(int)
+	brain3 = Brain(subject_id, hemi, surface,
+	              config_opts=dict(width=800, height=400, background="white"))
+	coor = Cortical_ROI_Coordinate[template_nodal_data['ROI'].isin(patient_target).values]
+	brain3.add_foci(coor[coor[:,0]<0], map_surface="white", color='red', hemi="lh" )
+	brain3.add_foci(coor[coor[:,0]>0], map_surface="white", color='red', hemi="rh" )
+
+# enter patietn's cortical target nodal data and node type
+GraphNodalData = pd.DataFrame.from_csv('Data/GraphNodalData.csv')
+GraphNodalData['Subject'].astype('string')
+connector_hubs = np.loadtxt('Data/connector_hubs')
+provincial_hubs = np.loadtxt('Data/provincial_hubs')
+GraphNodalData['node_type'] = 'none_hub'
+GraphNodalData['node_type'].loc[GraphNodalData['ROI'].isin(connector_hubs)] = 'connector_hub'
+GraphNodalData['node_type'].loc[GraphNodalData['ROI'].isin(provincial_hubs)] = 'provincial_hub'
+
+GraphNodalData['target'] = False
+GraphNodalData['non_target'] = False
+for p in patients:
+	fn = 'Data/%s_cortical_target' %p 
+	patient_target = np.loadtxt(fn)
+	fn = 'Data/%s_cortical_nontarget' %p
+	patient_nontarget = np.loadtxt(fn) 
+	patient_target = patient_target.astype(int)
+	patient_nontarget = patient_nontarget.astype(int)
+	GraphNodalData['target'].loc[(GraphNodalData['Subject']==s) & (GraphNodalData['ROI'].isin(patient_target))] = True
+	GraphNodalData['non_target'].loc[(GraphNodalData['Subject']==s) & (GraphNodalData['ROI'].isin(patient_nontarget))] = True
+GraphNodalData.to_csv('Data/GraphNodalData.csv')
 # explore ggplot
 #ggplot(aes(x = 'Density', y = 'Q_zscore', color = 'Subject'),data = GraphGlobalData[GraphGlobalData.Group == 'Thalamic_patients']) \
 #+ geom_line() + xlim(0.05, 0.15)

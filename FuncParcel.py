@@ -242,38 +242,38 @@ def convert_matlab_graph_str(graph_path, SubID, Cortical_ROIs):
 	tmp_dict = {}
 
 	tmp = mat_struct['Graph']['Full_CC'][0,0][0,0]
-	tmp_dict['CC'] = tmp.ravel()
+	tmp_dict['CC'] = tmp.ravel('F')
 
 	tmp = mat_struct['Graph']['Within_Module_Weight'][0,0][0,0]
-	tmp_dict['Within_Module_Weight'] = tmp.ravel()
+	tmp_dict['Within_Module_Weight'] = tmp.ravel('F')
 
 	tmp = mat_struct['Graph']['Out_Module_Weight'][0,0][0,0]
-	tmp_dict['Between_Module_Weight'] = tmp.ravel()
+	tmp_dict['Between_Module_Weight'] = tmp.ravel('F')
 
 	tmp = mat_struct['Graph']['Within_Module_Degree'][0,0][0,0]
-	tmp_dict['Within_Module_Degree'] = tmp.ravel()
+	tmp_dict['Within_Module_Degree'] = tmp.ravel('F')
 
 	tmp = mat_struct['Graph']['Out_Module_Degree'][0,0][0,0]
-	tmp_dict['Between_Module_Degree'] = tmp.ravel()
+	tmp_dict['Between_Module_Degree'] = tmp.ravel('F')
 
 	tmp = mat_struct['Graph']['P'][0,0][0,0]
-	tmp_dict['PC'] = tmp.ravel()
+	tmp_dict['PC'] = tmp.ravel('F')
 
 	tmp = mat_struct['Graph']['Full_locE'][0,0][0,0]
-	tmp_dict['localE'] = tmp.ravel()
+	tmp_dict['localE'] = tmp.ravel('F')
 
 	tmp = mat_struct['Graph']['Full_Ci'][0,0][0,0]
-	tmp_dict['Ci'] = tmp.ravel()
+	tmp_dict['Ci'] = tmp.ravel('F')
 
 	tmp_dict['Density'] = np.tile(density_vector,len(Cortical_ROIs))
 	tmp_dict['ROI'] = np.repeat(Cortical_ROIs,len(density_vector))
-	tmp_dict['Subject'] = [SubID] * len(tmp.ravel())
+	tmp_dict['Subject'] = [SubID] * len(tmp.ravel('F'))
 	NodalDataframe = pd.DataFrame(tmp_dict, columns=['Subject', 'ROI', 'Density','CC', 'PC', 'Ci', 'localE', 'Between_Module_Weight','Within_Module_Weight', 'Between_Module_Degree','Within_Module_Degree'])
 
 	return GlobalDataframe, NodalDataframe
 
 
-def cal_graph_z_score(PatientDataframe, ControlDataframe, nodal, metric):
+def cal_graph_z_score(PatientDataframe, ControlDataframe, rois, metric):
 	''' 
 	Function to load pateint's graph metric, convert that metric into z-score (number of stds relative to control subjects).
 
@@ -285,7 +285,7 @@ def cal_graph_z_score(PatientDataframe, ControlDataframe, nodal, metric):
 	ControlDataframe: Dataframe of graph metrics from control subjects. Note should be "ALL" control subjects, can use 'convert_matlab_graph_str' and append
 		results from each subject
 
-	nodal: logic, True if its nodal data
+	rois: np array of list of ROIs, empty if for gobal data
 
 	metric: string of the graph metric you want to convert to z-score
 
@@ -295,10 +295,14 @@ def cal_graph_z_score(PatientDataframe, ControlDataframe, nodal, metric):
 	z_score of the graph metric	
 	'''
 	#GlobalData, NodalData = convert_matlab_graph_str(patient_graph_path, patient_ID, Cortical_ROIs)
-	if nodal:
-		z_score = (PatientDataframe[metric] -ControlDataframe.groupby(['ROI','Density']).aggregate(np.nanmean).reset_index()[metric]) / ControlDataframe.groupby(['ROI','Density']).aggregate(np.nanstd).reset_index()[metric]
-	else:
+	if not rois.any():
 		z_score = (PatientDataframe[metric] -ControlDataframe.groupby(['Density']).aggregate(np.nanmean).reset_index()[metric]) / ControlDataframe.groupby(['Density']).aggregate(np.nanstd).reset_index()[metric]
+	else:
+		#z_score = (PatientDataframe[metric] -ControlDataframe.groupby(['ROI','Density']).aggregate(np.nanmean).reset_index()[metric]) / ControlDataframe.groupby(['ROI','Density']).aggregate(np.nanstd).reset_index()[metric]
+		x = PatientDataframe.loc[PatientDataframe['ROI'].isin(rois)].groupby(['Density']).aggregate(np.nanmean).reset_index()[metric]
+		m = ControlDataframe.loc[ControlDataframe['ROI'].isin(rois)].groupby(['Density']).aggregate(np.nanmean).reset_index()[metric]
+		sd = ControlDataframe.loc[ControlDataframe['ROI'].isin(rois)].groupby(['Density']).aggregate(np.nanstd).reset_index()[metric]
+		z_score = (x-m) / sd
 	return z_score	
 
 

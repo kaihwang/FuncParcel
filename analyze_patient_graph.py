@@ -12,7 +12,7 @@ import os
 import surfer
 from surfer import Brain
 import bct
-import brewer2mpl
+#import brewer2mpl
 import FuncParcel
 
 # what to do?

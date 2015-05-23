@@ -54,8 +54,8 @@ if calculate_z_scores:
 	for p in thalamic_patients:
 		fn = '/home/despoB/kaihwang/Rest/Graph/gsetCI_%s.mat' %p
 		GlobalData, NodalData = FuncParcel.convert_matlab_graph_str(fn, p, Cortical_ROIs)
-		GlobalData['Q_zscore'] = FuncParcel.cal_graph_z_score(GlobalData, False, OlderControlGlobalData, 'Q')
-		GlobalData['CC_zscore'] = FuncParcel.cal_graph_z_score(GlobalData, False, OlderControlGlobalData, 'CC')
+		GlobalData['Q_zscore'] = FuncParcel.cal_graph_z_score(GlobalData, OlderControlGlobalData, False, 'Q')
+		GlobalData['CC_zscore'] = FuncParcel.cal_graph_z_score(GlobalData, OlderControlGlobalData, False, 'CC')
 		GlobalData['Group'] = 'Thalamic_patients'
 		NodalData['PC_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, True, 'PC')
 		NodalData['localE_zscore'] = FuncParcel.cal_graph_z_score(NodalData, OlderControlNodalData, True,'localE')

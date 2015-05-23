@@ -17,15 +17,15 @@ import FuncParcel
 #from ggplot import *
 
 # what to do?
-calculate_z_scores = False
-calulate_template_partition = False
+calculate_z_scores = True
+calulate_template_partition = True
 visuazlie_template_partition = False
 visualize_patient_cortical_target = False
 visualize_hubs = False
 organize_patient_target_nontarget_data = False
-run_template_partition_across_densities = True
-cal_sub_parition_by_densities = True
-cal_NMI = True
+run_template_partition_across_densities = False
+cal_sub_parition_by_densities = False
+cal_NMI = False
 
 # vector of cortical ROI index
 Cortical_ROIs = np.loadtxt('Data/Cortical_ROI_index')
@@ -39,13 +39,15 @@ striatal_patients = ['b117', 'b122', 'b138', 'b143', 'b153']
 patients = thalamic_patients + striatal_patients
 
 
-# gent template partion and nodal properties from MGH data
+# get template partion and nodal properties from MGH data
 if calulate_template_partition:
 	AveMat = np.loadtxt('Data/CorticalAveMat')
 
-	template_ci, template_q = bct.modularity_und(bct.binarize(bct.threshold_proportional(AveMat, 0.052))) #threshold at 0.052 cost
-	template_pc = bct.participation_coef(bct.binarize(bct.threshold_proportional(AveMat, 0.052)), template_ci)
-	template_wmd = bct.module_degree_zscore(bct.binarize(bct.threshold_proportional(AveMat, 0.052)), template_ci)
+	#template_ci, template_q = bct.modularity_und(bct.binarize(bct.threshold_proportional(AveMat, 0.05))) #threshold at 0.05 cost
+	template_ci = np.loadtxt('Data/MGH_CI') #use previously generated CI at .05 cost
+	template_ci = template_ci.astype(int)
+	template_pc = bct.participation_coef(bct.binarize(bct.threshold_proportional(AveMat, 0.05)), template_ci)
+	template_wmd = bct.module_degree_zscore(bct.binarize(bct.threshold_proportional(AveMat, 0.05)), template_ci)
 
 	Cortical_ROI_Coordinate = np.loadtxt('Data/Cortical_ROI_Coordinate')
 	template_nodal_data = pd.DataFrame()
@@ -289,7 +291,7 @@ if cal_NMI:
 	row_count = 0
 	for d in np.unique(GraphNodalData.Density):
 		for s in patients+Control_Subj:
-			tmp_df = Subject_partition[Subject_partition.Density==d][['Subject','ROI','Ci', 'Group']]
+			tmp_df = GraphNodalData[GraphNodalData.Density==d][['Subject','ROI','Ci', 'Group']]
 			subject_ci = tmp_df[tmp_df.Subject==s]['Ci'].values
 			template_ci = MGH_template_partition[MGH_template_partition.Density == d]['Ci'].values
 			subject_ci = subject_ci.astype(int)

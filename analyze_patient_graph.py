@@ -21,6 +21,7 @@ calulate_template_partition = False
 visuazlie_template_partition = False
 visualize_patient_cortical_target = False
 visualize_hubs = False
+organize_patient_target_nontarget_data = False
 
 # vector of cortical ROI index
 Cortical_ROIs = np.loadtxt('Data/Cortical_ROI_index')
@@ -229,31 +230,33 @@ if visualize_patient_cortical_target:
 	brain3.add_foci(coor[coor[:,0]>0], map_surface="white", color='red', hemi="rh" )
 
 # enter patietn's cortical target nodal data and node type
-GraphNodalData = pd.DataFrame.from_csv('Data/GraphNodalData.csv')
-GraphNodalData['Subject'] = GraphNodalData['Subject'].astype('string')
-connector_hubs = np.loadtxt('Data/connector_hubs')
-provincial_hubs = np.loadtxt('Data/provincial_hubs')
-GraphNodalData['node_type'] = 'none_hub'
-GraphNodalData['node_type'].loc[GraphNodalData['ROI'].isin(connector_hubs)] = 'connector_hub'
-GraphNodalData['node_type'].loc[GraphNodalData['ROI'].isin(provincial_hubs)] = 'provincial_hub'
+if organize_patient_target_nontarget_data 
+	GraphNodalData = pd.DataFrame.from_csv('Data/GraphNodalData.csv')
+	GraphNodalData['Subject'] = GraphNodalData['Subject'].astype('string')
+	connector_hubs = np.loadtxt('Data/connector_hubs')
+	provincial_hubs = np.loadtxt('Data/provincial_hubs')
+	GraphNodalData['node_type'] = 'none_hub'
+	GraphNodalData['node_type'].loc[GraphNodalData['ROI'].isin(connector_hubs)] = 'connector_hub'
+	GraphNodalData['node_type'].loc[GraphNodalData['ROI'].isin(provincial_hubs)] = 'provincial_hub'
 
-GraphNodalData['target'] = False
-GraphNodalData['non_target'] = False
-for p in patients:
-	fn = 'Data/%s_cortical_target' %p 
-	patient_target = np.loadtxt(fn)
-	fn = 'Data/%s_cortical_nontarget' %p
-	patient_nontarget = np.loadtxt(fn) 
-	patient_target = patient_target.astype(int)
-	patient_nontarget = patient_nontarget.astype(int)
-	GraphNodalData['target'].loc[(GraphNodalData['Subject']==p) & (GraphNodalData['ROI'].isin(patient_target))] = True
-	GraphNodalData['non_target'].loc[(GraphNodalData['Subject']==p) & (GraphNodalData['ROI'].isin(patient_nontarget))] = True
+	GraphNodalData['target'] = False
+	GraphNodalData['non_target'] = False
+	for p in patients:
+		fn = 'Data/%s_cortical_target' %p 
+		patient_target = np.loadtxt(fn)
+		fn = 'Data/%s_cortical_nontarget' %p
+		patient_nontarget = np.loadtxt(fn) 
+		patient_target = patient_target.astype(int)
+		patient_nontarget = patient_nontarget.astype(int)
+		GraphNodalData['target'].loc[(GraphNodalData['Subject']==p) & (GraphNodalData['ROI'].isin(patient_target))] = True
+		GraphNodalData['non_target'].loc[(GraphNodalData['Subject']==p) & (GraphNodalData['ROI'].isin(patient_nontarget))] = True
 
-GraphNodalData.to_csv('Data/GraphNodalData.csv')
+	GraphNodalData.to_csv('Data/GraphNodalData.csv')
 
-# explore ggplot
-#ggplot(aes(x = 'Density', y = 'Q_zscore', color = 'Subject'),data = GraphGlobalData[GraphGlobalData.Group == 'Thalamic_patients']) \
-#+ geom_line() + xlim(0.05, 0.15)
+# plot patient nodal data
+plotData = GraphNodalData.loc[GraphNodalData['target']==True].groupby(['Subject', 'Density','node_type']).aggregate(np.nanmean).reset_index()
+ggplot(aes(x = 'Density', y = 'Within_Module_Weight_zscore', color = 'Subject'),data = plotData) \
++ geom_line() + xlim(0.05, 0.15) + facet_wrap('node_type')
 
 #cleanup
 #reset_selective GlobalData

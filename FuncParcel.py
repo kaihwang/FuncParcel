@@ -294,7 +294,7 @@ def cal_graph_z_score(PatientDataframe, ControlDataframe, metric):
 	'''
 	#GlobalData, NodalData = convert_matlab_graph_str(patient_graph_path, patient_ID, Cortical_ROIs)
 
-	z_score = (PatientDataframe[metric] -ControlDataframe.groupby(['Density']).aggregate(np.mean).reset_index()[metric]) / ControlDataframe.groupby(['Density']).aggregate(np.std).reset_index()[metric]
+	z_score = (PatientDataframe[metric] -ControlDataframe.groupby(['Density']).aggregate(np.nanmean).reset_index()[metric]) / ControlDataframe.groupby(['Density']).aggregate(np.nanstd).reset_index()[metric]
 	return z_score	
 
 

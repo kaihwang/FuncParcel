@@ -16,7 +16,7 @@ import brewer2mpl
 import FuncParcel
 
 # what to do?
-calculate_z_scores = False
+calculate_z_scores = True
 calulate_template_partition = False
 visuazlie_template_partition = False
 visualize_patient_cortical_target = False
@@ -230,7 +230,7 @@ if visualize_patient_cortical_target:
 
 # enter patietn's cortical target nodal data and node type
 GraphNodalData = pd.DataFrame.from_csv('Data/GraphNodalData.csv')
-GraphNodalData['Subject'].astype('string')
+GraphNodalData['Subject'] = GraphNodalData['Subject'].astype('string')
 connector_hubs = np.loadtxt('Data/connector_hubs')
 provincial_hubs = np.loadtxt('Data/provincial_hubs')
 GraphNodalData['node_type'] = 'none_hub'
@@ -246,9 +246,10 @@ for p in patients:
 	patient_nontarget = np.loadtxt(fn) 
 	patient_target = patient_target.astype(int)
 	patient_nontarget = patient_nontarget.astype(int)
-	GraphNodalData['target'].loc[(GraphNodalData['Subject']==s) & (GraphNodalData['ROI'].isin(patient_target))] = True
-	GraphNodalData['non_target'].loc[(GraphNodalData['Subject']==s) & (GraphNodalData['ROI'].isin(patient_nontarget))] = True
+	GraphNodalData['target'].loc[(GraphNodalData['Subject']==p) & (GraphNodalData['ROI'].isin(patient_target))] = True
+	GraphNodalData['non_target'].loc[(GraphNodalData['Subject']==p) & (GraphNodalData['ROI'].isin(patient_nontarget))] = True
 GraphNodalData.to_csv('Data/GraphNodalData.csv')
+
 # explore ggplot
 #ggplot(aes(x = 'Density', y = 'Q_zscore', color = 'Subject'),data = GraphGlobalData[GraphGlobalData.Group == 'Thalamic_patients']) \
 #+ geom_line() + xlim(0.05, 0.15)

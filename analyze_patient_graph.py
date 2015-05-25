@@ -299,7 +299,7 @@ if cal_NMI:
 			NMI_dataframe.loc[row_count,'NMI'] = normalized_mutual_info_score(subject_ci, template_ci)
 			NMI_dataframe.loc[row_count,'Subject'] = s
 			NMI_dataframe.loc[row_count,'Density'] = d
-			NMI_dataframe.loc[row_count,'Group'] = tmp_df[tmp_df['Subject']==s]['Group].values[0]
+			NMI_dataframe.loc[row_count,'Group'] = tmp_df[tmp_df['Subject']==s]['Group'].values[0]
 			row_count = row_count+1
 	NMI_dataframe.to_csv('Data/NMI_dataframe.csv')
 

@@ -17,9 +17,9 @@ import FuncParcel
 #from ggplot import *
 
 # what to do?
-calculate_z_scores = True
+calculate_z_scores = False
 calulate_template_partition = True
-visuazlie_template_partition = False
+visuazlie_template_partition = True
 visualize_patient_cortical_target = False
 visualize_hubs = False
 organize_patient_target_nontarget_data = False
@@ -43,8 +43,8 @@ patients = thalamic_patients + striatal_patients
 if calulate_template_partition:
 	AveMat = np.loadtxt('Data/CorticalAveMat')
 
-	#template_ci, template_q = bct.modularity_und(bct.binarize(bct.threshold_proportional(AveMat, 0.05))) #threshold at 0.05 cost
-	template_ci = np.loadtxt('Data/MGH_CI') #use previously generated CI at .05 cost
+	template_ci, template_q = bct.modularity_und(bct.binarize(bct.threshold_proportional(AveMat, 0.08))) #threshold at 0.05 cost
+	#template_ci = np.loadtxt('Data/MGH_CI') #use previously generated CI at .05 cost
 	template_ci = template_ci.astype(int)
 	template_pc = bct.participation_coef(bct.binarize(bct.threshold_proportional(AveMat, 0.05)), template_ci)
 	template_wmd = bct.module_degree_zscore(bct.binarize(bct.threshold_proportional(AveMat, 0.05)), template_ci)
@@ -306,6 +306,8 @@ if cal_NMI:
 
 #try to visulize template graph partition
 if visuazlie_template_partition:
+	#template_ci = np.loadtxt('Data/MGH_CI')
+	#Cortical_ROI_Coordinate = np.loadtxt('Data/Cortical_ROI_Coordinate')
 	subjects_dir = os.environ["SUBJECTS_DIR"]
 	subject_id, surface = 'fsaverage', 'inflated'
 	hemi = 'split'

@@ -330,7 +330,7 @@ def convert_partition_to_dict(input_partition):
     return partition_dict
 
 
-    def within_community_degree(weighted_partitions, edgeless = np.nan, catch_edgeless_node=True):
+def within_community_degree(weighted_partition, edgeless = np.nan, catch_edgeless_node=False):
     ''' Computes "within-module degree" (z-score) for each node (Guimera 2007, J Stat Mech)
 
     ------
@@ -378,7 +378,7 @@ def convert_partition_to_dict(input_partition):
             wc_dict[node] = ((float(within_community_degree) - float(mean)) / std) #z_score
     return wc_dict
 
-def participation_coefficient(weighted_partitions, edgeless =np.nan, catch_edgeless_node=True):
+def participation_coefficient(weighted_partitions, edgeless =np.nan, catch_edgeless_node=False):
     '''
     Computes the participation coefficient for each node (Guimera 2007, J Stat Mech)
 
@@ -400,15 +400,15 @@ def participation_coefficient(weighted_partitions, edgeless =np.nan, catch_edgel
         Dictionary of the participation coefficient of each node.
     '''
     pc_dict = {}
-    for node in weighted_partition.graph:
-        node_degree = weighted_partition.node_degree(node)
+    for node in weighted_partitions.graph:
+        node_degree = weighted_partitions.node_degree(node)
         if node_degree == 0.0: 
             if catch_edgeless_node:
                 raise ValueError("Node {} is edgeless".format(node))
             pc_dict[node] = edgeless
             continue    
         pc = 0.0
-        for comm_degree in weighted_partition.node_degree_by_community(node):
+        for comm_degree in weighted_partitions.node_degree_by_community(node):
             try:
                 pc = pc + ((float(comm_degree)/float(node_degree))**2)
             except:
@@ -416,3 +416,19 @@ def participation_coefficient(weighted_partitions, edgeless =np.nan, catch_edgel
         pc = 1-pc
         pc_dict[node] = pc
     return pc_dict
+
+def convert_partition_dict_to_array(d, roi_num):
+	ci = np.zeros(roi_num)
+	for key in d:
+		for i in xrange(len(d[key])):
+			ci[d[key][i]] = key
+
+	return ci
+
+def convert_graph_metric_dict_to_array(d, roi_num):
+	output = np.zeros(roi_num)
+	for key in d:
+		output[key] = d[key]
+
+	return output
+

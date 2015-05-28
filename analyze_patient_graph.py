@@ -2,7 +2,7 @@ from __future__ import division, print_function
 import numpy as np
 import scipy as sp
 import scipy.io as sio
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import pickle
 import csv
 import glob
@@ -12,13 +12,15 @@ import os
 import surfer
 from surfer import Brain
 import bct
-#import brewer2mpl
 import FuncParcel
+from brainx import weighted_modularity
+import networkx as nx
+
 #from ggplot import *
 
 # what to do?
 calculate_z_scores = False
-calulate_template_partition = True
+calulate_template_partition = False
 visuazlie_template_partition = True
 visualize_patient_cortical_target = False
 visualize_hubs = False
@@ -41,15 +43,29 @@ patients = thalamic_patients + striatal_patients
 
 # get template partion and nodal properties from MGH data
 if calulate_template_partition:
-	AveMat = np.loadtxt('Data/CorticalAveMat')
 
-	template_ci, template_q = bct.modularity_und(bct.binarize(bct.threshold_proportional(AveMat, 0.08))) #threshold at 0.05 cost
+	# get partition
+	AveMat = np.loadtxt('Data/CorticalAveMat')
+	#W = bct.binarize(bct.threshold_proportional(AveMat, 0.06))
+	graph = nx.from_numpy_matrix(bct.binarize(bct.threshold_proportional(AveMat, 0.075)))
+	louvain = weighted_modularity.LouvainCommunityDetection(graph)
+	weighted_partitions = louvain.run()
+	weighted_partition = weighted_partitions[0]
+	#
+	template_ci = FuncParcel.convert_partition_dict_to_array(FuncParcel.convert_partition_to_dict(weighted_partition.communities), 297)
+	#template_ci, template_q = bct.modularity_und(bct.binarize(bct.threshold_proportional(AveMat, 0.08))) #threshold at 0.05 cost
 	#template_ci = np.loadtxt('Data/MGH_CI') #use previously generated CI at .05 cost
 	template_ci = template_ci.astype(int)
-	template_pc = bct.participation_coef(bct.binarize(bct.threshold_proportional(AveMat, 0.05)), template_ci)
-	template_wmd = bct.module_degree_zscore(bct.binarize(bct.threshold_proportional(AveMat, 0.05)), template_ci)
-
 	Cortical_ROI_Coordinate = np.loadtxt('Data/Cortical_ROI_Coordinate')
+
+	# get pc and wmd
+	#template_pc = bct.participation_coef(bct.binarize(bct.threshold_proportional(AveMat, 0.05)), template_ci)
+	#template_wmd = bct.module_degree_zscore(bct.binarize(bct.threshold_proportional(AveMat, 0.05)), template_ci)
+	template_pc = FuncParcel.convert_graph_metric_dict_to_array(FuncParcel.participation_coefficient(weighted_partition), 297)
+	template_wmd = FuncParcel.convert_graph_metric_dict_to_array(FuncParcel.within_community_degree(weighted_partition), 297)
+
+	#outputdata
+	
 	template_nodal_data = pd.DataFrame()
 	template_nodal_data['ROI'] = Cortical_ROIs
 	template_nodal_data['PC'] = template_pc
@@ -58,16 +74,17 @@ if calulate_template_partition:
 	#template_nodal_data['Coordinate'] = Cortical_ROI_Coordinate
 	template_nodal_data.to_csv('Data/template_nodal_data.csv')
 
+	#write out hubs
 	connector_hubs =  template_nodal_data.ROI[template_nodal_data.PC>0.65].values
 	connector_hubs = connector_hubs.astype(int)
 	np.savetxt('Data/connector_hubs', connector_hubs)
 
-	provincial_hubs =  template_nodal_data.ROI[template_nodal_data.WMD>1.2].values
+	provincial_hubs =  template_nodal_data.ROI[template_nodal_data.WMD>1.3].values
 	provincial_hubs = provincial_hubs.astype(int)
 	np.savetxt('Data/provincial_hubs', provincial_hubs)
 
 	both_hubs = np.intersect1d(provincial_hubs,connector_hubs)
-	np.savetxt('Data/both_hubs', both_hubs)
+	# np.savetxt('Data/both_hubs', both_hubs)
 
 if calculate_z_scores:
 	# create control's dataframe
@@ -317,7 +334,7 @@ if visuazlie_template_partition:
 	#bmap = brewer2mpl.get_map('Paired', 'Qualitative', 12)
 	colors = ['#00ffff', '#000000', '#0000ff', '#ff00ff', '#008000', '#808080', '#00ff00', '#800000', '#000080', '#808000', '#800080', '#ff0000', '#c0c0c0', '#008080', '#ffffff', '#ffff00']
 	c_i = 0
-	for i in range(1, int(np.max(template_ci)+1)):
+	for i in range(0, int(np.max(template_ci)+1)):
 		coor = Cortical_ROI_Coordinate[template_ci==i]
 		print(coor)
 		if len(coor)>1:

@@ -1,2 +1,2 @@
 # FuncParcel
-Functional parcellation of brain structures mostly based on network modularity
+Functional parcellation of (subcortical) brain structures and followup graph analyses.

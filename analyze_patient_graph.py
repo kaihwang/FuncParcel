@@ -33,7 +33,7 @@ Cortical_ROIs = np.loadtxt('Data/Cortical_ROI_index')
 Cortical_CI = np.loadtxt('Data/Cortical_CI')
 
 # list of subjects
-Control_Subj = ['1103', '1220', '1306', '1223', '1314', '1311', '1318', '1313', '1326', '1325', '1328', '1329', '1333', '1331', '1335', '1338', '1336', '1339', '1337', '1344', '1340']
+Control_Subj = ['1103', '1220', '1306', '1223', '1314', '1311', '1318', '1313', '1326', '1325', '1328', '1329', '1333', '1331', '1335', '1338', '1336', '1339', '1337', '1344']
 #Control_Subj = ['114', '116', '117', '118', '119', '201', '203', '204', '205', '206', '207', '208', '209', '210', '211', '212', '213', '214', '215', '216', '217', '219', '220']
 thalamic_patients = ['128', '162', '163', '168', '176']
 striatal_patients = ['b117', 'b122', 'b138', 'b143', 'b153']
@@ -54,12 +54,12 @@ if calulate_template_partition:
 	template_ci = FuncParcel.convert_partition_dict_to_array(FuncParcel.convert_partition_to_dict(weighted_partition.communities), 297)
 	#template_ci, template_q = bct.modularity_und(bct.binarize(bct.threshold_proportional(AveMat, 0.08))) #threshold at 0.05 cost
 	#template_ci = np.loadtxt('Data/MGH_CI') #use previously generated CI at .05 cost
-	template_ci = template_ci.astype(int)
+	#template_ci = template_ci.astype(int)
 	Cortical_ROI_Coordinate = np.loadtxt('Data/Cortical_ROI_Coordinate')
 
 	# get pc and wmd
-	#template_pc = bct.participation_coef(bct.binarize(bct.threshold_proportional(AveMat, 0.05)), template_ci)
-	#template_wmd = bct.module_degree_zscore(bct.binarize(bct.threshold_proportional(AveMat, 0.05)), template_ci)
+	#template_pc = bct.participation_coef(bct.binarize(bct.threshold_proportional(AveMat, 0.08)), template_ci)
+	#template_wmd = bct.module_degree_zscore(bct.binarize(bct.threshold_proportional(AveMat, 0.08)), template_ci)
 	template_pc = FuncParcel.convert_graph_metric_dict_to_array(FuncParcel.participation_coefficient(weighted_partition), 297)
 	template_wmd = FuncParcel.convert_graph_metric_dict_to_array(FuncParcel.within_community_degree(weighted_partition), 297)
 
@@ -74,11 +74,11 @@ if calulate_template_partition:
 	template_nodal_data.to_csv('Data/template_nodal_data.csv')
 
 	#write out hubs
-	connector_hubs =  template_nodal_data.ROI[template_nodal_data.PC>0.65].values
+	connector_hubs =  template_nodal_data.ROI[template_nodal_data.PC>0.55].values
 	connector_hubs = connector_hubs.astype(int)
 	np.savetxt('Data/connector_hubs', connector_hubs)
 
-	provincial_hubs =  template_nodal_data.ROI[template_nodal_data.WMD>1.3].values
+	provincial_hubs =  template_nodal_data.ROI[template_nodal_data.WMD>1.1].values
 	provincial_hubs = provincial_hubs.astype(int)
 	np.savetxt('Data/provincial_hubs', provincial_hubs)
 
@@ -161,7 +161,7 @@ if calculate_z_scores:
 		patient_nontarget = np.loadtxt(fn) 
 		patient_target = patient_target.astype(int)
 		patient_nontarget = patient_nontarget.astype(int)
-		graph_metrics = ['Between_Module_Weight', 'Within_Module_Weight', 'localE', 'PC', 'WMD']
+		graph_metrics = ['Between_Module_Weight', 'Within_Module_Weight', 'Between_Module_Degree', 'Within_Module_Degree', 'localE', 'PC', 'WMD']
 		patient_zDF= pd.DataFrame()
 
 		#connector_hub 
@@ -177,6 +177,8 @@ if calculate_z_scores:
 				tmp_dict['node_type'] = ['connector_hub'] * 49
 
 			tmpdf = pd.DataFrame(tmp_dict, columns=['Subject', 'Density', 'node_type', \
+				'Target_Between_Module_Degree', 'Target_Within_Module_Degree', \
+				'nonTarget_Between_Module_Degree', 'nonTarget_Within_Module_Degree', \
 				'Target_Between_Module_Weight', 'Target_Within_Module_Weight', 'Target_PC', 'Target_WMD', 'Target_localE',\
 				'nonTarget_Between_Module_Weight', 'nonTarget_Within_Module_Weight', 'nonTarget_PC', 'nonTarget_WMD', 'nonTarget_localE'])
 			patient_zDF = patient_zDF.append(tmpdf)
@@ -194,6 +196,8 @@ if calculate_z_scores:
 				tmp_dict['node_type'] = ['provincial_hub'] * 49
 
 			tmpdf = pd.DataFrame(tmp_dict, columns=['Subject', 'Density', 'node_type', \
+				'Target_Between_Module_Degree', 'Target_Within_Module_Degree', \
+				'nonTarget_Between_Module_Degree', 'nonTarget_Within_Module_Degree', \
 				'Target_Between_Module_Weight', 'Target_Within_Module_Weight', 'Target_PC', 'Target_WMD', 'Target_localE',\
 				'nonTarget_Between_Module_Weight', 'nonTarget_Within_Module_Weight', 'nonTarget_PC', 'nonTarget_WMD', 'nonTarget_localE'])
 			patient_zDF = patient_zDF.append(tmpdf)	
@@ -210,6 +214,8 @@ if calculate_z_scores:
 			tmp_dict['node_type'] = ['non_hub'] * 49
 
 		tmpdf = pd.DataFrame(tmp_dict, columns=['Subject', 'Density', 'node_type', \
+			'Target_Between_Module_Degree', 'Target_Within_Module_Degree', \
+			'nonTarget_Between_Module_Degree', 'nonTarget_Within_Module_Degree', \
 			'Target_Between_Module_Weight', 'Target_Within_Module_Weight', 'Target_PC', 'Target_WMD', 'Target_localE',\
 			'nonTarget_Between_Module_Weight', 'nonTarget_Within_Module_Weight', 'nonTarget_PC', 'nonTarget_WMD', 'nonTarget_localE'])
 		patient_zDF = patient_zDF.append(tmpdf)
@@ -224,6 +230,8 @@ if calculate_z_scores:
 			tmp_dict['node_type'] = ['all'] * 49
 	
 		tmpdf = pd.DataFrame(tmp_dict, columns=['Subject', 'Density', 'node_type', \
+			'Target_Between_Module_Degree', 'Target_Within_Module_Degree', \
+			'nonTarget_Between_Module_Degree', 'nonTarget_Within_Module_Degree', \
 			'Target_Between_Module_Weight', 'Target_Within_Module_Weight', 'Target_PC', 'Target_WMD',  'Target_localE',\
 			'nonTarget_Between_Module_Weight', 'nonTarget_Within_Module_Weight', 'nonTarget_PC', 'nonTarget_WMD',  'nonTarget_localE'])
 		patient_zDF = patient_zDF.append(tmpdf)

@@ -161,7 +161,7 @@ if calculate_z_scores:
 		patient_nontarget = np.loadtxt(fn) 
 		patient_target = patient_target.astype(int)
 		patient_nontarget = patient_nontarget.astype(int)
-		graph_metrics = ['Between_Module_Weight', 'Within_Module_Weight', 'localE', 'PC']
+		graph_metrics = ['Between_Module_Weight', 'Within_Module_Weight', 'localE', 'PC', 'WMD']
 		patient_zDF= pd.DataFrame()
 
 		#connector_hub 
@@ -177,8 +177,8 @@ if calculate_z_scores:
 				tmp_dict['node_type'] = ['connector_hub'] * 49
 
 			tmpdf = pd.DataFrame(tmp_dict, columns=['Subject', 'Density', 'node_type', \
-				'Target_Between_Module_Weight', 'Target_Within_Module_Weight', 'Target_PC', 'Target_localE',\
-				'nonTarget_Between_Module_Weight', 'nonTarget_Within_Module_Weight', 'nonTarget_PC', 'nonTarget_localE'])
+				'Target_Between_Module_Weight', 'Target_Within_Module_Weight', 'Target_PC', 'Target_WMD', 'Target_localE',\
+				'nonTarget_Between_Module_Weight', 'nonTarget_Within_Module_Weight', 'nonTarget_PC', 'nonTarget_WMD', 'nonTarget_localE'])
 			patient_zDF = patient_zDF.append(tmpdf)
 
 		#provincial_hub
@@ -194,8 +194,8 @@ if calculate_z_scores:
 				tmp_dict['node_type'] = ['provincial_hub'] * 49
 
 			tmpdf = pd.DataFrame(tmp_dict, columns=['Subject', 'Density', 'node_type', \
-				'Target_Between_Module_Weight', 'Target_Within_Module_Weight', 'Target_PC', 'Target_localE',\
-				'nonTarget_Between_Module_Weight', 'nonTarget_Within_Module_Weight', 'nonTarget_PC', 'nonTarget_localE'])
+				'Target_Between_Module_Weight', 'Target_Within_Module_Weight', 'Target_PC', 'Target_WMD', 'Target_localE',\
+				'nonTarget_Between_Module_Weight', 'nonTarget_Within_Module_Weight', 'nonTarget_PC', 'nonTarget_WMD', 'nonTarget_localE'])
 			patient_zDF = patient_zDF.append(tmpdf)	
 			
 		#non_hub
@@ -210,8 +210,8 @@ if calculate_z_scores:
 			tmp_dict['node_type'] = ['non_hub'] * 49
 
 		tmpdf = pd.DataFrame(tmp_dict, columns=['Subject', 'Density', 'node_type', \
-			'Target_Between_Module_Weight', 'Target_Within_Module_Weight', 'Target_PC', 'Target_localE',\
-			'nonTarget_Between_Module_Weight', 'nonTarget_Within_Module_Weight', 'nonTarget_PC', 'nonTarget_localE'])
+			'Target_Between_Module_Weight', 'Target_Within_Module_Weight', 'Target_PC', 'Target_WMD', 'Target_localE',\
+			'nonTarget_Between_Module_Weight', 'nonTarget_Within_Module_Weight', 'nonTarget_PC', 'nonTarget_WMD', 'nonTarget_localE'])
 		patient_zDF = patient_zDF.append(tmpdf)
 			
 		#all
@@ -224,8 +224,8 @@ if calculate_z_scores:
 			tmp_dict['node_type'] = ['all'] * 49
 	
 		tmpdf = pd.DataFrame(tmp_dict, columns=['Subject', 'Density', 'node_type', \
-			'Target_Between_Module_Weight', 'Target_Within_Module_Weight', 'Target_PC', 'Target_localE',\
-			'nonTarget_Between_Module_Weight', 'nonTarget_Within_Module_Weight', 'nonTarget_PC', 'nonTarget_localE'])
+			'Target_Between_Module_Weight', 'Target_Within_Module_Weight', 'Target_PC', 'Target_WMD',  'Target_localE',\
+			'nonTarget_Between_Module_Weight', 'nonTarget_Within_Module_Weight', 'nonTarget_PC', 'nonTarget_WMD',  'nonTarget_localE'])
 		patient_zDF = patient_zDF.append(tmpdf)
 		
 		PatientsNodalZscoreData = PatientsNodalZscoreData.append(patient_zDF)

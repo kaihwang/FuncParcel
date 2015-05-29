@@ -259,6 +259,9 @@ def convert_matlab_graph_str(graph_path, SubID, Cortical_ROIs):
 	tmp = mat_struct['Graph']['P'][0,0][0,0]
 	tmp_dict['PC'] = tmp.ravel('F')
 
+	tmp = mat_struct['Graph']['WMD'][0,0][0,0]
+	tmp_dict['WMD'] = tmp.ravel('F')
+
 	tmp = mat_struct['Graph']['Full_locE'][0,0][0,0]
 	tmp_dict['localE'] = tmp.ravel('F')
 
@@ -268,7 +271,7 @@ def convert_matlab_graph_str(graph_path, SubID, Cortical_ROIs):
 	tmp_dict['Density'] = np.tile(density_vector,len(Cortical_ROIs))
 	tmp_dict['ROI'] = np.repeat(Cortical_ROIs,len(density_vector))
 	tmp_dict['Subject'] = [SubID] * len(tmp.ravel('F'))
-	NodalDataframe = pd.DataFrame(tmp_dict, columns=['Subject', 'ROI', 'Density','CC', 'PC', 'Ci', 'localE', 'Between_Module_Weight','Within_Module_Weight', 'Between_Module_Degree','Within_Module_Degree'])
+	NodalDataframe = pd.DataFrame(tmp_dict, columns=['Subject', 'ROI', 'Density','CC', 'PC', 'WMD', 'Ci', 'localE', 'Between_Module_Weight','Within_Module_Weight', 'Between_Module_Degree','Within_Module_Degree'])
 
 	return GlobalDataframe, NodalDataframe
 

@@ -28,9 +28,9 @@ PatientData <- subset(Data, node_type !='all')
 PatientData$row.names <-NULL
 PatientData$X <-NULL
 rm(plotData)
-plotData<-melt(data=PatientData, id.vars=c("Group","Subject","Density", "node_type"), measure.vars = c("Target_Between_Module_Weight", "nonTarget_Between_Module_Weight"))
+plotData<-melt(data=PatientData,value.name = "z_score",variable.name = "Metric", id.vars=c("Group","Subject","Density", "node_type"), measure.vars = c("Target_Within_Module_Weight", "nonTarget_Within_Module_Weight"))
 
-fig_nodal <- ggplot(data=plotData, aes(x=Density, y=value, linetype = variable )) 
-fig_nodal <- fig_nodal + facet_grid(Group ~ node_type)
+fig_nodal <- ggplot(data=plotData, aes(x=Density, y=z_score, linetype = Metric )) 
+fig_nodal <- fig_nodal + facet_grid(node_type ~ Group)
 fig_nodal <- fig_nodal + geom_line(aes(color=Subject), size = 1) + xlim( 0.05, 0.2) 
 plot(fig_nodal)

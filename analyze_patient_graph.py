@@ -19,12 +19,11 @@ import networkx as nx
 #from ggplot import *
 
 # what to do?
-calculate_z_scores = False
+calculate_z_scores = True
 calulate_template_partition = False
-visuazlie_template_partition = True
+visuazlie_template_partition = False
 visualize_patient_cortical_target = False
 visualize_hubs = False
-organize_patient_target_nontarget_data = False
 run_template_partition_across_densities = False
 cal_sub_parition_by_densities = False
 cal_NMI = False
@@ -200,7 +199,7 @@ if calculate_z_scores:
 			patient_zDF = patient_zDF.append(tmpdf)	
 			
 		#non_hub
-		target_selector = np.array(list(set(patient_nontarget) - set(np.intersect1d(patient_nontarget, connector_hubs)) - set(np.intersect1d(patient_nontarget, provincial_hubs))))
+		target_selector = np.array(list(set(patient_target) - set(np.intersect1d(patient_target, connector_hubs)) - set(np.intersect1d(patient_target, provincial_hubs))))
 		nontarget_selector = np.array(list(set(patient_nontarget) - set(np.intersect1d(patient_nontarget, connector_hubs)) - set(np.intersect1d(patient_nontarget, provincial_hubs))))
 		tmp_dict = {}
 		for metric in graph_metrics:

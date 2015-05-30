@@ -22,12 +22,12 @@ import networkx as nx
 calulate_template_partition = False
 identify_patient_cortical_targets = False
 calculate_z_scores = False
-visuazlie_template_partition = False
+visuazlie_template_partition = True
 visualize_patient_cortical_target = False
 visualize_hubs = False
 run_template_partition_across_densities = False
 cal_sub_parition_by_densities = False
-cal_NMI = True
+cal_NMI = False
 
 # vector of cortical ROI index
 Cortical_ROIs = np.loadtxt('Data/Cortical_ROI_index')
@@ -404,13 +404,13 @@ if cal_NMI:
 
 #try to visulize template graph partition
 if visuazlie_template_partition:
-	#template_ci = np.loadtxt('Data/MGH_CI')
-	#Cortical_ROI_Coordinate = np.loadtxt('Data/Cortical_ROI_Coordinate')
+	template_ci = np.loadtxt('Data/MGH_CI')
+	Cortical_ROI_Coordinate = np.loadtxt('Data/Cortical_ROI_Coordinate')
 	subjects_dir = os.environ["SUBJECTS_DIR"]
 	subject_id, surface = 'fsaverage', 'inflated'
 	hemi = 'split'
-	brain = Brain(subject_id, hemi, surface,
-	              config_opts=dict(width=800, height=400, background="white"))
+	brain = Brain(subject_id, hemi, surface, views=['lat', 'med'],
+	              config_opts=dict(background="white"))
 
 	#bmap = brewer2mpl.get_map('Paired', 'Qualitative', 12)
 	colors = ['#00ffff', '#000000', '#0000ff', '#ff00ff', '#008000', '#808080', '#00ff00', '#800000', '#000080', '#808000', '#800080', '#ff0000', '#c0c0c0', '#008080', '#ffffff', '#ffff00']
@@ -422,7 +422,7 @@ if visuazlie_template_partition:
 			brain.add_foci(coor[coor[:,0]<0], map_surface="white", color=colors[c_i], hemi="lh" )
 			brain.add_foci(coor[coor[:,0]>0], map_surface="white", color=colors[c_i], hemi="rh" )
 		c_i = c_i+1
-
+	brain.save_image('test.png')	
 
 
 # visualize hubs

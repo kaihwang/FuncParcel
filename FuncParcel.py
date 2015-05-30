@@ -7,7 +7,9 @@ import pickle
 import csv
 import glob
 import pandas as pd
-
+import networkx as nx
+from brainx import weighted_modularity
+import bct
 
 
 def average_corrmat(file_path):
@@ -437,4 +439,20 @@ def convert_graph_metric_dict_to_array(d, roi_num):
 		output[key] = d[key]
 
 	return output
+
+
+def iterate_modularity_partition(subject):
+	fn = '/home/despoB/kaihwang/Rest/AdjMatrices/t%s_Full_WashU333_corrmat' %subject
+	AveMat = np.loadtxt(fn)
+	graph = nx.from_numpy_matrix(bct.binarize(bct.threshold_proportional(AveMat, 0.05)))
+	q = 0
+	for i in xrange(0,100):
+		print(i)
+		louvain = weighted_modularity.LouvainCommunityDetection(graph)
+		weighted_partitions = louvain.run()
+		if weighted_partitions[0].modularity() > q:
+			q = weighted_partitions[0].modularity()
+			weighted_partition = weighted_partitions[0]
+			ci = convert_partition_dict_to_array(convert_partition_to_dict(weighted_partition.communities), len(AveMat))
+	return ci, q
 

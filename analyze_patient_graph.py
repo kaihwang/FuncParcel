@@ -86,11 +86,11 @@ if calulate_template_partition:
 	#write out hubs
 	connector_hubs =  template_nodal_data.ROI[np.argsort(template_pc)[::-1][0:30]].values
 	connector_hubs = connector_hubs.astype(int)
-	np.savetxt('Data/connector_hubs', connector_hubs)
+	np.savetxt('Data/connector_hubs', connector_hubs, fmt='%3.d')
 
 	provincial_hubs =  template_nodal_data.ROI[np.argsort(template_wmd)[::-1][0:30]].values
 	provincial_hubs = provincial_hubs.astype(int)
-	np.savetxt('Data/provincial_hubs', provincial_hubs)
+	np.savetxt('Data/provincial_hubs', provincial_hubs, fmt='%3.d')
 
 	both_hubs = np.intersect1d(provincial_hubs,connector_hubs)
 	# np.savetxt('Data/both_hubs', both_hubs)

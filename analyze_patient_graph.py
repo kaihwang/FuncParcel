@@ -45,13 +45,20 @@ if calulate_template_partition:
 
 	# get partition
 	AveMat = np.loadtxt('Data/CorticalAveMat')
-	#W = bct.binarize(bct.threshold_proportional(AveMat, 0.06))
-	graph = nx.from_numpy_matrix(bct.binarize(bct.threshold_proportional(AveMat, 0.075)))
-	louvain = weighted_modularity.LouvainCommunityDetection(graph)
-	weighted_partitions = louvain.run()
-	weighted_partition = weighted_partitions[0]
-	#
-	template_ci = FuncParcel.convert_partition_dict_to_array(FuncParcel.convert_partition_to_dict(weighted_partition.communities), 297)
+	#W = bct.binarize(bct.threshold_proportional(AveMat, 0.05))
+	graph = nx.from_numpy_matrix(bct.binarize(bct.threshold_proportional(AveMat, 0.05)))
+
+	template_q = 0
+	for i in xrange(0,100):
+		print(i)
+		louvain = weighted_modularity.LouvainCommunityDetection(graph)
+		weighted_partitions = louvain.run()
+		if weighted_partitions[0].modularity() > template_q:
+			template_q = weighted_partitions[0].modularity()
+			weighted_partition = weighted_partitions[0]
+			template_ci = FuncParcel.convert_partition_dict_to_array(FuncParcel.convert_partition_to_dict(weighted_partition.communities), 297)
+
+	
 	#template_ci, template_q = bct.modularity_und(bct.binarize(bct.threshold_proportional(AveMat, 0.08))) #threshold at 0.05 cost
 	#template_ci = np.loadtxt('Data/MGH_CI') #use previously generated CI at .05 cost
 	#template_ci = template_ci.astype(int)
@@ -62,7 +69,10 @@ if calulate_template_partition:
 	#template_wmd = bct.module_degree_zscore(bct.binarize(bct.threshold_proportional(AveMat, 0.08)), template_ci)
 	template_pc = FuncParcel.convert_graph_metric_dict_to_array(FuncParcel.participation_coefficient(weighted_partition), 297)
 	template_wmd = FuncParcel.convert_graph_metric_dict_to_array(FuncParcel.within_community_degree(weighted_partition), 297)
-
+	template_pc[np.isnan(template_pc)] = np.ma.masked
+	template_wmd[np.isnan(template_wmd)] = np.ma.masked
+	np.savetxt('Data/Cortical_PC', template_pc)
+	np.savetxt('Data/Cortical_WMD', template_wmd)
 	#outputdata
 	
 	template_nodal_data = pd.DataFrame()
@@ -74,11 +84,11 @@ if calulate_template_partition:
 	template_nodal_data.to_csv('Data/template_nodal_data.csv')
 
 	#write out hubs
-	connector_hubs =  template_nodal_data.ROI[template_nodal_data.PC>0.55].values
+	connector_hubs =  template_nodal_data.ROI[np.argsort(template_pc)[::-1][0:30]].values
 	connector_hubs = connector_hubs.astype(int)
 	np.savetxt('Data/connector_hubs', connector_hubs)
 
-	provincial_hubs =  template_nodal_data.ROI[template_nodal_data.WMD>1.1].values
+	provincial_hubs =  template_nodal_data.ROI[np.argsort(template_wmd)[::-1][0:30]].values
 	provincial_hubs = provincial_hubs.astype(int)
 	np.savetxt('Data/provincial_hubs', provincial_hubs)
 
@@ -308,16 +318,16 @@ if cal_sub_parition_by_densities:
 # # calculate mutual information
 if cal_NMI:
 	from sklearn.metrics import normalized_mutual_info_score
-	MGH_template_partition = pd.DataFrame.from_csv('Data/MGH_partition.csv')
+	MGH_template_partition = pd.DataFrame.from_csv('Data/template_nodal_data.csv')
 	GraphNodalData = pd.DataFrame.from_csv('Data/GraphNodalData.csv')
 	GraphNodalData['Subject'] = GraphNodalData['Subject'].astype('string').values
 	NMI_dataframe = pd.DataFrame()
 	row_count = 0
-	for d in np.unique(GraphNodalData.Density):
+	for d in [0.05]:
 		for s in patients+Control_Subj:
 			tmp_df = GraphNodalData[GraphNodalData.Density==d][['Subject','ROI','Ci', 'Group']]
 			subject_ci = tmp_df[tmp_df.Subject==s]['Ci'].values
-			template_ci = MGH_template_partition[MGH_template_partition.Density == d]['Ci'].values
+			template_ci = MGH_template_partition['Ci'].values
 			subject_ci = subject_ci.astype(int)
 			template_ci = template_ci.astype(int)
 			NMI_dataframe.loc[row_count,'NMI'] = normalized_mutual_info_score(subject_ci, template_ci)

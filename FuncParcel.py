@@ -130,7 +130,7 @@ def parcel_subcortical_network(path_to_adjmat, path_to_list_of_subcorticalcortic
 	return Subcorticalcortical_Targets
 
 
-def subcortical_patients_cortical_target(Subcorticalcortical_Targets, Patients):
+def subcortical_patients_cortical_target(Subcorticalcortical_Targets, Patients, numROI):
 	'''
 	function to identify lesioned subcortical voxels' cortical targets and non-targets
 	targets defined as top connected ROI
@@ -145,6 +145,9 @@ def subcortical_patients_cortical_target(Subcorticalcortical_Targets, Patients):
     Patients: vector	
 		example patient vector: Patients = ['b117', 'b122', 'b138', 'b143', 'b153']
 
+	numROI: integer
+		number of ROIs you want to associate with each lesioned voxel.	
+
 	------
 	Return
 	------
@@ -157,7 +160,7 @@ def subcortical_patients_cortical_target(Subcorticalcortical_Targets, Patients):
 	------	
 	Usage 
 	------
-	Patients_Cortical_Targets, Patients_Cortical_non Targets = subcortical_patients_cortical_target(Subcorticalcortical_Targets, Patients)
+	Patients_Cortical_Targets, Patients_Cortical_non Targets = subcortical_patients_cortical_target(Subcorticalcortical_Targets, Patients, 3)
 	
 
 	'''
@@ -167,13 +170,13 @@ def subcortical_patients_cortical_target(Subcorticalcortical_Targets, Patients):
 	Patients_Cortical_NonTargets = {}
 	for sub in Patients:
 	    print(sub)
-	    fn = "/home/despoB/kaihwang/bin/FuncParcel/%s_lesioned_voxels" %sub
+	    fn = "/home/despoB/kaihwang/bin/FuncParcel/Data/%s_lesioned_voxels" %sub # at some point need to update this...
 	    lesioned_vox = np.loadtxt(fn)
 	    Cortical_Targets = np.array([])
 	    Cortical_NonTargets = np.array([])
 	    for vox in lesioned_vox:
-	        Cortical_Targets = np.append(Cortical_Targets,Subcorticalcortical_Targets[str(int(vox))][0])
-	        Cortical_NonTargets = np.append(Cortical_NonTargets,Subcorticalcortical_Targets[str(int(vox))][-1])
+	        Cortical_Targets = np.append(Cortical_Targets,Subcorticalcortical_Targets[str(int(vox))][0:numROI])
+	        Cortical_NonTargets = np.append(Cortical_NonTargets,Subcorticalcortical_Targets[str(int(vox))][::-1][0:numROI])
 
 	    # take out repetitions
 	    Cortical_Targets = np.unique(Cortical_Targets)

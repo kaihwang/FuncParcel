@@ -19,14 +19,15 @@ import networkx as nx
 #from ggplot import *
 
 # what to do?
-calculate_z_scores = True
 calulate_template_partition = False
+identify_patient_cortical_targets = False
+calculate_z_scores = False
 visuazlie_template_partition = False
 visualize_patient_cortical_target = False
 visualize_hubs = False
 run_template_partition_across_densities = False
 cal_sub_parition_by_densities = False
-cal_NMI = False
+cal_NMI = True
 
 # vector of cortical ROI index
 Cortical_ROIs = np.loadtxt('Data/Cortical_ROI_index')
@@ -84,16 +85,61 @@ if calulate_template_partition:
 	template_nodal_data.to_csv('Data/template_nodal_data.csv')
 
 	#write out hubs
-	connector_hubs =  template_nodal_data.ROI[np.argsort(template_pc)[::-1][0:30]].values
+	connector_hubs =  template_nodal_data.ROI[np.argsort(template_pc)[::-1][0:25]].values
 	connector_hubs = connector_hubs.astype(int)
 	np.savetxt('Data/connector_hubs', connector_hubs, fmt='%3.d')
 
-	provincial_hubs =  template_nodal_data.ROI[np.argsort(template_wmd)[::-1][0:30]].values
+	provincial_hubs =  template_nodal_data.ROI[np.argsort(template_wmd)[::-1][0:25]].values
 	provincial_hubs = provincial_hubs.astype(int)
 	np.savetxt('Data/provincial_hubs', provincial_hubs, fmt='%3.d')
 
 	both_hubs = np.intersect1d(provincial_hubs,connector_hubs)
 	# np.savetxt('Data/both_hubs', both_hubs)
+
+if identify_patient_cortical_targets:
+
+
+	#striatal patients
+	#file_path = '/home/despoB/kaihwang/Rest/AdjMatrices/*Ses1_FIX_striatalcortical_corrmat'
+	#AdjMat = FuncParcel.average_corrmat(file_path)
+	#np.savetxt('/home/despoB/kaihwang/Rest/Striatum_parcel/StriatalCorticalAveMat', AdjMat)
+
+	path_to_adjmat = '/home/despoB/kaihwang/Rest/Striatum_parcel/StriatalCorticalAveMat'
+	path_to_list_of_subcorticalcortical_ROIs = '/home/despoB/kaihwang/bin/FuncParcel/Data/Striatalcortical_ROIs_index'
+	path_to_list_of_subcortical_voxels = '/home/despoB/kaihwang/bin/FuncParcel/Data/striatal_voxel_index'
+	path_to_list_of_cortical_ROIs = '/home/despoB/kaihwang/bin/FuncParcel/Data/Cortical_ROI_index'
+	
+	Subcorticalcortical_Targets = FuncParcel.parcel_subcortical_network(path_to_adjmat, path_to_list_of_subcorticalcortical_ROIs, path_to_list_of_subcortical_voxels, path_to_list_of_cortical_ROIs)
+	Striatal_Patients_Cortical_Targets, Striatal_Patients_Cortical_NonTargets = FuncParcel.subcortical_patients_cortical_target(Subcorticalcortical_Targets, striatal_patients, 1)
+
+
+	#thalamic patients
+	#file_path = '/home/despoB/kaihwang/Rest/AdjMatrices/*Ses1_FIX_thalamocortical_corrmat'
+	#AdjMat = FuncParcel.average_corrmat(file_path)
+	#np.savetxt('/home/despoB/kaihwang/Rest/Thalamic_parcel/ThalamoCorticalAveMat', AdjMat)
+
+	path_to_adjmat = '/home/despoB/kaihwang/Rest/Thalamic_parcel/ThalamoCorticalAveMat'
+	path_to_list_of_subcorticalcortical_ROIs = '/home/despoB/kaihwang/bin/FuncParcel/Data/Thalamocortical_ROIs_index'
+	path_to_list_of_subcortical_voxels = '/home/despoB/kaihwang/bin/FuncParcel/Data/Thalamic_voxel_index'
+	path_to_list_of_cortical_ROIs = '/home/despoB/kaihwang/bin/FuncParcel/Data/Cortical_ROI_index'
+	
+	Subcorticalcortical_Targets = FuncParcel.parcel_subcortical_network(path_to_adjmat, path_to_list_of_subcorticalcortical_ROIs, path_to_list_of_subcortical_voxels, path_to_list_of_cortical_ROIs)
+	Thalamic_Patients_Cortical_Targets, Thalamic_Patients_Cortical_NonTargets = FuncParcel.subcortical_patients_cortical_target(Subcorticalcortical_Targets, thalamic_patients, 1)
+
+	#combine dictionaries
+	Patients_Cortical_Targets = Thalamic_Patients_Cortical_Targets.copy()
+	Patients_Cortical_Targets.update(Striatal_Patients_Cortical_Targets)
+	Patients_Cortical_NonTargets = Thalamic_Patients_Cortical_NonTargets.copy()
+	Patients_Cortical_NonTargets.update(Striatal_Patients_Cortical_NonTargets)
+
+	#save dict
+	output = open('Data/Patients_Cortical_Targets.pkl', 'wb')
+	pickle.dump(Patients_Cortical_Targets, output)
+	output.close()
+
+	output = open('Data/Patients_Cortical_NonTargets.pkl', 'wb')
+	pickle.dump(Patients_Cortical_NonTargets, output)
+	output.close()
 
 if calculate_z_scores:
 	# create control's dataframe
@@ -151,11 +197,21 @@ if calculate_z_scores:
 
 	PatientsNodalData['target'] = False
 	PatientsNodalData['non_target'] = False
+
+	#load pickle saving target and nontarget
+	pkl_file = open('Data/Patients_Cortical_Targets.pkl', 'rb')
+	Patients_Cortical_Targets = pickle.load(pkl_file)
+	pkl_file.close()
+
+	pkl_file = open('Data/Patients_Cortical_NonTargets.pkl', 'rb')
+	Patients_Cortical_NonTargets = pickle.load(pkl_file)
+	pkl_file.close()
+
 	for p in patients:
-		fn = 'Data/%s_cortical_target' %p 
-		patient_target = np.loadtxt(fn)
-		fn = 'Data/%s_cortical_nontarget' %p
-		patient_nontarget = np.loadtxt(fn) 
+		#fn = 'Data/%s_cortical_target' %p 
+		patient_target = Patients_Cortical_Targets[p]  #np.loadtxt(fn)
+		#fn = 'Data/%s_cortical_nontarget' %p
+		patient_nontarget = Patients_Cortical_NonTargets[p] #np.loadtxt(fn) 
 		patient_target = patient_target.astype(int)
 		patient_nontarget = patient_nontarget.astype(int)
 		PatientsNodalData['target'].loc[(PatientsNodalData['Subject']==p) & (PatientsNodalData['ROI'].isin(patient_target))] = True
@@ -165,10 +221,10 @@ if calculate_z_scores:
 	#convert nodal graph metrics into z_score
 	PatientsNodalZscoreData = pd.DataFrame()
 	for p in patients:
-		fn = 'Data/%s_cortical_target' %p 
-		patient_target = np.loadtxt(fn)
-		fn = 'Data/%s_cortical_nontarget' %p
-		patient_nontarget = np.loadtxt(fn) 
+		#fn = 'Data/%s_cortical_target' %p 
+		patient_target = Patients_Cortical_Targets[p] 
+		#fn = 'Data/%s_cortical_nontarget' %p
+		patient_nontarget = Patients_Cortical_NonTargets[p]
 		patient_target = patient_target.astype(int)
 		patient_nontarget = patient_nontarget.astype(int)
 		graph_metrics = ['Between_Module_Weight', 'Within_Module_Weight', 'Between_Module_Degree', 'Within_Module_Degree', 'localE', 'PC', 'WMD']
@@ -216,19 +272,20 @@ if calculate_z_scores:
 		target_selector = np.array(list(set(patient_target) - set(np.intersect1d(patient_target, connector_hubs)) - set(np.intersect1d(patient_target, provincial_hubs))))
 		nontarget_selector = np.array(list(set(patient_nontarget) - set(np.intersect1d(patient_nontarget, connector_hubs)) - set(np.intersect1d(patient_nontarget, provincial_hubs))))
 		tmp_dict = {}
-		for metric in graph_metrics:
-			tmp_dict['Target_' + metric] = FuncParcel.cal_graph_z_score(PatientsNodalData[PatientsNodalData['Subject']==p], OlderControlNodalData, target_selector , metric)
-			tmp_dict['nonTarget_' + metric] = FuncParcel.cal_graph_z_score(PatientsNodalData[PatientsNodalData['Subject']==p], OlderControlNodalData, nontarget_selector, metric)
-			tmp_dict['Density'] = np.linspace(0.01, 0.25, num = 49)
-			tmp_dict['Subject'] = [p] * 49
-			tmp_dict['node_type'] = ['non_hub'] * 49
+		if target_selector.any() & nontarget_selector.any():
+			for metric in graph_metrics:
+				tmp_dict['Target_' + metric] = FuncParcel.cal_graph_z_score(PatientsNodalData[PatientsNodalData['Subject']==p], OlderControlNodalData, target_selector , metric)
+				tmp_dict['nonTarget_' + metric] = FuncParcel.cal_graph_z_score(PatientsNodalData[PatientsNodalData['Subject']==p], OlderControlNodalData, nontarget_selector, metric)
+				tmp_dict['Density'] = np.linspace(0.01, 0.25, num = 49)
+				tmp_dict['Subject'] = [p] * 49
+				tmp_dict['node_type'] = ['non_hub'] * 49
 
-		tmpdf = pd.DataFrame(tmp_dict, columns=['Subject', 'Density', 'node_type', \
-			'Target_Between_Module_Degree', 'Target_Within_Module_Degree', \
-			'nonTarget_Between_Module_Degree', 'nonTarget_Within_Module_Degree', \
-			'Target_Between_Module_Weight', 'Target_Within_Module_Weight', 'Target_PC', 'Target_WMD', 'Target_localE',\
-			'nonTarget_Between_Module_Weight', 'nonTarget_Within_Module_Weight', 'nonTarget_PC', 'nonTarget_WMD', 'nonTarget_localE'])
-		patient_zDF = patient_zDF.append(tmpdf)
+			tmpdf = pd.DataFrame(tmp_dict, columns=['Subject', 'Density', 'node_type', \
+				'Target_Between_Module_Degree', 'Target_Within_Module_Degree', \
+				'nonTarget_Between_Module_Degree', 'nonTarget_Within_Module_Degree', \
+				'Target_Between_Module_Weight', 'Target_Within_Module_Weight', 'Target_PC', 'Target_WMD', 'Target_localE',\
+				'nonTarget_Between_Module_Weight', 'nonTarget_Within_Module_Weight', 'nonTarget_PC', 'nonTarget_WMD', 'nonTarget_localE'])
+			patient_zDF = patient_zDF.append(tmpdf)
 			
 		#all
 		tmp_dict = {}
@@ -318,7 +375,7 @@ if cal_sub_parition_by_densities:
 # # calculate mutual information
 if cal_NMI:
 	from sklearn.metrics import normalized_mutual_info_score
-	MGH_template_partition = pd.DataFrame.from_csv('Data/template_nodal_data.csv')
+	#MGH_template_partition = pd.DataFrame.from_csv('Data/template_nodal_data.csv')
 	GraphNodalData = pd.DataFrame.from_csv('Data/GraphNodalData.csv')
 	GraphNodalData['Subject'] = GraphNodalData['Subject'].astype('string').values
 	NMI_dataframe = pd.DataFrame()
@@ -327,9 +384,16 @@ if cal_NMI:
 		for s in patients+Control_Subj:
 			tmp_df = GraphNodalData[GraphNodalData.Density==d][['Subject','ROI','Ci', 'Group']]
 			subject_ci = tmp_df[tmp_df.Subject==s]['Ci'].values
-			template_ci = MGH_template_partition['Ci'].values
+			template_ci = np.loadtxt('Data/MGH_CI') #MGH_template_partition['Ci'].values
 			subject_ci = subject_ci.astype(int)
 			template_ci = template_ci.astype(int)
+
+			#take out single partitions
+			for i in np.unique(subject_ci):
+				if np.count_nonzero(subject_ci==i) ==1:
+					subject_ci[subject_ci==i] = np.ma.masked
+
+
 			NMI_dataframe.loc[row_count,'NMI'] = normalized_mutual_info_score(subject_ci, template_ci)
 			NMI_dataframe.loc[row_count,'Subject'] = s
 			NMI_dataframe.loc[row_count,'Density'] = d

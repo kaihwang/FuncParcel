@@ -6,7 +6,6 @@ import glob
 import pandas as pd
 import bct
 import os
-import surfer
 from surfer import Brain
 import bct
 import FuncParcel

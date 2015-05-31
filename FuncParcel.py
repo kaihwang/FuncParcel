@@ -1,10 +1,7 @@
 from __future__ import division, print_function
 import numpy as np
-import scipy as sp
 import scipy.io as sio
 #import matplotlib.pyplot as plt
-import pickle
-import csv
 import glob
 import pandas as pd
 import networkx as nx
@@ -43,7 +40,11 @@ def average_corrmat(file_path):
 	return AdjMat
 
 
-def parcel_subcortical_network(path_to_adjmat, path_to_list_of_subcorticalcortical_ROIs, path_to_list_of_subcortical_voxels, path_to_list_of_cortical_ROIs):
+def parcel_subcortical_network(path_to_adjmat = '/home/despoB/kaihwang/Rest/Thalamic_parcel/ThalamoCorticalAveMat', \
+	path_to_list_of_subcorticalcortical_ROIs = '/home/despoB/kaihwang/bin/FuncParcel/Data/Thalamocortical_ROIs_index', \
+	path_to_list_of_subcortical_voxels = '/home/despoB/kaihwang/bin/FuncParcel/Data/Thalamic_voxel_index', \
+	path_to_list_of_cortical_ROIs ='/home/despoB/kaihwang/bin/FuncParcel/Data/Cortical_ROI_index', \
+	Cortical_CI = '/home/despoB/kaihwang/bin/FuncParcel/Data/MGH_CI'):
 	'''#Here try to do subcortical parcellation in python
 	The process works like this. 
 	* You will need a set of ROI that consists of: (1) the cortex, (2) a subcortical mask that you wish to parcellate based 
@@ -68,19 +69,22 @@ def parcel_subcortical_network(path_to_adjmat, path_to_list_of_subcorticalcortic
     path_to_adjmat:
 		path_to_adjmat = '/home/despoB/kaihwang/Rest/Striatum_parcel/StriatalCorticalAveMat'
 	path_to_list_of_subcorticalcortical_ROIs:
-		path_to_list_of_subcorticalcortical_ROIs = '/home/despoB/kaihwang/bin/FuncParcel/Striatalcortical_ROIs_index'
+		path_to_list_of_subcorticalcortical_ROIs = '/home/despoB/kaihwang/bin/FuncParcel/Data/Striatalcortical_ROIs_index'
 	path_to_list_of_subcortical_voxels:	
-		path_to_list_of_subcortical_voxels = '/home/despoB/kaihwang/bin/FuncParcel/striatal_voxel_index'
+		path_to_list_of_subcortical_voxels = '/home/despoB/kaihwang/bin/FuncParcel/Data/striatal_voxel_index'
 	path_to_list_of_cortical_ROIs:
-		path_to_list_of_cortical_ROIs = '/home/despoB/kaihwang/bin/FuncParcel/Cortical_ROI_index'
-
+		path_to_list_of_cortical_ROIs = '/home/despoB/kaihwang/bin/FuncParcel/Data/Cortical_ROI_index'
+	Cortical_CI:  path to where a list of cortical ROI parittion is saved	
+		Cortical_CI = '/home/despoB/kaihwang/bin/FuncParcel/Data/MGH_CI'
     ------
     Return
     ------
     Subcorticalcortical_Targets: dict
     	function will return a dictionary "Subcorticalcortical_Targets". Where the key is the subcortical voxel index, and 
     	values are cortical ROIs ranked by strength of conenction with the subcortical voxel
-
+    Subcortical_ParcelCI: 
+    	 key is the subcortical voxel index, and values are arrays of cortical paritions ranked by strength of conenction with 
+    	 the subcortical voxel
     ------
     Example usage
     ------
@@ -122,14 +126,15 @@ def parcel_subcortical_network(path_to_adjmat, path_to_list_of_subcorticalcortic
 	# Then for each Subcortical voxel rank the cortical ROIs based on its Subcorticalcortical connectivity strength. 
 	#initialize output as dictionary. 
 	Subcorticalcortical_Targets = {}
+	Subcortical_ParcelCI = {}
 	for i_Subcortical in Subcortical_indices:
 	    r_vec = AdjMat[i_Subcortical,Cortical_indices] #extract r values bewteen a given Subcortical voxel and cortical ROIs
 	    index = np.argsort(r_vec) # sort r values, save index       
 	    index = index[::-1] # reverse index (highest to lowest r values)
 	    # rank the cortical ROI number by highest to lowerst r value, then save to a dictionary where the voxel number is the key 
-	    Subcorticalcortical_Targets[str(int(Subcorticalcortical_ROIs[i_Subcortical]))] = Cortical_ROIs[index]
-
-	return Subcorticalcortical_Targets
+	    Subcorticalcortical_Targets[(int(Subcorticalcortical_ROIs[i_Subcortical])] = Cortical_ROIs[index]
+	    Subcortical_ParcelCI[(int(Subcorticalcortical_ROIs[i_Subcortical])] = Cortical_CI[index]
+	return Subcorticalcortical_Targets, Subcortical_ParcelCI
 
 
 def subcortical_patients_cortical_target(Subcorticalcortical_Targets, Patients, numROI):
@@ -177,8 +182,8 @@ def subcortical_patients_cortical_target(Subcorticalcortical_Targets, Patients, 
 	    Cortical_Targets = np.array([])
 	    Cortical_NonTargets = np.array([])
 	    for vox in lesioned_vox:
-	        Cortical_Targets = np.append(Cortical_Targets,Subcorticalcortical_Targets[str(int(vox))][0:numROI])
-	        Cortical_NonTargets = np.append(Cortical_NonTargets,Subcorticalcortical_Targets[str(int(vox))][::-1][0:numROI])
+	        Cortical_Targets = np.append(Cortical_Targets,Subcorticalcortical_Targets[int(vox)][0:numROI])
+	        Cortical_NonTargets = np.append(Cortical_NonTargets,Subcorticalcortical_Targets[int(vox)][::-1][0:numROI])
 
 	    # take out repetitions
 	    Cortical_Targets = np.unique(Cortical_Targets)
@@ -340,7 +345,7 @@ def convert_partition_to_dict(input_partition):
 
 def within_community_degree(weighted_partition, edgeless = np.nan, catch_edgeless_node=False):
     ''' Computes "within-module degree" (z-score) for each node (Guimera 2007, J Stat Mech)
-
+    Shared by Maxwell Bertolero 
     ------
     Parameters
     ------
@@ -389,6 +394,7 @@ def within_community_degree(weighted_partition, edgeless = np.nan, catch_edgeles
 def participation_coefficient(weighted_partitions, edgeless =np.nan, catch_edgeless_node=False):
     '''
     Computes the participation coefficient for each node (Guimera 2007, J Stat Mech)
+    Shared by Maxwell Bertolero
 
     ------
     Parameters

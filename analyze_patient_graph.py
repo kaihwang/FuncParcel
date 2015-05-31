@@ -36,7 +36,7 @@ Control_Subj = ['1103', '1220', '1306', '1223', '1314', '1311', '1318', '1313', 
 thalamic_patients = ['128', '162', '163', '168', '176']
 striatal_patients = ['b117', 'b122', 'b138', 'b143', 'b153']
 patients = thalamic_patients + striatal_patients
-Group = ['Control'] * len(Control_subj) + ['Thalamic_patients'] * len(thalamic_patients) + ['Striatal_patietns'] * len(Striatal_patietns)
+Group = ['Control'] * len(Control_Subj) + ['Thalamic_patients'] * len(thalamic_patients) + ['Striatal_patietns'] * len(striatal_patients)
 
 # get template partion and nodal properties from MGH data
 if calulate_template_partition:
@@ -371,13 +371,12 @@ if cal_sub_parition_by_densities:
 
 # # calculate mutual information
 If cal_NMI:
-late NMI between input subjects and default normal template
 
 	NMI_dataframe = pd.DataFrame()
 	row_count = 0
-	for s in Subjects:
+	for s in Control_Subj + patients:
 		fn = '/home/despoB/kaihwang/bin/FuncParcel/Data/Subject_Partition/%s_ci' %s
-		subject_ci = np.loadtxt(fn)
+		subject_ci = np.genfromtxt(fn)
 		template_ci = np.loadtxt('Data/MGH_CI') #MGH_template_partition['Ci'].values
 		subject_ci = subject_ci.astype(int)
 		template_ci = template_ci.astype(int)

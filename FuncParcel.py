@@ -441,12 +441,12 @@ def convert_graph_metric_dict_to_array(d, roi_num):
 	return output
 
 
-def iterate_modularity_partition(subject):
+def iterate_modularity_partition(subject, iter):
 	fn = '/home/despoB/kaihwang/Rest/AdjMatrices/t%s_Full_WashU333_corrmat' %subject
 	AveMat = np.loadtxt(fn)
 	graph = nx.from_numpy_matrix(bct.binarize(bct.threshold_proportional(AveMat, 0.05)))
 	q = 0
-	for i in xrange(0,100):
+	for i in xrange(0,iter):
 		print(i)
 		louvain = weighted_modularity.LouvainCommunityDetection(graph)
 		weighted_partitions = louvain.run()

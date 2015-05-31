@@ -1,10 +1,7 @@
 from __future__ import division, print_function
 import numpy as np
-import scipy as sp
 import scipy.io as sio
-#import matplotlib.pyplot as plt
 import pickle
-import csv
 import glob
 import pandas as pd
 import bct
@@ -15,14 +12,14 @@ import bct
 import FuncParcel
 from brainx import weighted_modularity
 import networkx as nx
-
+from sklearn.metrics import normalized_mutual_info_score
 #from ggplot import *
 
 # what to do?
 calulate_template_partition = False
 identify_patient_cortical_targets = False
 calculate_z_scores = False
-visuazlie_template_partition = True
+visuazlie_template_partition = False
 visualize_patient_cortical_target = False
 visualize_hubs = False
 run_template_partition_across_densities = False
@@ -39,7 +36,7 @@ Control_Subj = ['1103', '1220', '1306', '1223', '1314', '1311', '1318', '1313', 
 thalamic_patients = ['128', '162', '163', '168', '176']
 striatal_patients = ['b117', 'b122', 'b138', 'b143', 'b153']
 patients = thalamic_patients + striatal_patients
-
+Group = ['Control'] * len(Control_subj) + ['Thalamic_patients'] * len(thalamic_patients) + ['Striatal_patietns'] * len(Striatal_patietns)
 
 # get template partion and nodal properties from MGH data
 if calulate_template_partition:
@@ -373,33 +370,29 @@ if cal_sub_parition_by_densities:
 	Subject_partition.to_csv('Data/Subject_partition.csv')
 
 # # calculate mutual information
-if cal_NMI:
-	from sklearn.metrics import normalized_mutual_info_score
-	#MGH_template_partition = pd.DataFrame.from_csv('Data/template_nodal_data.csv')
-	GraphNodalData = pd.DataFrame.from_csv('Data/GraphNodalData.csv')
-	GraphNodalData['Subject'] = GraphNodalData['Subject'].astype('string').values
+If cal_NMI:
+late NMI between input subjects and default normal template
+
 	NMI_dataframe = pd.DataFrame()
 	row_count = 0
-	for d in [0.05]:
-		for s in patients+Control_Subj:
-			tmp_df = GraphNodalData[GraphNodalData.Density==d][['Subject','ROI','Ci', 'Group']]
-			subject_ci = tmp_df[tmp_df.Subject==s]['Ci'].values
-			template_ci = np.loadtxt('Data/MGH_CI') #MGH_template_partition['Ci'].values
-			subject_ci = subject_ci.astype(int)
-			template_ci = template_ci.astype(int)
+	for s in Subjects:
+		fn = '/home/despoB/kaihwang/bin/FuncParcel/Data/Subject_Partition/%s_ci' %s
+		subject_ci = np.loadtxt(fn)
+		template_ci = np.loadtxt('Data/MGH_CI') #MGH_template_partition['Ci'].values
+		subject_ci = subject_ci.astype(int)
+		template_ci = template_ci.astype(int)
 
-			#take out single partitions
-			for i in np.unique(subject_ci):
-				if np.count_nonzero(subject_ci==i) ==1:
-					subject_ci[subject_ci==i] = np.ma.masked
+		#take out single partitions
+		for i in np.unique(subject_ci):
+			if np.count_nonzero(subject_ci==i) ==1:
+				subject_ci[subject_ci==i] = np.ma.masked
 
 
-			NMI_dataframe.loc[row_count,'NMI'] = normalized_mutual_info_score(subject_ci, template_ci)
-			NMI_dataframe.loc[row_count,'Subject'] = s
-			NMI_dataframe.loc[row_count,'Density'] = d
-			NMI_dataframe.loc[row_count,'Group'] = tmp_df[tmp_df['Subject']==s]['Group'].values[0]
-			row_count = row_count+1
-	NMI_dataframe.to_csv('Data/NMI_dataframe.csv')
+		NMI_dataframe.loc[row_count,'NMI'] = normalized_mutual_info_score(subject_ci, template_ci)
+		NMI_dataframe.loc[row_count,'Subject'] = s
+		NMI_dataframe.loc[row_count,'Group'] = Group[row_count]
+		row_count = row_count+1
+NMI_dataframe.to_csv('Data/NMI_dataframe.csv')
 
 
 #try to visulize template graph partition

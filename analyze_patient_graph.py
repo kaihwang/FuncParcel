@@ -23,7 +23,7 @@ visualize_patient_cortical_target = False
 visualize_hubs = False
 run_template_partition_across_densities = False
 cal_sub_parition_by_densities = False
-cal_NMI = False
+cal_NMI = True
 
 # vector of cortical ROI index
 Cortical_ROIs = np.loadtxt('Data/Cortical_ROI_index')

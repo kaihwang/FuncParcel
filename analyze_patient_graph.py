@@ -369,7 +369,7 @@ if cal_sub_parition_by_densities:
 	Subject_partition.to_csv('Data/Subject_partition.csv')
 
 # # calculate mutual information
-If cal_NMI:
+if cal_NMI:
 
 	NMI_dataframe = pd.DataFrame()
 	row_count = 0

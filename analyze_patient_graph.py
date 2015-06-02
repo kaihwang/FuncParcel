@@ -7,7 +7,6 @@ import pandas as pd
 import bct
 import os
 from surfer import Brain
-import bct
 import FuncParcel
 from brainx import weighted_modularity
 import networkx as nx
@@ -15,21 +14,24 @@ from sklearn.metrics import normalized_mutual_info_score
 #from ggplot import *
 
 # what to do?
-calulate_template_partition = False
+calulate_template_partition = False	
 identify_patient_cortical_targets = False
-calculate_z_scores = False
+calculate_z_scores = True
 visuazlie_template_partition = False
 visualize_patient_cortical_target = False
 visualize_hubs = False
 run_template_partition_across_densities = False
 cal_sub_parition_by_densities = False
-cal_NMI = True
+cal_NMI = False
 
 # vector of cortical ROI index
 Cortical_ROIs = np.loadtxt('Data/Cortical_ROI_index')
 Cortical_CI = np.loadtxt('Data/Cortical_CI')
 
 # list of subjects
+#filename = '/home/despoB/connectome-thalamus/MGH/usable_sub'
+#Control_Subj = [line.rstrip('\n') for line in open(filename)]
+#Control_Subj.remove('Sub0094_Ses1')
 Control_Subj = ['1103', '1220', '1306', '1223', '1314', '1311', '1318', '1313', '1326', '1325', '1328', '1329', '1333', '1331', '1335', '1338', '1336', '1339', '1337', '1344']
 #Control_Subj = ['114', '116', '117', '118', '119', '201', '203', '204', '205', '206', '207', '208', '209', '210', '211', '212', '213', '214', '215', '216', '217', '219', '220']
 thalamic_patients = ['128', '162', '163', '168', '176']
@@ -43,10 +45,10 @@ if calulate_template_partition:
 	# get partition
 	AveMat = np.loadtxt('Data/CorticalAveMat')
 	#W = bct.binarize(bct.threshold_proportional(AveMat, 0.05))
-	graph = nx.from_numpy_matrix(bct.binarize(bct.threshold_proportional(AveMat, 0.05)))
+	graph = nx.from_numpy_matrix(bct.binarize(bct.threshold_proportional(AveMat, 0.075)))
 
 	template_q = 0
-	for i in xrange(0,100):
+	for i in xrange(0,10):
 		print(i)
 		louvain = weighted_modularity.LouvainCommunityDetection(graph)
 		weighted_partitions = louvain.run()
@@ -57,8 +59,9 @@ if calulate_template_partition:
 
 	
 	#template_ci, template_q = bct.modularity_und(bct.binarize(bct.threshold_proportional(AveMat, 0.08))) #threshold at 0.05 cost
-	#template_ci = np.loadtxt('Data/MGH_CI') #use previously generated CI at .05 cost
-	#template_ci = template_ci.astype(int)
+	#template_ci = np.loadtxt('Data/Cortical_CI') #use previously generated CI
+	template_ci = template_ci.astype(int)
+	np.savetxt('Data/MGH_CI', template_ci)
 	Cortical_ROI_Coordinate = np.loadtxt('Data/Cortical_ROI_Coordinate')
 
 	# get pc and wmd
@@ -81,16 +84,17 @@ if calulate_template_partition:
 	template_nodal_data.to_csv('Data/template_nodal_data.csv')
 
 	#write out hubs
-	connector_hubs =  template_nodal_data.ROI[np.argsort(template_pc)[::-1][0:25]].values
+	connector_hubs =  template_nodal_data.ROI[np.argsort(template_pc)[::-1][0:30]].values
 	connector_hubs = connector_hubs.astype(int)
 	np.savetxt('Data/connector_hubs', connector_hubs, fmt='%3.d')
 
-	provincial_hubs =  template_nodal_data.ROI[np.argsort(template_wmd)[::-1][0:25]].values
+	provincial_hubs =  template_nodal_data.ROI[np.argsort(template_wmd)[::-1][0:30]].values
 	provincial_hubs = provincial_hubs.astype(int)
 	np.savetxt('Data/provincial_hubs', provincial_hubs, fmt='%3.d')
 
 	both_hubs = np.intersect1d(provincial_hubs,connector_hubs)
-	# np.savetxt('Data/both_hubs', both_hubs)
+	both_hubs = both_hubs.astype(int)
+	np.savetxt('Data/both_hubs', both_hubs)
 
 if identify_patient_cortical_targets:
 
@@ -390,7 +394,7 @@ if cal_NMI:
 		NMI_dataframe.loc[row_count,'Subject'] = s
 		NMI_dataframe.loc[row_count,'Group'] = Group[row_count]
 		row_count = row_count+1
-NMI_dataframe.to_csv('Data/NMI_dataframe.csv')
+	NMI_dataframe.to_csv('Data/NMI_dataframe.csv')
 
 
 #try to visulize template graph partition

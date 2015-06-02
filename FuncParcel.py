@@ -132,8 +132,8 @@ def parcel_subcortical_network(path_to_adjmat = '/home/despoB/kaihwang/Rest/Thal
 	    index = np.argsort(r_vec) # sort r values, save index       
 	    index = index[::-1] # reverse index (highest to lowest r values)
 	    # rank the cortical ROI number by highest to lowerst r value, then save to a dictionary where the voxel number is the key 
-	    Subcorticalcortical_Targets[(int(Subcorticalcortical_ROIs[i_Subcortical])] = Cortical_ROIs[index]
-	    Subcortical_ParcelCI[(int(Subcorticalcortical_ROIs[i_Subcortical])] = Cortical_CI[index]
+	    Subcorticalcortical_Targets[int(Subcorticalcortical_ROIs[i_Subcortical])] = Cortical_ROIs[index]
+	    Subcortical_ParcelCI[int(Subcorticalcortical_ROIs[i_Subcortical])] = Cortical_CI[index]
 	return Subcorticalcortical_Targets, Subcortical_ParcelCI
 
 

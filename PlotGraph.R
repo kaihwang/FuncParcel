@@ -36,7 +36,7 @@ for (v in Variables_to_plot){
   levels(plotData$Group) <- c("Striatal Patients", "Thalamic Patients")
   fig_nodal <- ggplot(data=plotData, aes(x=Density, y=z_score, linetype = Metric )) + ggtitle(gsub("_"," ",v))
   fig_nodal <- fig_nodal + facet_grid(Group ~ node_type) + scale_colour_manual(name = "Patients", values=c(BlueScale, WarmScale))
-  fig_nodal <- fig_nodal + geom_line(aes(color=Subject), size = 1) + xlim( 0.05, 0.2) + ylim(-2.5, 2.5) + labs(y ="Z Score") + scale_linetype_discrete(name = "", labels = c("Target", "Non-Target"))
+  fig_nodal <- fig_nodal + geom_line(aes(color=Subject), size = 1) + xlim( 0.05, 0.2) + labs(y ="Z Score") + scale_linetype_discrete(name = "", labels = c("Target", "Non-Target"))
 
   plot(fig_nodal)
 }

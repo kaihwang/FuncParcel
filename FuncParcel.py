@@ -40,11 +40,11 @@ def average_corrmat(file_path):
 	return AdjMat
 
 
-def parcel_subcortical_network(path_to_adjmat = '/home/despoB/kaihwang/Rest/Thalamic_parcel/ThalamoCorticalAveMat', \
+def parcel_subcortical_network(path_to_adjmat = '/home/despoB/kaihwang/Rest/bin/FuncParcel/Data/ThalamoCorticalAveMat', \
 	path_to_list_of_subcorticalcortical_ROIs = '/home/despoB/kaihwang/bin/FuncParcel/Data/Thalamocortical_ROIs_index', \
 	path_to_list_of_subcortical_voxels = '/home/despoB/kaihwang/bin/FuncParcel/Data/Thalamic_voxel_index', \
 	path_to_list_of_cortical_ROIs ='/home/despoB/kaihwang/bin/FuncParcel/Data/Cortical_ROI_index', \
-	Cortical_CI = '/home/despoB/kaihwang/bin/FuncParcel/Data/MGH_CI'):
+	path_to_cortical_CI = '/home/despoB/kaihwang/bin/FuncParcel/Data/MGH_CI'):
 	'''#Here try to do subcortical parcellation in python
 	The process works like this. 
 	* You will need a set of ROI that consists of: (1) the cortex, (2) a subcortical mask that you wish to parcellate based 
@@ -105,6 +105,9 @@ def parcel_subcortical_network(path_to_adjmat = '/home/despoB/kaihwang/Rest/Thal
 	Subcortical_voxels = np.loadtxt(path_to_list_of_subcortical_voxels)
 	# load the name vector of the cortical ROIs 
 	Cortical_ROIs = np.loadtxt(path_to_list_of_cortical_ROIs)
+    # load the CI vector
+	Cortical_CI = np.loadtxt(path_to_cortical_CI)
+	Cortical_CI = Cortical_CI.astype(int)
 
 	# Double check the ROI numbers match
 	print(len(Subcorticalcortical_ROIs) == len(Cortical_ROIs) + len(Subcortical_voxels))

@@ -16,10 +16,11 @@ from sklearn.metrics import normalized_mutual_info_score
 # what to do?
 calulate_template_partition = False	
 identify_patient_cortical_targets = False
-calculate_z_scores = True
+calculate_z_scores = False
 visuazlie_template_partition = False
+visuazlie_patient_partition = False
 visualize_patient_cortical_target = False
-visualize_hubs = False
+visualize_hubs = True
 run_template_partition_across_densities = False
 cal_sub_parition_by_densities = False
 cal_NMI = False
@@ -48,7 +49,7 @@ if calulate_template_partition:
 	graph = nx.from_numpy_matrix(bct.binarize(bct.threshold_proportional(AveMat, 0.075)))
 
 	template_q = 0
-	for i in xrange(0,10):
+	for i in xrange(0,20):
 		print(i)
 		louvain = weighted_modularity.LouvainCommunityDetection(graph)
 		weighted_partitions = louvain.run()
@@ -403,21 +404,45 @@ if visuazlie_template_partition:
 	Cortical_ROI_Coordinate = np.loadtxt('Data/Cortical_ROI_Coordinate')
 	subjects_dir = os.environ["SUBJECTS_DIR"]
 	subject_id, surface = 'fsaverage', 'inflated'
-	hemi = 'split'
-	brain = Brain(subject_id, hemi, surface, views=['lat', 'med'],
-	              config_opts=dict(background="white"))
+	hemi = 'rh'
+	brain = Brain(subject_id, hemi, surface, views=['med'], config_opts=dict(background="white"))
 
 	#bmap = brewer2mpl.get_map('Paired', 'Qualitative', 12)
-	colors = ['#00ffff', '#000000', '#0000ff', '#ff00ff', '#008000', '#808080', '#00ff00', '#800000', '#000080', '#808000', '#800080', '#ff0000', '#c0c0c0', '#008080', '#ffffff', '#ffff00']
+	colors = ['blue', 'cyan', 'purple', 'yellow', '#ffc966', 'grey', 'black', 'red']
 	c_i = 0
-	for i in range(0, int(np.max(template_ci)+1)):
+	for i in xrange(0, int(np.max(template_ci)+1)):
 		coor = Cortical_ROI_Coordinate[template_ci==i]
 		print(coor)
-		if len(coor)>1:
-			brain.add_foci(coor[coor[:,0]<0], map_surface="white", color=colors[c_i], hemi="lh" )
+		if len(coor)>3:
+			#brain.add_foci(coor[coor[:,0]<0], map_surface="white", color=colors[c_i], hemi="lh" )
 			brain.add_foci(coor[coor[:,0]>0], map_surface="white", color=colors[c_i], hemi="rh" )
-		c_i = c_i+1
-	brain.save_image('test.png')	
+			c_i = c_i+1
+	brain.save_image('Data/template_parition_med.png')
+	#brain.close()	
+
+#try to visulize patients' graph partition
+if visuazlie_patient_partition:
+	Cortical_ROI_Coordinate = np.loadtxt('Data/Cortical_ROI_Coordinate')
+	subject_id, surface = 'fsaverage', 'inflated'
+	hemi = 'rh'
+	subjects_dir = os.environ["SUBJECTS_DIR"]
+	colors = ['#00ffff', '#000000', '#0000ff', '#ff00ff', '#008000', '#808080', '#00ff00', '#800000', '#000080', '#808000', '#800080', '#ff0000', '#c0c0c0', '#008080', '#ffffff', '#ffff00']
+	for s in ['176']:
+		fn = 'Data/Subject_Partition/%s_ci' %s
+		patient_ci = np.loadtxt(fn)
+		brain = Brain(subject_id, hemi, surface, views=['lat'], config_opts=dict(background="white"))
+		c_i = 0
+		for i in xrange(0, int(np.max(patient_ci)+1)):
+			coor = Cortical_ROI_Coordinate[patient_ci==i]
+			print(coor)
+			if len(coor)>3:
+				#brain.add_foci(coor[coor[:,0]<0], map_surface="white", color=colors[c_i], hemi="lh" )
+				brain.add_foci(coor[coor[:,0]>0], map_surface="white", color=colors[c_i], hemi="rh" )
+				c_i = c_i+1
+		fn = 'Data/Subject_Partition/%s_lat_ci.png' %s		
+		brain.save_image(fn)			
+		#brain.close()		
+			
 
 
 # visualize hubs
@@ -425,17 +450,21 @@ if visualize_hubs:
 	subjects_dir = os.environ["SUBJECTS_DIR"]
 	subject_id, surface = 'fsaverage', 'inflated'
 	hemi = 'split'
-	brain2 = Brain(subject_id, hemi, surface,
-	              config_opts=dict(width=800, height=400, background="white"))
-	coor = Cortical_ROI_Coordinate[template_nodal_data['ROI'].isin(connector_hubs).values]
-	brain2.add_foci(coor[coor[:,0]<0], map_surface="white", color='red', hemi="lh" )
-	brain2.add_foci(coor[coor[:,0]>0], map_surface="white", color='red', hemi="rh" )
-	coor = Cortical_ROI_Coordinate[template_nodal_data['ROI'].isin(provincial_hubs).values]
-	brain2.add_foci(coor[coor[:,0]<0], map_surface="white", color='blue', hemi="lh" )
-	brain2.add_foci(coor[coor[:,0]>0], map_surface="white", color='blue', hemi="rh" )
-	coor = Cortical_ROI_Coordinate[template_nodal_data['ROI'].isin(both_hubs).values]
-	brain.add_foci(coor[coor[:,0]<0], map_surface="white", color='black', hemi="lh" )
-	brain.add_foci(coor[coor[:,0]>0], map_surface="white", color='black', hemi="rh" )
+	Cortical_ROI_Coordinate = np.loadtxt('Data/Cortical_ROI_Coordinate')
+	connector_hubs = np.loadtxt('Data/connector_hubs')
+	provincial_hubs = np.loadtxt('Data/provincial_hubs')
+	both_hubs = np.loadtxt('Data/both_hubs')
+	brain2 = Brain(subject_id, hemi, surface, views=['lat', 'med'], config_opts=dict(background="white"))
+	coor = Cortical_ROI_Coordinate[np.in1d(Cortical_ROIs,connector_hubs)]
+	brain2.add_foci(coor[coor[:,0]<0], scale_factor=2,  map_surface="white", color='red', hemi="lh" )
+	brain2.add_foci(coor[coor[:,0]>0], scale_factor=2,map_surface="white", color='red', hemi="rh" )
+	coor = Cortical_ROI_Coordinate[np.in1d(Cortical_ROIs,provincial_hubs)]
+	brain2.add_foci(coor[coor[:,0]<0], scale_factor=2,map_surface="white", color='blue', hemi="lh" )
+	brain2.add_foci(coor[coor[:,0]>0], scale_factor=2,map_surface="white", color='blue', hemi="rh" )
+	coor = Cortical_ROI_Coordinate[np.in1d(Cortical_ROIs,both_hubs)]
+	brain2.add_foci(coor[coor[:,0]<0], scale_factor=2,map_surface="white", color='black', hemi="lh" )
+	brain2.add_foci(coor[coor[:,0]>0], scale_factor=2,map_surface="white", color='black', hemi="rh" )
+	brain2.save_image('hubs.png')	
 
 #visualize patients cortical target
 if visualize_patient_cortical_target:

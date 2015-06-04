@@ -107,10 +107,10 @@ def parcel_subcortical_network(path_to_adjmat = '/home/despoB/kaihwang/Rest/bin/
 	Cortical_ROIs = np.loadtxt(path_to_list_of_cortical_ROIs)
     # load the CI vector
 	Cortical_CI = np.loadtxt(path_to_cortical_CI)
-	Cortical_CI = Cortical_CI.astype(int)
-
+	Cortical_CI = Cortical_CI.astype(int) # for some reason using dtype = int doesn't work...
+	
 	# Double check the ROI numbers match
-	print(len(Subcorticalcortical_ROIs) == len(Cortical_ROIs) + len(Subcortical_voxels))
+	assert len(Subcorticalcortical_ROIs) == len(Cortical_ROIs) + len(Subcortical_voxels)
 
 	# Each ROI and Subcortical voxel has a unique integer. So we need to extract the matrix indeces of those numbers.
 	#create cortical ROI index
@@ -181,7 +181,7 @@ def subcortical_patients_cortical_target(Subcorticalcortical_Targets, Patients, 
 	for sub in Patients:
 	    print(sub)
 	    fn = "/home/despoB/kaihwang/bin/FuncParcel/Data/%s_lesioned_voxels" %sub # at some point need to update this...
-	    lesioned_vox = np.loadtxt(fn)
+	    lesioned_vox = np.loadtxt(fn, dtype = int)
 	    Cortical_Targets = np.array([])
 	    Cortical_NonTargets = np.array([])
 	    for vox in lesioned_vox:
@@ -348,7 +348,7 @@ def convert_partition_to_dict(input_partition):
 
 def within_community_degree(weighted_partition, edgeless = np.nan, catch_edgeless_node=False):
     ''' Computes "within-module degree" (z-score) for each node (Guimera 2007, J Stat Mech)
-    Shared by Maxwell Bertolero 
+    Authored and shared by Maxwell Bertolero 
     ------
     Parameters
     ------
@@ -397,7 +397,7 @@ def within_community_degree(weighted_partition, edgeless = np.nan, catch_edgeles
 def participation_coefficient(weighted_partitions, edgeless =np.nan, catch_edgeless_node=False):
     '''
     Computes the participation coefficient for each node (Guimera 2007, J Stat Mech)
-    Shared by Maxwell Bertolero
+    Authored and shared by Maxwell Bertolero
 
     ------
     Parameters
@@ -435,6 +435,20 @@ def participation_coefficient(weighted_partitions, edgeless =np.nan, catch_edgel
     return pc_dict
 
 def convert_partition_dict_to_array(d, roi_num):
+	''' To convert brainx's network partition dictionary into an array
+	usage: ci = convert_partition_dict_to_array(d, roi_num)
+
+	----
+	Parameters
+	----
+	d: Dictionary of module partitions from brainx
+	roi_num: int number indicating number of rois
+
+	----
+	Returns
+	----
+	ci : vector of community partition assignments for each ROI. 
+	'''
 	ci = np.zeros(roi_num)
 	for key in d:
 		for i in xrange(len(d[key])):
@@ -443,6 +457,21 @@ def convert_partition_dict_to_array(d, roi_num):
 	return ci
 
 def convert_graph_metric_dict_to_array(d, roi_num):
+	''' To convert brainx's network graph metric dictionary into an array
+	usage: output = convert_graph_metric_dict_to_array(d, roi_num)
+
+	----
+	Parameters
+	----
+	d: Dictionary of graph metrics from brainx
+	roi_num: int number indicating number of rois
+
+	----
+	Returns
+	----
+	result : array
+	'''
+
 	output = np.zeros(roi_num)
 	for key in d:
 		output[key] = d[key]
@@ -451,6 +480,22 @@ def convert_graph_metric_dict_to_array(d, roi_num):
 
 
 def iterate_modularity_partition(subject, iter):
+	''' Function to run iterations of Louvain modularity detection, return the one with the highest modularity (Q)
+	usage: ci, q = iterate_modularity_partition(subject, iter)
+
+	----
+	Parameters
+	----
+	subject: subject number, will look for its correlation corrmat file with a hard coded path... (should prob change that)
+	iter: int number indicating number of iterations
+
+	----
+	Returns
+	----
+	ci : community partition
+	q  : modularity
+	'''
+
 	fn = '/home/despoB/kaihwang/Rest/AdjMatrices/t%s_Full_WashU333_corrmat' %subject
 	AveMat = np.loadtxt(fn)
 	graph = nx.from_numpy_matrix(bct.binarize(bct.threshold_proportional(AveMat, 0.05)))

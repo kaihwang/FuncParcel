@@ -16,11 +16,11 @@ from sklearn.metrics import normalized_mutual_info_score
 # what to do?
 calulate_template_partition = False	
 identify_patient_cortical_targets = False
-calculate_z_scores = False
+calculate_z_scores = True
 visuazlie_template_partition = False
 visuazlie_patient_partition = False
 visualize_patient_cortical_target = False
-visualize_hubs = True
+visualize_hubs = False
 run_template_partition_across_densities = False
 cal_sub_parition_by_densities = False
 cal_NMI = False

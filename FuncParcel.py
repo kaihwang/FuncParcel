@@ -7,6 +7,8 @@ import pandas as pd
 import networkx as nx
 from brainx import weighted_modularity
 import bct
+import nibabel as nib
+from collections import Counter
 
 
 def average_corrmat(file_path):
@@ -510,3 +512,20 @@ def iterate_modularity_partition(subject, iter):
 			ci = convert_partition_dict_to_array(convert_partition_to_dict(weighted_partition.communities), len(AveMat))
 	return ci, q
 
+def make_image(atlas_path,image_path,ROI_list,values):
+	image = nib.load(atlas_path)
+	image_data = image.get_data()
+	ROIs = np.loadtxt(ROI_list, dtype = int)
+	value_data = image_data.copy()
+	
+	partition_count = Counter(values)
+
+	for ix,i in enumerate(values):
+
+		if partition_count[i] > 1:
+			value_data[image_data==ROIs[ix]] = i+1
+		else: 
+			value_data[image_data==ROIs[ix]] = 0
+
+	image_data[:,:,:,] = value_data[:,:,:,]
+	nib.save(image,image_path)

@@ -20,7 +20,7 @@ Variables_to_plot <- c('Q_zscore')
 for (v in Variables_to_plot){
   
   fig_global <- ggplot(data=PatientData, aes_string(x='Density', y=v)) + facet_wrap(~Group) + ggtitle('Modularity(Q)') + theme_grey(base_size = 32) + theme(panel.margin = unit(5, "lines"))
-  fig_global <- fig_global + geom_line(aes(color=Subject), size = 2) + xlim( 0.05, 0.2) + scale_colour_manual(values=c(BlueScale, WarmScale)) + labs(y ="Z Score")
+  fig_global <- fig_global + geom_line(aes(color=Subject), size = 2) + xlim( 0.05, 0.2) + scale_colour_manual(values=c(BlueScale, WarmScale), labels = c('T1', 'T2', 'T3', 'T4', 'T5', 'S1', 'S2', 'S3', 'S4', 'S5')) + labs(y ="Z Score")
   plot(fig_global)
 
 }
@@ -39,7 +39,7 @@ for (v in Variables_to_plot){
   levels(plotData$node_type) <- c("All Cortical ROIs", "Cortical Connector Hubs", "Non Hubs", "Cortical Provincial Hubs")
   levels(plotData$Group) <- c("Striatal Patients", "Thalamic Patients")
   fig_nodal <- ggplot(data=plotData, aes(x=Density, y=z_score, linetype = Metric )) + ggtitle(gsub("_"," ",v)) + theme_grey(base_size = 32)
-  fig_nodal <- fig_nodal + facet_grid(Group ~ node_type) + scale_colour_manual(name = "Patients", values=c(BlueScale, WarmScale)) + theme(panel.margin = unit(2, "lines"))
+  fig_nodal <- fig_nodal + facet_grid(Group ~ node_type) + scale_colour_manual(name = "Patients", values=c(BlueScale, WarmScale),labels = c('T1', 'T2', 'T3', 'T4', 'T5', 'S1', 'S2', 'S3', 'S4', 'S5') ) + theme(panel.margin = unit(0.5, "lines"))
   fig_nodal <- fig_nodal + geom_line(aes(color=Subject), size = 2) + xlim( 0.05, 0.2) + ylim( -2.5, 2.5) + labs(y ="Z Score") + scale_linetype_discrete(name = "", labels = c("Target", "Non-Target"))
 
   plot(fig_nodal)
@@ -51,8 +51,8 @@ for (v in Variables_to_plot){
 
 NMIDATA <- read.csv('NMI_dataframe.csv', header = TRUE)
 levels(NMIDATA$Group) <- c("Controls","Striatal Patients", "Thalamic Patients")
-NMIplot <- ggplot(data=NMIDATA, aes(x=Group, y=NMI, color = Group)) + geom_boxplot(size=0.5)+geom_point(size=4) + scale_colour_manual(values=c("Black","Yellow", "Blue","#888888")) 
-NMIplot <- NMIplot + theme_grey(base_size = 32) + labs(y="Normalized Mutual Information") + ggtitle('NMI of modularity parition \n compared to Power/Gordon Atlases')
+NMIplot <- ggplot(data=NMIDATA, aes(x=Group, y=NMI, color = Group)) + geom_boxplot(size=0.5)+geom_point(size=4) + scale_colour_manual(values=c("Black","DarkGreen", "Blue","#888888")) 
+NMIplot <- NMIplot + theme_grey(base_size = 32) + labs(y="NMI") + ggtitle('Normalized mutual information (NMI)\n of modularity partition \n compared to Power/Gordon Atlases')
 NMIplot <- NMIplot +theme(plot.title=element_text( size=28)) + scale_x_discrete(breaks=NULL)
 NMIplot
 

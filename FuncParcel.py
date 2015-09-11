@@ -9,6 +9,7 @@ from brainx import weighted_modularity
 import bct
 import nibabel as nib
 from collections import Counter
+import pickle
 
 
 def average_corrmat(file_path):
@@ -348,93 +349,6 @@ def convert_partition_to_dict(input_partition):
     return partition_dict
 
 
-def within_community_degree(weighted_partition, edgeless = np.nan, catch_edgeless_node=False):
-    ''' Computes "within-module degree" (z-score) for each node (Guimera 2007, J Stat Mech)
-    Authored and shared by Maxwell Bertolero 
-    ------
-    Parameters
-    ------
-    weighted_partition: Louvain Weighted Partition
-        louvain = weighted_modularity.LouvainCommunityDetection(graph)
-        weighted_partitions = louvain.run()
-        weighted_partition = weighted_partition[0], where index is the partition level
-    edgeless : int
-        number to replace edgeless nodes with
-        default = 0.0
-    catch_edgeless_node: Boolean
-        raise ValueError if node degree is zero
-        default = True
-        saves wcd of these nodes as edgeless variable if False
-
-    ------
-    Returns
-    ------
-    within_community_degree: dict
-        Dictionary of the within community degree of each node.
-
-    '''
-    wc_dict = {}
-    for c, community in enumerate(weighted_partition.communities):
-        community_degrees = []
-        for node in community: #get average within-community-degree
-            node_degree = weighted_partition.node_degree(node)
-            if node_degree == 0.0: #catch edgeless nodes, this shouldn't count towards avg wcd
-                if catch_edgeless_node:
-                    raise ValueError("Node {} is edgeless".format(node))
-                continue
-            community_degrees.append(weighted_partition.node_degree_by_community(node)[c])
-        std = np.std(community_degrees) # std of community's degrees
-        mean = np.mean(community_degrees) # mean of community's degrees
-        for node in community: #get node's within_community-degree z-score
-            if weighted_partition.node_degree(node) == 0:
-                wc_dict[node] = edgeless
-                continue
-            within_community_degree = weighted_partition.node_degree_by_community(node)[c]
-            if std == 0.0: #so we don't divide by 0
-                wc_dict[node] = (float(within_community_degree) - float(mean)) #z_score
-                continue
-            wc_dict[node] = ((float(within_community_degree) - float(mean)) / std) #z_score
-    return wc_dict
-
-def participation_coefficient(weighted_partitions, edgeless =np.nan, catch_edgeless_node=False):
-    '''
-    Computes the participation coefficient for each node (Guimera 2007, J Stat Mech)
-    Authored and shared by Maxwell Bertolero
-
-    ------
-    Parameters
-    ------
-    weighted_partition: Louvain Weighted Partition
-        louvain = weighted_modularity.LouvainCommunityDetection(graph)
-        weighted_partitions = louvain.run()
-        weighted_partition = weighted_partition[0], where index is the partition level
-    catch_edgeless_node: Boolean
-        raise ValueError if node degree is zero
-        default = True
-
-    ------
-    Returns
-    ------
-    participation_coefficient: dict
-        Dictionary of the participation coefficient of each node.
-    '''
-    pc_dict = {}
-    for node in weighted_partitions.graph:
-        node_degree = weighted_partitions.node_degree(node)
-        if node_degree == 0.0: 
-            if catch_edgeless_node:
-                raise ValueError("Node {} is edgeless".format(node))
-            pc_dict[node] = edgeless
-            continue    
-        pc = 0.0
-        for comm_degree in weighted_partitions.node_degree_by_community(node):
-            try:
-                pc = pc + ((float(comm_degree)/float(node_degree))**2)
-            except:
-                continue
-        pc = 1-pc
-        pc_dict[node] = pc
-    return pc_dict
 
 def convert_partition_dict_to_array(d, roi_num):
 	''' To convert brainx's network partition dictionary into an array
@@ -513,11 +427,25 @@ def iterate_modularity_partition(subject, iter):
 	return ci, q
 
 def make_image(atlas_path,image_path,ROI_list,values):
+	''' Function to write out modularity community assignments to a nifit image
+	usage: make_image(atlas_path,image_path,ROI_list,values)
+
+	----
+	Parameters
+	----
+	atlas_path : the ROI template used. Path to a nifit file
+	image_path : the output path
+	ROI_list : a text file of list of ROI indices in the ROI template
+	values : a vector of community assignment, has to be the same length as ROI_list
+	'''
 	image = nib.load(atlas_path)
 	image_data = image.get_data()
 	ROIs = np.loadtxt(ROI_list, dtype = int)
-	value_data = image_data.copy()
-	
+
+	# check ROI number and CI are the same length
+	assert len(ROIs) == len(values)
+
+	value_data = image_data.copy()	
 	partition_count = Counter(values)
 
 	for ix,i in enumerate(values):
@@ -529,3 +457,15 @@ def make_image(atlas_path,image_path,ROI_list,values):
 
 	image_data[:,:,:,] = value_data[:,:,:,]
 	nib.save(image,image_path)
+
+
+def save_object(obj, filename):
+	''' Simple function to write out objects into a pickle file
+	usage: save_object(obj, filename)
+	'''
+	with open(filename, 'wb') as output:
+		pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
+
+
+
+

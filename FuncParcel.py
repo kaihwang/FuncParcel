@@ -88,6 +88,9 @@ def parcel_subcortical_network(path_to_adjmat = '/home/despoB/kaihwang/Rest/bin/
     Subcortical_ParcelCI: 
     	 key is the subcortical voxel index, and values are arrays of cortical paritions ranked by strength of conenction with 
     	 the subcortical voxel
+    Subcorticalcortical_Targets_corr: 
+    	key is the subcortical voxel index, and values of arrays of correlatin coefficeint between subcortical voxel and cortical ROI,
+    	ranked by the strength	 
     ------
     Example usage
     ------
@@ -133,6 +136,7 @@ def parcel_subcortical_network(path_to_adjmat = '/home/despoB/kaihwang/Rest/bin/
 	#initialize output as dictionary. 
 	Subcorticalcortical_Targets = {}
 	Subcortical_ParcelCI = {}
+	Subcorticalcortical_Targets_corr = {}
 	for i_Subcortical in Subcortical_indices:
 	    r_vec = AdjMat[i_Subcortical,Cortical_indices] #extract r values bewteen a given Subcortical voxel and cortical ROIs
 	    index = np.argsort(r_vec) # sort r values, save index       
@@ -140,7 +144,9 @@ def parcel_subcortical_network(path_to_adjmat = '/home/despoB/kaihwang/Rest/bin/
 	    # rank the cortical ROI number by highest to lowerst r value, then save to a dictionary where the voxel number is the key 
 	    Subcorticalcortical_Targets[int(Subcorticalcortical_ROIs[i_Subcortical])] = Cortical_ROIs[index]
 	    Subcortical_ParcelCI[int(Subcorticalcortical_ROIs[i_Subcortical])] = Cortical_CI[index]
-	return Subcorticalcortical_Targets, Subcortical_ParcelCI
+	    Subcorticalcortical_Targets_corr[int(Subcorticalcortical_ROIs[i_Subcortical])]  = r_vec[index]
+
+	return Subcorticalcortical_Targets, Subcortical_ParcelCI, Subcorticalcortical_Targets_corr
 
 
 def subcortical_patients_cortical_target(Subcorticalcortical_Targets, Patients, numROI):
@@ -451,7 +457,7 @@ def make_image(atlas_path,image_path,ROI_list,values):
 	for ix,i in enumerate(values):
 
 		if partition_count[i] > 1:
-			value_data[image_data==ROIs[ix]] = i+1
+			value_data[image_data==ROIs[ix]] = i
 		else: 
 			value_data[image_data==ROIs[ix]] = 0
 

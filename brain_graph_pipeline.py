@@ -35,7 +35,7 @@ for roi_template in templates:
 				atlas_path = '/home/despoB/connectome-thalamus/ROIs/%s.nii.gz' %roi_template
 				ROI_list = '/home/despoB/connectome-thalamus/ROIs/%s_ROIs' %roi_template
 				image_path = '/home/despoB/connectome-thalamus/ROIs/MGH_%s_CI_min_cost%s_min_weight%s_min_size%s.nii.gz' %(roi_template, cost_string, weight_string, size_string)
-				make_image(atlas_path, image_path, ROI_list, graph.community.membership)
+				make_image(atlas_path, image_path, ROI_list, graph.community.membership+1)
 
 				for sequence in sequences:
 					#load adj
@@ -52,7 +52,7 @@ for roi_template in templates:
 					atlas_path = '/home/despoB/connectome-thalamus/ROIs/%s.nii.gz' %roi_template
 					ROI_list = '/home/despoB/connectome-thalamus/ROIs/%s_ROIs' %roi_template
 					image_path = '/home/despoB/connectome-thalamus/ROIs/NKI_%s_%s_CI_min_cost%s_min_weight%s_min_size%s.nii.gz' %(sequence, roi_template, cost_string, weight_string, size_string)
-					make_image(atlas_path, image_path, ROI_list, graph.community.membership)
+					make_image(atlas_path, image_path, ROI_list, graph.community.membership+1)
 
 
 	

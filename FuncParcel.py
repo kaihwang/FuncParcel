@@ -1,6 +1,7 @@
 from __future__ import division, print_function
 import numpy as np
 import scipy.io as sio
+from scipy import stats, linalg
 #import matplotlib.pyplot as plt
 import glob
 import pandas as pd
@@ -471,6 +472,64 @@ def save_object(obj, filename):
 	'''
 	with open(filename, 'wb') as output:
 		pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
+
+
+
+def pcorr_subcortico_cortical_connectivity(subcortical_ts, cortical_ts):
+	''' function to do partial correlation bewteen subcortical and cortical ROI timeseries. 
+	Cortical signals (not subcortical) will be removed from subcortical and cortical ROIs,
+	and then pairwise correlation will be calculated bewteen subcortical and cortical ROIs 
+	(but not between subcortico-subcortical or cortico-cortical ROIs).
+	This partial correlation/regression approach is for  cleaning subcortico-cortical 
+	conectivity, which seems to be heavily influenced by a global noise.
+
+
+	usage: pcorr_mat = pcorr_subcortico-cortical(subcortical_ts, cortical_ts)
+
+	----
+	Parameters
+	----
+	atlas_path : the ROI template used. Path to a nifit file
+	image_path : the output path
+	ROI_list : a text file of list of ROI indices in the ROI template
+	values : a vector of community assignment, has to be the same length as ROI_list
+	'''
+
+	# transpose so that column is ROI, this is because output from 3dNetcorr is row-based.
+	subcortical_ts = subcortical_ts.T
+	cortical_ts = cortical_ts.T
+
+	#first check that the dimension is appropriate
+	num_cort = cortical_ts.shape[1]
+	num_subcor = subcortical_ts.shape[1]
+	num_total = num_cort + num_subcor
+	pcorr_mat = np.zeros((num_total, num_total), dtype=np.float)
+
+	for i in range(num_subcor):
+		#X = subcortical_ts[:,i] #subcortical TS
+
+		for j in range(num_cort):
+			#Y = cortical_ts[:, j] #cortical TS
+
+			k = np.ones(num_cort, dtype=np.bool)
+			k[j] = False
+			#Z = cortical_ts[:,k]
+
+			# fit cortical signal to subcortical and cortical ROI TS, get betas
+			beta_cortical = linalg.lstsq(cortical_ts[:,k], cortical_ts[:,j])[0]
+			beta_subcortical = linalg.lstsq(cortical_ts[:,k], subcortical_ts[:,i])[0]
+
+			#get residuals
+			res_cortical = cortical_ts[:, j] - cortical_ts[:, k].dot(beta_cortical)
+			res_subcortical = subcortical_ts[:, i] - cortical_ts[:, k].dot(beta_subcortical)
+
+			#partial correlation
+			pcorr_mat[i+num_cort, j] = stats.pearsonr(res_cortical, res_subcortical)[0]
+			pcorr_mat[j,i+num_cort ] = pcorr_mat[i+num_cort, j]  
+
+	return pcorr_mat		
+
+
 
 
 

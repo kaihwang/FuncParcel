@@ -504,22 +504,21 @@ def pcorr_subcortico_cortical_connectivity(subcortical_ts, cortical_ts):
 	num_total = num_cort + num_subcor
 	pcorr_mat = np.zeros((num_total, num_total), dtype=np.float)
 
-	for i in range(num_subcor):
-		#X = subcortical_ts[:,i] #subcortical TS
+	
+	for j in range(num_cort):	
+		k = np.ones(num_cort, dtype=np.bool)
+		k[j] = False
+		# fit cortical signal to cortical ROI TS, get betas
+		beta_cortical = linalg.lstsq(cortical_ts[:,k], cortical_ts[:,j])[0]
 
-		for j in range(num_cort):
-			#Y = cortical_ts[:, j] #cortical TS
-
-			k = np.ones(num_cort, dtype=np.bool)
-			k[j] = False
-			#Z = cortical_ts[:,k]
-
-			# fit cortical signal to subcortical and cortical ROI TS, get betas
-			beta_cortical = linalg.lstsq(cortical_ts[:,k], cortical_ts[:,j])[0]
+		#get residuals
+		res_cortical = cortical_ts[:, j] - cortical_ts[:, k].dot(beta_cortical)
+		
+		for i in range(num_subcor):
+			# fit cortical signal to subcortical ROI TS, get betas
 			beta_subcortical = linalg.lstsq(cortical_ts[:,k], subcortical_ts[:,i])[0]
 
 			#get residuals
-			res_cortical = cortical_ts[:, j] - cortical_ts[:, k].dot(beta_cortical)
 			res_subcortical = subcortical_ts[:, i] - cortical_ts[:, k].dot(beta_subcortical)
 
 			#partial correlation

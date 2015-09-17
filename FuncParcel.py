@@ -489,10 +489,9 @@ def pcorr_subcortico_cortical_connectivity(subcortical_ts, cortical_ts):
 	----
 	Parameters
 	----
-	atlas_path : the ROI template used. Path to a nifit file
-	image_path : the output path
-	ROI_list : a text file of list of ROI indices in the ROI template
-	values : a vector of community assignment, has to be the same length as ROI_list
+	subcortical_ts: txt file of timeseries data from subcortical ROIs/voxels, each roi is an ROI
+	cortical_ts: txt file of timeseries data from cortical ROIs, each roi is an ROI
+	pcorr_mat: output partial correlation matrix
 	'''
 
 	# transpose so that column is ROI, this is because output from 3dNetcorr is row-based.

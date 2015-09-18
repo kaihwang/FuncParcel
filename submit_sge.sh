@@ -19,22 +19,22 @@ cd ${WD}
 
 for s in $(ls -d 0*); do
 
-	for sequance in __mx_645 __mx_1400; do
-		sed "s/128/NKI_${s}${sequance}_/g" < ${SCRIPT}/python_brainx_mod.sh > ~/tmp/pcorr${s}${sequance}.sh
-		#qsub -V -M kaihwang -m e -e ~/tmp -o ~/tmp ~/tmp/pcorr${s}${sequence}.sh
+	for seqq in __mx_645 ; do #__mx_1400
+		sed "s/128/NKI_${s}${seqq}_/g" < ${SCRIPT}/python_brainx_mod.sh > ~/tmp/pcorr${s}${seqq}_fm.sh
+		qsub -V -M kaihwang -m e -e ~/tmp -o ~/tmp ~/tmp/pcorr${s}${seqq}_fm.sh
 
 	done
 
 done
 
 
-WD='/home/despoB/connectome-thalamus/MGH'
-SCRIPT='/home/despoB/kaihwang/bin/FuncParcel'
-cd ${WD}
+# WD='/home/despoB/connectome-thalamus/MGH'
+# SCRIPT='/home/despoB/kaihwang/bin/FuncParcel'
+# cd ${WD}
 
-for s in $(ls -d Sub*); do
-	if [ -e ${WD}/${s}/MNINonLinear/rfMRI_REST_ncsreg.nii.gz ]; then
-		sed "s/128/MGH_${s}_/g" < ${SCRIPT}/python_brainx_mod.sh > ~/tmp/pcorr${s}.sh
-		#qsub -V -M kaihwang -m e -e ~/tmp -o ~/tmp ~/tmp/pcorr${s}.sh
-	fi
-done
+# for s in $(ls -d Sub*); do
+# 	if [ -e ${WD}/${s}/MNINonLinear/rfMRI_REST_ncsreg.nii.gz ]; then
+# 		sed "s/128/MGH_${s}_/g" < ${SCRIPT}/python_brainx_mod.sh > ~/tmp/pcorr${s}.sh
+# 		qsub -V -M kaihwang -m e -e ~/tmp -o ~/tmp ~/tmp/pcorr${s}.sh
+# 	fi
+# done

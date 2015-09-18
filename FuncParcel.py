@@ -10,7 +10,7 @@ from brainx import weighted_modularity
 import bct
 import nibabel as nib
 from collections import Counter
-import pickle
+import cPickle as pickle
 
 
 def average_corrmat(file_path):

@@ -1,4 +1,5 @@
 import FuncParcel
+import numpy as np
 
 #thalamo CI
 Old_ThalamoCorticalAveMat = FuncParcel.average_corrmat('/home/despoB/connectome-thalamus/NotBackedUp/ParMatrices/MGH*CI*')

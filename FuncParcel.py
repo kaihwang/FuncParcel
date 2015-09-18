@@ -35,18 +35,13 @@ def average_corrmat(file_path, np_txt=False, pickle_object=True):
 	AdjMat_Files = glob.glob(file_path)
 
 	M_Sum =[];
-
-	
 	for f in AdjMat_Files:
-		
 		if np_txt:
 			M = np.loadtxt(f)
-		
 		if pickle_object:
-			M = pickle.load(open(f, "rb"))	    
-	    
-	    M_Sum += [M]	    
-	    
+			M = pickle.load(open(f, "rb"))
+		M_Sum += [M]
+
 	AdjMat = sum(M_Sum)/len(AdjMat_Files)
 	#np.savetxt('/home/despoB/kaihwang/Rest/Striatum_parcel/StriatalCorticalAveMat', AdjMat)
 	return AdjMat
@@ -533,7 +528,66 @@ def pcorr_subcortico_cortical_connectivity(subcortical_ts, cortical_ts):
 			pcorr_mat[i+num_cort, j] = stats.pearsonr(res_cortical, res_subcortical)[0]
 			pcorr_mat[j,i+num_cort ] = pcorr_mat[i+num_cort, j]  
 
-	return pcorr_mat		
+	return pcorr_mat
+
+
+def par_pcorr_subcortico_cortical_connectivity(idx, subcortical_ts, cortical_ts):
+	''' function to do partial correlation bewteen subcortical and cortical ROI timeseries. 
+	Cortical signals (not subcortical) will be removed from subcortical and cortical ROIs,
+	and then pairwise correlation will be calculated bewteen subcortical and cortical ROIs 
+	(but not between subcortico-subcortical or cortico-cortical ROIs).
+	This partial correlation/regression approach is for  cleaning subcortico-cortical 
+	conectivity, which seems to be heavily influenced by a global noise.
+
+	THIS VERSION IS CREATED TO DO PARALLEL FOR LOOPS
+
+
+	usage: pcorr_coef = pcorr_subcortico-cortical(idx, subcortical_ts, cortical_ts)
+
+	----
+	Parameters
+	----
+	subcortical_ts: txt file of timeseries data from subcortical ROIs/voxels, each roi is an ROI
+	cortical_ts: txt file of timeseries data from cortical ROIs, each roi is an ROI
+	idx a tuple of indices like this (i,j):
+		i = index for subcortical
+		j = index for cortical
+	pcorr_coef: return partial correlation between subcortical_ts(i) and cortical_ts(j)
+	'''
+
+	# transpose so that column is ROI, this is because output from 3dNetcorr is row-based.
+	i = idx[0]
+	j = idx[1]
+
+	subcortical_ts = np.loadtxt(subcortical_ts)
+	cortical_ts = np.loadtxt(cortical_ts)
+
+	s_ts = subcortical_ts.T
+	c_ts = cortical_ts.T
+
+	#first check that the dimension is appropriate
+	num_cort = c_ts.shape[1]
+	num_subcor = s_ts.shape[1]
+	num_total = num_cort + num_subcor
+	
+	k = np.ones(num_cort, dtype=np.bool)
+	k[j] = False
+	# fit cortical signal to cortical ROI TS, get betas
+	beta_cortical = linalg.lstsq(c_ts[:,k], c_ts[:,j])[0]
+
+	#get residuals
+	res_cortical = c_ts[:, j] - c_ts[:, k].dot(beta_cortical)
+		
+	# fit cortical signal to subcortical ROI TS, get betas
+	beta_subcortical = linalg.lstsq(c_ts[:,k], s_ts[:,i])[0]
+
+	#get residuals
+	res_subcortical = s_ts[:, i] - c_ts[:, k].dot(beta_subcortical)
+
+	#partial correlation
+	pcorr_coef = stats.pearsonr(res_cortical, res_subcortical)[0]
+
+	return pcorr_coef	
 
 
 

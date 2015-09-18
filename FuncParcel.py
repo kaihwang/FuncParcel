@@ -10,10 +10,10 @@ from brainx import weighted_modularity
 import bct
 import nibabel as nib
 from collections import Counter
-import cPickle as pickle
+import pickle
 
 
-def average_corrmat(file_path):
+def average_corrmat(file_path, np_txt=False, pickle_object=True):
 	'''
 	This is a short function to average correlation coefficient matrices.
 	
@@ -23,8 +23,9 @@ def average_corrmat(file_path):
     file_path:
 		file_path = '/home/despoB/kaihwang/Rest/AdjMatrices/*Ses1_Full_WashU333_corrmat'
 
-	usage: average_corrmat(file_path)
-
+	usage: average_corrmat(file_path, np_txt=False, pickle_object=True)
+	if the saved matrices are txt files from np.savetxt, set np_txt =True
+	if in pickle object format, set pckle_object=True (default)
 	------
     Return
     ------
@@ -34,10 +35,17 @@ def average_corrmat(file_path):
 	AdjMat_Files = glob.glob(file_path)
 
 	M_Sum =[];
+
+	
 	for f in AdjMat_Files:
-	    M = np.loadtxt(f)
-	    M_Sum += [M]
+		
+		if np_txt:
+			M = np.loadtxt(f)
+		
+		if pickle_object:
+			M = pickle.load(open(f, "rb"))	    
 	    
+	    M_Sum += [M]	    
 	    
 	AdjMat = sum(M_Sum)/len(AdjMat_Files)
 	#np.savetxt('/home/despoB/kaihwang/Rest/Striatum_parcel/StriatalCorticalAveMat', AdjMat)

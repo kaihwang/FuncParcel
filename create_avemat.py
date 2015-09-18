@@ -1,18 +1,29 @@
 import FuncParcel
-import numpy as np
 
-#thalamo
-Old_ThalamoCorticalAveMat = FuncParcel.average_corrmat('/home/despoB/kaihwang/Rest/AdjMatrices/*MGH*CI*')
-np.savetxt('/home/despoB/kaihwang/Rest/Thalamic_parcel/MGH_cortical_network_plus_thalamus_corrmatavg', Old_ThalamoCorticalAveMat)
+#thalamo CI
+Old_ThalamoCorticalAveMat = FuncParcel.average_corrmat('/home/despoB/connectome-thalamus/NotBackedUp/ParMatrices/MGH*CI*')
+np.savetxt('/home/despoB/kaihwang/Rest/Thalamic_parcel/MGH_cortical_network_plus_thalamus_parcorrmatavg', Old_ThalamoCorticalAveMat)
 
-Old_ThalamoCorticalAveMat = FuncParcel.average_corrmat('/home/despoB/kaihwang/Rest/AdjMatrices/*NKI*CI*645*')
-np.savetxt('/home/despoB/kaihwang/Rest/Thalamic_parcel/NKI_mx_645_cortical_network_plus_thalamus_corrmatavg', Old_ThalamoCorticalAveMat)
+Old_ThalamoCorticalAveMat = FuncParcel.average_corrmat('/home/despoB/connectome-thalamus/NotBackedUp/ParMatrices/NKI*645*CI*')
+np.savetxt('/home/despoB/kaihwang/Rest/Thalamic_parcel/NKI_mx_645_cortical_network_plus_thalamus_parcorrmatavg', Old_ThalamoCorticalAveMat)
 
-Old_ThalamoCorticalAveMat = FuncParcel.average_corrmat('/home/despoB/kaihwang/Rest/AdjMatrices/*NKI*CI*1400*')
-np.savetxt('/home/despoB/kaihwang/Rest/Thalamic_parcel/NKI_mx_1400_cortical_network_plus_thalamus_corrmatavg', Old_ThalamoCorticalAveMat)
+Old_ThalamoCorticalAveMat = FuncParcel.average_corrmat('/home/despoB/connectome-thalamus/NotBackedUp/ParMatrices/NKI*1400*CI*')
+np.savetxt('/home/despoB/kaihwang/Rest/Thalamic_parcel/NKI_mx_1400_cortical_network_plus_thalamus_parcorrmatavg', Old_ThalamoCorticalAveMat)
 
-Old_ThalamoCorticalAveMat = FuncParcel.average_corrmat('/home/despoB/kaihwang/Rest/AdjMatrices/*NKI*CI*2500*')
-np.savetxt('/home/despoB/kaihwang/Rest/Thalamic_parcel/NKI_std_2500_cortical_network_plus_thalamus_corrmatavg', Old_ThalamoCorticalAveMat)
+
+#thalamo cortex
+Old_ThalamoCorticalAveMat = FuncParcel.average_corrmat('/home/despoB/connectome-thalamus/NotBackedUp/ParMatrices/MGH*ROI*')
+np.savetxt('/home/despoB/kaihwang/Rest/Thalamic_parcel/MGH_cortex_plus_thalamus_parcorrmatavg', Old_ThalamoCorticalAveMat)
+
+Old_ThalamoCorticalAveMat = FuncParcel.average_corrmat('/home/despoB/connectome-thalamus/NotBackedUp/ParMatrices/NKI*645*ROI*')
+np.savetxt('/home/despoB/kaihwang/Rest/Thalamic_parcel/NKI_mx_645_cortex_plus_thalamus_parcorrmatavg', Old_ThalamoCorticalAveMat)
+
+Old_ThalamoCorticalAveMat = FuncParcel.average_corrmat('/home/despoB/connectome-thalamus/NotBackedUp/ParMatrices/NKI*1400*ROI*')
+np.savetxt('/home/despoB/kaihwang/Rest/Thalamic_parcel/NKI_mx_1400_cortex_plus_thalamus_parcorrmatavg', Old_ThalamoCorticalAveMat)
+
+
+#Old_ThalamoCorticalAveMat = FuncParcel.average_corrmat('//home/despoB/connectome-thalamus/NotBackedUp/ParMatrices/*NKI*CI*2500*')
+#np.savetxt('/home/despoB/kaihwang/Rest/Thalamic_parcel/NKI_std_2500_cortical_network_plus_thalamus_corrmatavg', Old_ThalamoCorticalAveMat)
 
 #Old_CorticalAveMat = FuncParcel.average_corrmat('/home/despoB/kaihwang/Rest/AdjMatrx`ices/t1*FIX*')
 #striatal

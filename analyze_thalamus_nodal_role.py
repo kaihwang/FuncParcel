@@ -16,7 +16,6 @@ Thalamus_voxel_positions = np.arange(320,3859,1)
 Thalamus_voxel_coordinate = np.loadtxt(path_to_ROIs +'/thalamus_voxels_ijk_indices', dtype = int)
 
 
-### Discovery, use MGh
 ## do network based parcellation
 path_to_adjmat = '/home/despoB/connectome-thalamus/Thalamic_parcel/NKI_mx_645_cortical_network_plus_thalamus_corrmatavg'
 path_to_list_of_subcorticalcortical_ROIs = '/home/despoB/connectome-thalamus/ROIs/Cortical_CI_plus_thalamus_ROIs'

@@ -11,6 +11,7 @@ import bct
 import nibabel as nib
 from collections import Counter
 import pickle
+from sklearn.decomposition import PCA
 
 
 def average_corrmat(file_path, np_txt=False, pickle_object=True):
@@ -297,7 +298,8 @@ def convert_matlab_graph_str(graph_path, SubID, Cortical_ROIs):
 	tmp_dict['Density'] = np.tile(density_vector,len(Cortical_ROIs))
 	tmp_dict['ROI'] = np.repeat(Cortical_ROIs,len(density_vector))
 	tmp_dict['Subject'] = [SubID] * len(tmp.ravel('F'))
-	NodalDataframe = pd.DataFrame(tmp_dict, columns=['Subject', 'ROI', 'Density','CC', 'PC', 'WMD', 'Ci', 'localE', 'Between_Module_Weight','Within_Module_Weight', 'Between_Module_Degree','Within_Module_Degree'])
+	NodalDataframe = pd.DataFrame(tmp_dict, columns=['Subject', 'ROI', 'Density','CC', 'PC', 'WMD', 'Ci', 'localE', 
+		'Between_Module_Weight','Within_Module_Weight', 'Between_Module_Degree','Within_Module_Degree'])
 
 	return GlobalDataframe, NodalDataframe
 
@@ -311,7 +313,8 @@ def cal_graph_z_score(PatientDataframe, ControlDataframe, rois, metric):
 	----
 	PatientDataframe: Dataframe of graph metrics from a particular patient. Should be output from 'convert_matlab_graph_str'
 
-	ControlDataframe: Dataframe of graph metrics from control subjects. Note should be "ALL" control subjects, can use 'convert_matlab_graph_str' and append
+	ControlDataframe: Dataframe of graph metrics from control subjects. Note should be "ALL" control subjects, 
+	can use 'convert_matlab_graph_str' and append
 		results from each subject
 
 	rois: np array of list of ROIs, empty if for gobal data
@@ -325,9 +328,9 @@ def cal_graph_z_score(PatientDataframe, ControlDataframe, rois, metric):
 	'''
 	#GlobalData, NodalData = convert_matlab_graph_str(patient_graph_path, patient_ID, Cortical_ROIs)
 	if not rois.any():
-		z_score = (PatientDataframe[metric] -ControlDataframe.groupby(['Density']).aggregate(np.nanmean).reset_index()[metric]) / ControlDataframe.groupby(['Density']).aggregate(np.nanstd).reset_index()[metric]
+		z_score = (PatientDataframe[metric] -ControlDataframe.groupby(['Density']).aggregate(np.nanmean).reset_index()
+			[metric]) / ControlDataframe.groupby(['Density']).aggregate(np.nanstd).reset_index()[metric]
 	else:
-		#z_score = (PatientDataframe[metric] -ControlDataframe.groupby(['ROI','Density']).aggregate(np.nanmean).reset_index()[metric]) / ControlDataframe.groupby(['ROI','Density']).aggregate(np.nanstd).reset_index()[metric]
 		x = PatientDataframe.loc[PatientDataframe['ROI'].isin(rois)].groupby(['Density']).aggregate(np.nanmean).reset_index()[metric]
 		m = ControlDataframe.loc[ControlDataframe['ROI'].isin(rois)].groupby(['Density']).aggregate(np.nanmean).reset_index()[metric]
 		sd = ControlDataframe.loc[ControlDataframe['ROI'].isin(rois)].groupby(['Density']).aggregate(np.nanstd).reset_index()[metric]
@@ -501,6 +504,10 @@ def pcorr_subcortico_cortical_connectivity(subcortical_ts, cortical_ts):
 	subcortical_ts = subcortical_ts.T
 	cortical_ts = cortical_ts.T
 
+	# check length of data
+	assert cortical_ts.shape[0] == subcortical_ts.shape[0]
+	num_vol = cortical_ts.shape[0]
+
 	#first check that the dimension is appropriate
 	num_cort = cortical_ts.shape[1]
 	num_subcor = subcortical_ts.shape[1]
@@ -511,18 +518,30 @@ def pcorr_subcortico_cortical_connectivity(subcortical_ts, cortical_ts):
 	for j in range(num_cort):	
 		k = np.ones(num_cort, dtype=np.bool)
 		k[j] = False
+
+		#use PCA to reduce cortical data dimensionality
+		#maximum number of regressors that we can use
+		max_num_components = num_vol/20
+		if max_num_components > num_cort:
+			max_num_components = num_cort 
+
+		pca = PCA(n_components=max_num_components)
+		pca.fit(cortical_ts[:,k])
+		reduced_cortical_ts = pca.fit_transform(cortical_ts[:,k])
+		print "Amount of varaince explanined by cortical signal regressors after PCA: %s"  %np.sum(pca.explained_variance_ratio_)
+		
 		# fit cortical signal to cortical ROI TS, get betas
-		beta_cortical = linalg.lstsq(cortical_ts[:,k], cortical_ts[:,j])[0]
+		beta_cortical = linalg.lstsq(reduced_cortical_ts, cortical_ts[:,j])[0]
 
 		#get residuals
-		res_cortical = cortical_ts[:, j] - cortical_ts[:, k].dot(beta_cortical)
+		res_cortical = cortical_ts[:, j] - reduced_cortical_ts.dot(beta_cortical)
 		
 		for i in range(num_subcor):
 			# fit cortical signal to subcortical ROI TS, get betas
-			beta_subcortical = linalg.lstsq(cortical_ts[:,k], subcortical_ts[:,i])[0]
+			beta_subcortical = linalg.lstsq(reduced_cortical_ts, subcortical_ts[:,i])[0]
 
 			#get residuals
-			res_subcortical = subcortical_ts[:, i] - cortical_ts[:, k].dot(beta_subcortical)
+			res_subcortical = subcortical_ts[:, i] - reduced_cortical_ts.dot(beta_subcortical)
 
 			#partial correlation
 			pcorr_mat[i+num_cort, j] = stats.pearsonr(res_cortical, res_subcortical)[0]
@@ -565,24 +584,40 @@ def par_pcorr_subcortico_cortical_connectivity(idx, subcortical_ts, cortical_ts)
 	s_ts = subcortical_ts.T
 	c_ts = cortical_ts.T
 
+	#first check number of volumnes/timepoints/observations are the same
+	assert c_ts.shape[0] == s_ts.shape[0]
+	num_vol = c_ts.shape[0]
+
 	#first check that the dimension is appropriate
 	num_cort = c_ts.shape[1]
 	num_subcor = s_ts.shape[1]
 	num_total = num_cort + num_subcor
+
+	#maximum number of regressors that we can use
+	max_num_components = num_vol/20
+	if max_num_components > num_cort:
+			max_num_components = num_cort
 	
+	#use PCA to reduce cortical timeseries data dimension
 	k = np.ones(num_cort, dtype=np.bool)
 	k[j] = False
+
+	pca = PCA(n_components=max_num_components)
+	pca.fit(c_ts[:,k])
+	reduced_c_ts = pca.fit_transform(c_ts[:,k])
+	print "Amount of varaince explanined by cortical signal regressors after PCA: %s"  %np.sum(pca.explained_variance_ratio_)
+
 	# fit cortical signal to cortical ROI TS, get betas
-	beta_cortical = linalg.lstsq(c_ts[:,k], c_ts[:,j])[0]
+	beta_cortical = linalg.lstsq(reduced_c_ts, c_ts[:,j])[0]
 
 	#get residuals
-	res_cortical = c_ts[:, j] - c_ts[:, k].dot(beta_cortical)
+	res_cortical = c_ts[:, j] - reduced_c_ts.dot(beta_cortical)
 		
 	# fit cortical signal to subcortical ROI TS, get betas
-	beta_subcortical = linalg.lstsq(c_ts[:,k], s_ts[:,i])[0]
+	beta_subcortical = linalg.lstsq(reduced_c_ts, s_ts[:,i])[0]
 
 	#get residuals
-	res_subcortical = s_ts[:, i] - c_ts[:, k].dot(beta_subcortical)
+	res_subcortical = s_ts[:, i] - reduced_c_ts.dot(beta_subcortical)
 
 	#partial correlation
 	pcorr_coef = stats.pearsonr(res_cortical, res_subcortical)[0]

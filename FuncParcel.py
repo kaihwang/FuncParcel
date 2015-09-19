@@ -559,8 +559,8 @@ def par_pcorr_subcortico_cortical_connectivity(idx, subcortical_ts, cortical_ts)
 	i = idx[0]
 	j = idx[1]
 
-	subcortical_ts = np.loadtxt(subcortical_ts)
-	cortical_ts = np.loadtxt(cortical_ts)
+	#subcortical_ts = np.loadtxt(subcortical_ts)
+	#cortical_ts = np.loadtxt(cortical_ts)
 
 	s_ts = subcortical_ts.T
 	c_ts = cortical_ts.T

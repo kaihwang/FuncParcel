@@ -40,8 +40,12 @@ for roi in ROIs:
 
 
 
+## this is for testing
+# tha_ts = np.random.rand(3500, 900)
+# cort_ts = np.random.rand(320, 900)
 
-
-
-
-
+# pcorr_mat = np.zeros((tha_ts.shape[0],cort_ts.shape[0]),dtype=np.float)
+# pf = partial(par_pcorr_subcortico_cortical_connectivity, subcortical_ts=tha_ts, cortical_ts=cort_ts)
+# %%time
+# for idx, r in enumerate(pool.imap(pf, product(range(3500), range(20)),chunksize = 160)):
+# 	pcorr_mat.flat[idx] = r

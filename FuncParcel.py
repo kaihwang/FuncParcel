@@ -512,23 +512,24 @@ def pcorr_subcortico_cortical_connectivity(subcortical_ts, cortical_ts):
 	num_cort = cortical_ts.shape[1]
 	num_subcor = subcortical_ts.shape[1]
 	num_total = num_cort + num_subcor
+
+	#maximum number of regressors that we can use
+	max_num_components = int(num_vol/20)
+	if max_num_components > num_cort:
+		max_num_components = num_cort-1 
+
 	pcorr_mat = np.zeros((num_total, num_total), dtype=np.float)
 
-	
 	for j in range(num_cort):	
 		k = np.ones(num_cort, dtype=np.bool)
 		k[j] = False
 
 		#use PCA to reduce cortical data dimensionality
-		#maximum number of regressors that we can use
-		max_num_components = num_vol/20
-		if max_num_components > num_cort:
-			max_num_components = num_cort 
-
 		pca = PCA(n_components=max_num_components)
 		pca.fit(cortical_ts[:,k])
 		reduced_cortical_ts = pca.fit_transform(cortical_ts[:,k])
-		print "Amount of varaince explanined by cortical signal regressors after PCA: %s"  %np.sum(pca.explained_variance_ratio_)
+		
+		print("Amount of varaince explanined after PCA: %s" %np.sum(pca.explained_variance_ratio_))  
 		
 		# fit cortical signal to cortical ROI TS, get betas
 		beta_cortical = linalg.lstsq(reduced_cortical_ts, cortical_ts[:,j])[0]
@@ -588,15 +589,15 @@ def par_pcorr_subcortico_cortical_connectivity(idx, subcortical_ts, cortical_ts)
 	assert c_ts.shape[0] == s_ts.shape[0]
 	num_vol = c_ts.shape[0]
 
-	#first check that the dimension is appropriate
+	#first check that the dintimension is appropriate
 	num_cort = c_ts.shape[1]
 	num_subcor = s_ts.shape[1]
 	num_total = num_cort + num_subcor
 
 	#maximum number of regressors that we can use
-	max_num_components = num_vol/20
+	max_num_components = int(num_vol/20)
 	if max_num_components > num_cort:
-			max_num_components = num_cort
+			max_num_components = num_cort-1
 	
 	#use PCA to reduce cortical timeseries data dimension
 	k = np.ones(num_cort, dtype=np.bool)
@@ -605,7 +606,7 @@ def par_pcorr_subcortico_cortical_connectivity(idx, subcortical_ts, cortical_ts)
 	pca = PCA(n_components=max_num_components)
 	pca.fit(c_ts[:,k])
 	reduced_c_ts = pca.fit_transform(c_ts[:,k])
-	print "Amount of varaince explanined by cortical signal regressors after PCA: %s"  %np.sum(pca.explained_variance_ratio_)
+	print("Amount of varaince explanined by after PCA: %s" %np.sum(pca.explained_variance_ratio_))  
 
 	# fit cortical signal to cortical ROI TS, get betas
 	beta_cortical = linalg.lstsq(reduced_c_ts, c_ts[:,j])[0]

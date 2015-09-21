@@ -529,7 +529,7 @@ def pcorr_subcortico_cortical_connectivity(subcortical_ts, cortical_ts):
 		pca.fit(cortical_ts[:,k])
 		reduced_cortical_ts = pca.fit_transform(cortical_ts[:,k])
 		
-		print("Amount of varaince explanined after PCA: %s" %np.sum(pca.explained_variance_ratio_))  
+		#print("Amount of varaince explanined after PCA: %s" %np.sum(pca.explained_variance_ratio_))  
 		
 		# fit cortical signal to cortical ROI TS, get betas
 		beta_cortical = linalg.lstsq(reduced_cortical_ts, cortical_ts[:,j])[0]
@@ -606,7 +606,7 @@ def par_pcorr_subcortico_cortical_connectivity(idx, subcortical_ts, cortical_ts)
 	pca = PCA(n_components=max_num_components)
 	pca.fit(c_ts[:,k])
 	reduced_c_ts = pca.fit_transform(c_ts[:,k])
-	print("Amount of varaince explanined by after PCA: %s" %np.sum(pca.explained_variance_ratio_))  
+	#print("Amount of varaince explanined by after PCA: %s" %np.sum(pca.explained_variance_ratio_))  
 
 	# fit cortical signal to cortical ROI TS, get betas
 	beta_cortical = linalg.lstsq(reduced_c_ts, c_ts[:,j])[0]

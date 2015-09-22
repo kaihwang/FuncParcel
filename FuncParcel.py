@@ -453,7 +453,6 @@ def make_image(atlas_path,image_path,ROI_list,values):
 	'''
 	image = nib.load(atlas_path)
 	image_data = image.get_data()
-	header = image.get_header()
 	ROIs = np.loadtxt(ROI_list, dtype = int)
 
 	# check ROI number and CI are the same length
@@ -470,7 +469,6 @@ def make_image(atlas_path,image_path,ROI_list,values):
 			value_data[image_data==ROIs[ix]] = 0
 
 	image_data[:,:,:,] = value_data[:,:,:,]
-	header.set_data_dtype(np.float32)
 	nib.save(image,image_path)
 
 
@@ -626,6 +624,50 @@ def par_pcorr_subcortico_cortical_connectivity(idx, subcortical_ts, cortical_ts)
 	pcorr_coef = stats.pearsonr(res_cortical, res_subcortical)[0]
 
 	return pcorr_coef	
+
+
+def map_subcortical_cortical_targets(corrmat, Cortical_ROIs, Subcortical_voxels):
+	''' function to generate a dictionary listing the cortical ROIs connected with each subcortical voxel, at different costs
+
+	usage: cortical_targets, thresholds = map_subcortical_cortical_targets(corrmat, Cortical_ROIs, Subcortical_voxels):
+	----
+	Parameters
+	----
+	corrmat: adj matrix in numpy format, the cortical ROIs first, then concatnated by subcortical voxels
+	Cortical_ROIs : list of cortical ROIs
+	Subcortical_voxels : list of subcortical voxels
+
+	It will return a dictionary of cortical_targets
+	where the key is (cost, voxel_number), and the value is a list of cortical ROIs
+
+	It will also return the threshold for each cost, from .15 to .01
+	'''
+
+	#do the annoying conversion to integer
+	Subcortical_voxels = Subcortical_voxels.astype('int', copy=True)
+	Cortical_ROIs = Cortical_ROIs.astype('int', copy=True)
+
+	#check data length
+	assert corrmat.shape[0] == Cortical_ROIs.shape[0]+ Subcortical_voxels.shape[0]
+	assert corrmat.shape[1] == Cortical_ROIs.shape[0]+ Subcortical_voxels.shape[0]
+
+	#determine size
+	num_cortical_rois =  len(Cortical_ROIs)
+	num_subcortical_voxels =  len(Subcortical_voxels)
+
+	#extract subcortical_cortical_matrix, ignoring whithn cortical and within subcortical weights
+	sc_mat = corrmat[range(num_cortical_rois, num_subcortical_voxels+num_cortical_rois),:][:, range(num_cortical_rois)].copy()
+
+	#determine density thresholds, cost at .15 to .01, right now this range is hard coded
+	thresholds = np.percentile(sc_mat.flatten(), range(85,100))
+	costs = 100 -np.array(range(85,100))
+	#save target in a dictionary, stepping by cost
+	cortical_targets={}
+	for p, th in enumerate(thresholds):
+		for i in range(sc_mat.shape[0]):
+			cortical_targets[costs[p],Subcortical_voxels[i]] = Cortical_ROIs[sc_mat[i]>th]
+	return cortical_targets, thresholds
+	
 
 
 

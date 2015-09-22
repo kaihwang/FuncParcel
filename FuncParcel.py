@@ -453,6 +453,7 @@ def make_image(atlas_path,image_path,ROI_list,values):
 	'''
 	image = nib.load(atlas_path)
 	image_data = image.get_data()
+	header = image.get_header()
 	ROIs = np.loadtxt(ROI_list, dtype = int)
 
 	# check ROI number and CI are the same length
@@ -469,6 +470,7 @@ def make_image(atlas_path,image_path,ROI_list,values):
 			value_data[image_data==ROIs[ix]] = 0
 
 	image_data[:,:,:,] = value_data[:,:,:,]
+	header.set_data_dtype(np.float32)
 	nib.save(image,image_path)
 
 

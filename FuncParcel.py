@@ -48,11 +48,7 @@ def average_corrmat(file_path, np_txt=False, pickle_object=True):
 	return AdjMat
 
 
-def parcel_subcortical_network(path_to_adjmat = '/home/despoB/kaihwang/Rest/bin/FuncParcel/Data/ThalamoCorticalAveMat', \
-	path_to_list_of_subcorticalcortical_ROIs = '/home/despoB/kaihwang/bin/FuncParcel/Data/Thalamocortical_ROIs_index', \
-	path_to_list_of_subcortical_voxels = '/home/despoB/kaihwang/bin/FuncParcel/Data/Thalamic_voxel_index', \
-	path_to_list_of_cortical_ROIs ='/home/despoB/kaihwang/bin/FuncParcel/Data/Cortical_ROI_index', \
-	path_to_cortical_CI = '/home/despoB/kaihwang/bin/FuncParcel/Data/MGH_CI'):
+def parcel_subcortical_network(AdjMat, Subcorticalcortical_ROIs, Subcortical_voxels, Cortical_ROIs, Cortical_CI):
 	'''#Here try to do subcortical parcellation in python
 	The process works like this. 
 	* You will need a set of ROI that consists of: (1) the cortex, (2) a subcortical mask that you wish to parcellate based 
@@ -109,15 +105,15 @@ def parcel_subcortical_network(path_to_adjmat = '/home/despoB/kaihwang/Rest/bin/
 
 
 	# load the averaged adj matrix
-	AdjMat = np.loadtxt(path_to_adjmat)
+	#AdjMat = np.loadtxt(path_to_adjmat)
 	# load the ROI name vector of the full Subcorticalcortical adj matrix
-	Subcorticalcortical_ROIs = np.loadtxt(path_to_list_of_subcorticalcortical_ROIs)
+	#Subcorticalcortical_ROIs = np.loadtxt(path_to_list_of_subcorticalcortical_ROIs)
 	# load the name vector of the Subcortical voxels
-	Subcortical_voxels = np.loadtxt(path_to_list_of_subcortical_voxels)
+	#Subcortical_voxels = np.loadtxt(path_to_list_of_subcortical_voxels)
 	# load the name vector of the cortical ROIs 
-	Cortical_ROIs = np.loadtxt(path_to_list_of_cortical_ROIs)
+	#Cortical_ROIs = np.loadtxt(path_to_list_of_cortical_ROIs)
     # load the CI vector
-	Cortical_CI = np.loadtxt(path_to_cortical_CI)
+	#Cortical_CI = np.loadtxt(path_to_cortical_CI)
 	Cortical_CI = Cortical_CI.astype(int) # for some reason using dtype = int doesn't work...
 	
 	# Double check the ROI numbers match
@@ -454,19 +450,21 @@ def make_image(atlas_path,image_path,ROI_list,values):
 	image = nib.load(atlas_path)
 	image_data = image.get_data()
 	ROIs = np.loadtxt(ROI_list, dtype = int)
+	header = image.get_header()
+	header.set_data_dtype(np.float)
 
 	# check ROI number and CI are the same length
 	assert len(ROIs) == len(values)
 
 	value_data = image_data.copy()	
-	partition_count = Counter(values)
+	#partition_count = Counter(values)
 
 	for ix,i in enumerate(values):
-
-		if partition_count[i] > 1:
-			value_data[image_data==ROIs[ix]] = i
-		else: 
-			value_data[image_data==ROIs[ix]] = 0
+		value_data[image_data==ROIs[ix]] = i
+		#if partition_count[i] > 1:
+		#	value_data[image_data==ROIs[ix]] = i
+		#else: 
+	    #		value_data[image_data==ROIs[ix]] = 0
 
 	image_data[:,:,:,] = value_data[:,:,:,]
 	nib.save(image,image_path)
@@ -660,13 +658,25 @@ def map_subcortical_cortical_targets(corrmat, Cortical_ROIs, Subcortical_voxels)
 
 	#determine density thresholds, cost at .15 to .01, right now this range is hard coded
 	thresholds = np.percentile(sc_mat.flatten(), range(85,100))
+	#thresholds_lb = np.percentile(sc_mat.flatten(), range(1,16)) #lower bound threshold for neg weights
+
 	costs = 100 -np.array(range(85,100))
 	#save target in a dictionary, stepping by cost
 	cortical_targets={}
 	for p, th in enumerate(thresholds):
 		for i in range(sc_mat.shape[0]):
 			cortical_targets[costs[p],Subcortical_voxels[i]] = Cortical_ROIs[sc_mat[i]>th]
-	return cortical_targets, thresholds
+	
+	cortical_nontargets={}
+	for p, th in enumerate(thresholds):
+		for i in range(sc_mat.shape[0]):
+			rvec=abs(sc_mat[i]-0) #find the ones close to zero
+			cortical_nontargets[costs[p],Subcortical_voxels[i]] \
+			= Cortical_ROIs[rvec.argsort()[:len(cortical_targets[costs[p],Subcortical_voxels[i]])]]
+			
+	return cortical_targets, cortical_nontargets, thresholds
+
+
 	
 
 

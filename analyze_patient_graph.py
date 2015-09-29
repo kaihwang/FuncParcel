@@ -4,14 +4,114 @@ from brain_graphs import *
 from FuncParcel import *
 import matplotlib.pylab as plt
 
+################################################################
+###### Setup
+################################################################
+
+AvgMat_path = '/home/despoB/connectome-thalamus/AvgMatrices'
+Parcel_path = '/home/despoB/connectome-thalamus/Thalamic_parcel'
+roi_template = 'Craddock_300_plus_thalamus_ROIs_ncsreg' 
+path_to_ROIs = '/home/despoB/connectome-thalamus/ROIs'
+path_to_data_folder = '/home/despoB/kaihwang/bin/FuncParcel/Data'
+
+ROIs = np.loadtxt(path_to_ROIs+'/Craddock_300_cortical_plus_thalamus_ROIs', dtype = int)
+Thalamus_voxels = np.loadtxt(path_to_ROIs+'/thalamus_voxel_indices', dtype = int)
+Cortical_ROIs = np.loadtxt(path_to_ROIs+'/Craddock_300_cortical_ROIs', dtype = int)
+Cortical_ROIs_positions = np.arange(0,320,1)
+Thalamus_voxel_positions = np.arange(320,3859,1)	
+Thalamus_voxel_coordinate = np.loadtxt(path_to_ROIs +'/thalamus_voxels_ijk_indices', dtype = int)
+#Thalamocortical_corrmat = np.loadtxt(Parcel_path+'/MGH_Craddock_300_cortical_plus_thalamus_parcorrmatavg')
+
+Cortical_CI = np.loadtxt(path_to_ROIs+'/Cortical_CI', dtype='int')
+Thalamus_CIs = pickle.load(open(path_to_data_folder +'/Thalamus_CIs', "rb"))
+
+Cortical_targets= pickle.load(open(path_to_data_folder +'/Cortical_targets', "rb"))
+Cortical_nontargets= pickle.load(open(path_to_data_folder +'/Cortical_nontargets', "rb"))
+
+
+path_to_lesion_masks = '/home/despoB/connectome-thalamus/Lesion_Masks/'
+path_to_adjmat = '/home/despoB/connectome-thalamus/NotBackedUp/AdjMatrices/'
+
+thalamic_patients = ['128', '162', '163', '168', '176']
+
+Partition_CIs=np.array(range(1,12), dtype=int)
+Network_names = ['Default', 'Visual', 'SM', 'FP', 'Attn', 'CO', 'Aud', 'CingP', 'OFC', 'IFT', 'Saliency']
+
+################################################################
+###### look at each subject's lesioned voxel distribution
+################################################################
+
+#load lesioned voxels indices
+Lesioned_voxels = {}
+for patient in thalamic_patients:
+	Lesioned_voxels[patient] = np.loadtxt(path_to_lesion_masks+ patient+'_lesioned_voxels', dtype='int')
+
+
+#look at ditribution of CI
+Lesioned_CIs = {}
+for patient in thalamic_patients:
+	Lesioned_CIs[patient] = Thalamus_CIs[np.in1d(Thalamus_voxels, Lesioned_voxels[patient]).nonzero()[0]]
+
+
+for patient in thalamic_patients:	
+	To_Plot = np.zeros(Partition_CIs.size)
+	for i, ci in enumerate(Partition_CIs):
+		To_Plot[i] = sum(Lesioned_CIs[patient]==ci) 
+
+	plt.figure()	
+	plt.bar(Partition_CIs, To_Plot, align='center')
+	plt.xticks(Partition_CIs, Network_names, rotation=30)
+	plt.title(patient)
+	#plt.show()
+	
+#look at ditribution of nodal properties
+
+Lesioned_values = np.array([])
+for patient in thalamic_patients:
+	Lesioned_values = np.concatenate((Lesioned_values, Tha_WMDs_percentage[np.in1d(Thalamus_voxels, Lesioned_voxels[patient]).nonzero()[0]]))
+
+plt.hist(Lesioned_values, 20)
+plt.show()
+
+
+################################################################
+###### Load adj mats for all subjects, in 3d array ROIxROIxsubject
+################################################################
+
+AdjMat_Files = glob.glob(path_to_adjmat + 'MGH*Craddock_300_cortical_corrmat')
+
+Control_AdjMats = np.loadtxt(AdjMat_Files[0])
+for f in AdjMat_Files[1:]:
+
+	M = np.loadtxt(f)
+	Control_AdjMats = np.dstack((Control_AdjMats,M))
+
+save_object(Control_AdjMats, path_to_data_folder +'/Control_AdjMats')
+#np.dstack((a,a)).shape
+
+
+################################################################
+###### Create patient data dataframe
+################################################################
+
+
+for patient in thalamic_patients:
+	Patient_adjmat = np.loadtxt(path_to_adjmat + 'Tha_' + patient + '_Craddock_300_cortical_corrmat' )
+
+	patient_df = pd.DataFrame()
+	patient_df = pd.DataFrame(columns=('SubjID', 'Voxel', 'Cost', 'CI', 'PC', 'WMD', 'BNCR', 'NNC', \
+		'Target_total_Weight', 'nonTarget_total_Weight', \
+		'Target_total_Weight_bn', 'nonTarget_total_Weight_wn', \
+		'Target_total_Weight_wn', 'nonTarget_total_Weight_wn', \
+		'Target_connected_Weight', 'nonTarget_connected_Weight', \
+		'Target_connected_Weight_bn', 'nonTarget_connected_Weight_wn', \
+		'Target_connected_Weight_wn', 'nonTarget_connected_Weight_wn', ), index = range(Lesioned_voxels[patient].size * 15))
+
+	
 
 
 
-
-
-
-
-
+	
 
 
 

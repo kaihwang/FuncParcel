@@ -98,6 +98,9 @@ make_image(atlas_path, image_path, ROI_list, Thalamus_CIs)
 Cortical_plus_thalamus_CI = np.concatenate((Cortical_CI, Thalamus_CIs), 1) 
 Cortical_plus_thalamus_CI = Cortical_plus_thalamus_CI.astype(int)
 
+save_object(Cortical_plus_thalamus_CI, path_to_data_folder +'/Cortical_plus_thalamus_CI')
+save_object(Thalamus_CIs, path_to_data_folder +'/Thalamus_CIs')
+
 ## calculate PC, BNWR, WMD, iterate through costs 
 #PC
 Tha_PCs = np.empty(Cortical_plus_thalamus_CI.size)
@@ -257,7 +260,7 @@ save_object(NNCs, path_to_data_folder +'/NNCs')
 
 
 ################################################################
-#### get descriptive stats of PC within parcel
+#### get descriptive stats of nodal rols per parcel
 ################################################################
 mean_PC_per_thalamus_parcel = np.zeros(max(Thalamus_CIs))
 for ix, i in enumerate(np.unique(Thalamus_CIs)):
@@ -275,6 +278,24 @@ Tha_NNCs = NNCs_percentage[Thalamus_voxel_positions]/100
 mean_NNCs_per_thalamus_parcel = np.zeros(max(Thalamus_CIs))
 for ix, i in enumerate(np.unique(Thalamus_CIs)):
 	mean_NNCs_per_thalamus_parcel[ix] = np.nanmean(Tha_NNCs[Thalamus_CIs==i])
+
+
+mean_PC_per_Cortical_parcel = np.zeros(len(np.unique(Cortical_CI)))
+for ix, i in enumerate(np.unique(Cortical_CI)):
+	mean_PC_per_Cortical_parcel[ix] = np.nanmean(Cortical_PCs_percentage[Cortical_CI==i])
+
+mean_WMD_per_Cortical_parcel = np.zeros(len(np.unique(Cortical_CI)))
+for ix, i in enumerate(np.unique(Cortical_CI)):
+	mean_WMD_per_Cortical_parcel[ix] = np.nanmean(Cortical_WMDs_percentage[Cortical_CI==i])
+
+mean_BNWR_per_Cortical_parcel = np.zeros(len(np.unique(Cortical_CI)))
+for ix, i in enumerate(np.unique(Cortical_CI)):
+	mean_BNWR_per_Cortical_parcel[ix] = np.nanmean(Cortical_BNWR_percentage[Cortical_CI==i])
+
+Cortical_NNCs = NNCs_percentage[Cortical_ROIs_positions]/100
+mean_NNCs_per_Cortical_parcel = np.zeros(len(np.unique(Cortical_CI)))
+for ix, i in enumerate(np.unique(Cortical_CI)):
+	mean_NNCs_per_Cortical_parcel[ix] = np.nanmean(Cortical_NNCs[Cortical_CI==i])
 
 
 

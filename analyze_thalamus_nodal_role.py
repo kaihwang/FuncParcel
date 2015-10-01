@@ -35,9 +35,9 @@ NKI_cor_adj = np.loadtxt(AvgMat_path + '/NKI/_Craddock_300_cortical__mx_645_corr
 MGH_network_plus_tha_adj = np.loadtxt(Parcel_path +'/MGH_cortical_network_plus_thalamus_parcorrmatavg')
 NKI_network_plus_tha_adj = np.loadtxt(Parcel_path +'/NKI_mx_645_cortical_network_plus_thalamus_parcorrmatavg')
 #Within thalamus weight
-MGH_Thalamus_corrmat = np.loadtxt(AvgMat_path + '/AvgMatrices/MGH/_Craddock_300_plus_thalamus_ROIs_ncsreg_corrmatavg')
+MGH_Thalamus_corrmat = np.loadtxt(AvgMat_path + '/MGH/_Craddock_300_plus_thalamus_ROIs_ncsreg_corrmatavg')
 MGH_Thalamus_corrmat = MGH_Thalamus_corrmat[Thalamus_voxel_positions,:][:,Thalamus_voxel_positions]
-NKI_Thalamus_corrmat = np.loadtxt(AvgMat_path + '/AvgMatrices/NKI/_Craddock_300_plus_thalamus_ROIs__mx_645_ncsreg_corrmatavg')
+NKI_Thalamus_corrmat = np.loadtxt(AvgMat_path + '/NKI/_Craddock_300_plus_thalamus_ROIs__mx_645_ncsreg_corrmatavg')
 NKI_Thalamus_corrmat = NKI_Thalamus_corrmat[Thalamus_voxel_positions,:][:,Thalamus_voxel_positions]
 
 #### load cortical modular partition result

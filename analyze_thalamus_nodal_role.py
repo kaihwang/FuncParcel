@@ -29,7 +29,7 @@ Thalamocortical_corrmat = np.loadtxt(Parcel_path+'/MGH_Craddock_300_cortical_plu
 MGH_thalamocor_adj = np.loadtxt(Parcel_path+'/MGH_Craddock_300_cortical_plus_thalamus_parcorrmatavg')
 NKI_thalamocor_adj = np.loadtxt(Parcel_path+'/NKI_mx_645_Craddock_300_cortical_plus_thalamus_parcorrmatavg')
 #Cortical ROIs only
-MGH_cor_adj = np.loadtxt(AvgMat_path + '/AvgMatrices/MGH/_Craddock_300_cortical_corrmatavg')
+MGH_cor_adj = np.loadtxt(AvgMat_path + '/MGH/_Craddock_300_cortical_corrmatavg')
 NKI_cor_adj = np.loadtxt(AvgMat_path + '/NKI/_Craddock_300_cortical__mx_645_corrmatavg')
 #Cortical modular partitions (network) plus thalamus
 MGH_network_plus_tha_adj = np.loadtxt(Parcel_path +'/MGH_cortical_network_plus_thalamus_parcorrmatavg')

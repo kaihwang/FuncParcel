@@ -34,7 +34,7 @@ NKI_cor_adj = np.loadtxt(AvgMat_path + '/NKI/_Craddock_300_cortical__mx_645_corr
 #Cortical modular partitions (network) plus thalamus
 MGH_network_plus_tha_adj = np.loadtxt(Parcel_path +'/MGH_cortical_network_plus_thalamus_parcorrmatavg')
 NKI_network_plus_tha_adj = np.loadtxt(Parcel_path +'/NKI_mx_645_cortical_network_plus_thalamus_parcorrmatavg')
-#Within thalamus weight
+#Extract Within thalamus weight
 MGH_Thalamus_corrmat = np.loadtxt(AvgMat_path + '/MGH/_Craddock_300_plus_thalamus_ROIs_ncsreg_corrmatavg')
 MGH_Thalamus_corrmat = MGH_Thalamus_corrmat[Thalamus_voxel_positions,:][:,Thalamus_voxel_positions]
 NKI_Thalamus_corrmat = np.loadtxt(AvgMat_path + '/NKI/_Craddock_300_plus_thalamus_ROIs__mx_645_ncsreg_corrmatavg')
@@ -193,25 +193,26 @@ def cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocortical_corrmat, Cor
 	save_object(Tha_BNWR, file_path)
 
 
-	#get cortical PC and BNEW and WMD
+	#get cortical PC and BNEW
 	Cortical_adj[np.isnan(Cortical_adj)] = 0
 
-	Cortical_wm_mean = {}
-	Cortical_wm_std = {}
+	#Cortical_wm_mean = {}
+	#Cortical_wm_std = {}
 	Cortical_PCs = np.zeros(Cortical_CI.size)
-	Cortical_WMDs = np.zeros(Cortical_CI.size)
+	#Cortical_WMDs = np.zeros(Cortical_CI.size)
 	Cortical_BNWR = np.zeros(Cortical_CI.size)
 	for ix, c in enumerate(np.arange(0.01,0.16, 0.01)):
 
+		#PC
 		Cortical_PCs += bct.participation_coef(bct.threshold_proportional(Cortical_adj, c, copy=True), Cortical_CI)
 
 		#wmd
-		M = bct.weight_conversion(bct.threshold_proportional(Cortical_adj, c, copy=True), 'binarize')
-		Cortical_WMDs += bct.module_degree_zscore(M, Cortical_CI)
+		#M = bct.weight_conversion(bct.threshold_proportional(Cortical_adj, c, copy=True), 'binarize')
+		#Cortical_WMDs += bct.module_degree_zscore(M, Cortical_CI)
 		#return mean and degree 
-		for CI in np.unique(Cortical_CI):
-			Cortical_wm_mean[ix+1, CI] = np.nanmean(np.sum(M[Cortical_CI==CI,:],1))
-			Cortical_wm_std[ix+1, CI] = np.nanstd(np.sum(M[Cortical_CI==CI,:],1))
+		#for CI in np.unique(Cortical_CI):
+		#	Cortical_wm_mean[ix+1, CI] = np.nanmean(np.sum(M[Cortical_CI==CI,:],1))
+		#	Cortical_wm_std[ix+1, CI] = np.nanstd(np.sum(M[Cortical_CI==CI,:],1))
 
 		#BNWR
 		M = bct.threshold_proportional(Cortical_adj, c, copy=True)
@@ -241,30 +242,6 @@ def cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocortical_corrmat, Cor
 	make_image(atlas_path, image_path, Cortical_ROIs, Cortical_BNWR_percentage)
 	file_path = path_to_data_folder +'/%s_Cortical_BNWR' %dset
 	save_object(Cortical_BNWR, file_path) 
-
-	#get thlamus WMD, using mean and STD from cortex. 
-	Tha_WMDs = np.zeros(Cortical_plus_thalamus_CI.size)
-	for ix, c in enumerate(cost_thresholds):
-		Par_adj = Thalamocortical_corrmat.copy()
-		Par_adj[Cortical_ROIs_positions[Cortical_CI==0],:]=0
-		Par_adj[:,Cortical_ROIs_positions[Cortical_CI==0]]=0
-		Par_adj[Par_adj<c]=0
-		M = bct.weight_conversion(Par_adj, 'binarize')
-
-		tha_wmd = np.zeros(Cortical_plus_thalamus_CI.size)
-		for i in np.unique(Cortical_CI):
-			tha_wmd[Cortical_plus_thalamus_CI==i] = (np.sum(M[Cortical_plus_thalamus_CI==i][:, Cortical_ROIs_positions],1)\
-			- Cortical_wm_mean[ix+1,i])/Cortical_wm_std[ix+1,i]
-		tha_wmd = np.nan_to_num(tha_wmd)
-		Tha_WMDs += tha_wmd
-
-	Tha_WMDs[Cortical_ROIs_positions.astype('int')]=0
-	Tha_WMDs_percentage = (Tha_WMDs/15)*100 
-	atlas_path = path_to_ROIs+'/Craddock_300_plus_thalamus_ROIs.nii.gz' 
-	image_path = '/home/despoB/connectome-thalamus/Thalamic_parcel/%s_tha_nodal_role_WMD.nii.gz' %dset
-	make_image(atlas_path, image_path, ROIs, Tha_WMDs_percentage)
-	file_path = path_to_data_folder + '/%s_Tha_WMDs' %dset
-	save_object(Tha_WMDs, file_path)
 
 
 	#get number of networks/communities connected
@@ -301,8 +278,68 @@ def cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocortical_corrmat, Cor
 #### run function
 #cal_thalamus_and_cortical_ROIs_nodal_properties(MGH_thalamocor_adj, MGH_cor_adj, \
 #	MGH_Cortical_plus_thalamus_CI, MGH_Thalamus_CIs, MGH_cost_thresholds, 'MGH')
-cal_thalamus_and_cortical_ROIs_nodal_properties(NKI_thalamocor_adj, NKI_cor_adj, \
-	NKI_Cortical_plus_thalamus_CI, NKI_Thalamus_CIs, NKI_cost_thresholds, 'NKI')
+#cal_thalamus_and_cortical_ROIs_nodal_properties(NKI_thalamocor_adj, NKI_cor_adj, \
+#	NKI_Cortical_plus_thalamus_CI, NKI_Thalamus_CIs, NKI_cost_thresholds, 'NKI')
+
+
+######## do WMD separately
+
+def cal_WMD(Cortical_adj, Thalamocortical_corrmat , Cortical_plus_thalamus_CI, dset):
+	global cortical_ROIs_positions, path_to_ROIs, ROIs, Cortical_CI, Cortical_ROIs, path_to_ROIs
+
+	#get cortical WMD
+	Cortical_adj[np.isnan(Cortical_adj)] = 0
+
+	Cortical_wm_mean = {}
+	Cortical_wm_std = {}
+	Cortical_WMDs = np.zeros(Cortical_CI.size)
+	Tha_WMDs = np.zeros(Cortical_plus_thalamus_CI.size)
+
+	for ix, c in enumerate(np.arange(0.01,0.16, 0.01)):
+
+		#wmd
+		M = bct.weight_conversion(bct.threshold_proportional(Cortical_adj, c, copy=True), 'binarize')
+		Cortical_WMDs += bct.module_degree_zscore(M, Cortical_CI)
+		#return mean and degree 
+		for CI in np.unique(Cortical_CI):
+			Cortical_wm_mean[ix+1, CI] = np.nanmean(np.sum(M[Cortical_CI==CI,:],1))
+			Cortical_wm_std[ix+1, CI] = np.nanstd(np.sum(M[Cortical_CI==CI,:],1))
+
+		#thalamic WMD
+		M = bct.weight_conversion(bct.threshold_proportional(Thalamocortical_corrmat, c, copy=True), 'binarize')	
+
+		tha_wmd = np.zeros(Cortical_plus_thalamus_CI.size)
+		for i in np.unique(Cortical_CI):
+			tha_wmd[Cortical_plus_thalamus_CI==i] = (np.sum(M[Cortical_plus_thalamus_CI==i][:, Cortical_ROIs_positions],1)\
+			- Cortical_wm_mean[ix+1,i])/Cortical_wm_std[ix+1,i]
+		tha_wmd = np.nan_to_num(tha_wmd)
+		Tha_WMDs += tha_wmd
+
+	Cortical_WMDs_percentage = (Cortical_WMDs/15)*100 
+	atlas_path = path_to_ROIs+'/Craddock_300_cortical.nii.gz' 
+	image_path = '/home/despoB/connectome-thalamus/Thalamic_parcel/%s_cortical_nodal_role_wmd.nii.gz' %dset
+	make_image(atlas_path, image_path, Cortical_ROIs, Cortical_WMDs_percentage)
+	file_path = path_to_data_folder +'/%s_Cortical_WMDs' %dset
+	save_object(Cortical_WMDs, file_path) 
+		
+	Tha_WMDs[Cortical_ROIs_positions.astype('int')]=0
+	Tha_WMDs_percentage = (Tha_WMDs/15)*100 
+	atlas_path = path_to_ROIs+'/Craddock_300_plus_thalamus_ROIs.nii.gz' 
+	image_path = '/home/despoB/connectome-thalamus/Thalamic_parcel/%s_tha_nodal_role_WMD.nii.gz' %dset
+	make_image(atlas_path, image_path, ROIs, Tha_WMDs_percentage)
+	file_path = path_to_data_folder + '/%s_Tha_WMDs' %dset
+	save_object(Tha_WMDs, file_path)
+
+## run function, first extract cortical adj and thalamocortical adj using full corr matrices
+#Extract cortico thalamus weight
+MGH_Thalamus_corrmat = np.loadtxt(AvgMat_path + '/MGH/_Craddock_300_plus_thalamus_ROIs_ncsreg_corrmatavg')
+NKI_Thalamus_corrmat = np.loadtxt(AvgMat_path + '/NKI/_Craddock_300_plus_thalamus_ROIs__mx_645_ncsreg_corrmatavg')
+MGH_cor_adjmat = MGH_Thalamus_corrmat[Cortical_ROIs_positions,:][:,Cortical_ROIs_positions]
+NKI_cor_adjmat = NKI_Thalamus_corrmat[Cortical_ROIs_positions,:][:,Cortical_ROIs_positions]
+cal_WMD(MGH_cor_adjmat, MGH_Thalamus_corrmat , MGH_Cortical_plus_thalamus_CI, 'MGH')
+cal_WMD(NKI_cor_adjmat, NKI_Thalamus_corrmat , NKI_Cortical_plus_thalamus_CI, 'NKI')
+
+
 
 ################################################################
 #### Thalamus's nodal properties based on within thalamus weight
@@ -340,8 +377,8 @@ def cal_within_thalamus_nodal_roles(Thalamus_corrmat, Thalamus_CIs, dset):
 	save_object(within_Tha_WMDs, file_path)
 
 #### cal function
-cal_within_thalamus_nodal_roles(MGH_Thalamus_corrmat,MGH_Thalamus_CIs, 'MGH')
-cal_within_thalamus_nodal_roles(NKI_Thalamus_corrmat,NKI_Thalamus_CIs, 'NKI')
+#cal_within_thalamus_nodal_roles(MGH_Thalamus_corrmat, MGH_Thalamus_CIs, 'MGH')
+#cal_within_thalamus_nodal_roles(NKI_Thalamus_corrmat, NKI_Thalamus_CIs, 'NKI')
 
 ################################################################
 #### get descriptive stats of nodal rols per parcel

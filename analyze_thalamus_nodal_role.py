@@ -22,7 +22,7 @@ Cortical_ROIs = np.loadtxt(path_to_ROIs+'/Craddock_300_cortical_ROIs', dtype = i
 Cortical_ROIs_positions = np.arange(0,320,1)
 Thalamus_voxel_positions = np.arange(320,3859,1)	
 Thalamus_voxel_coordinate = np.loadtxt(path_to_ROIs +'/thalamus_voxels_ijk_indices', dtype = int)
-Thalamocortical_corrmat = np.loadtxt(Parcel_path+'/MGH_Craddock_300_cortical_plus_thalamus_parcorrmatavg')
+#Thalamocortical_corrmat = np.loadtxt(Parcel_path+'/MGH_Craddock_300_cortical_plus_thalamus_parcorrmatavg')
 
 #### load MGH and NKI adj matrices separately
 #thalamus + cortical ROIs
@@ -64,7 +64,7 @@ save_object(Cortical_targets, path_to_data_folder +'/Cortical_targets')
 save_object(Cortical_nontargets, path_to_data_folder +'/Cortical_nontargets')
 
 #### do a count for each ROI, hownay thalamic voxels it connects, save result to nifti
-targets = np.empty(0, dtype='int')
+targets = np.zeros(0, dtype='int')
 for v in Cortical_targets.itervalues():
 	targets=np.concatenate((targets,v))
 np.savetxt(path_to_data_folder+'/targets_across_costs.txt', targets)
@@ -99,7 +99,7 @@ _, MGH_Thalamo_ParcelCIs, _, = parcel_subcortical_network(MGH_network_plus_tha_a
 	Thalamus_voxels, Cortical_Network_CIs, Cortical_Network_CIs)
 save_object(MGH_Thalamo_ParcelCIs, path_to_data_folder +'/MGH_Thalamo_ParcelCIs')
 
-_, NKI_Thalamo_ParcelCIs, _, = parcel_subcortical_network(MGH_network_plus_tha_adj, Cortical_Network_CIs_plus_thalamus, \
+_, NKI_Thalamo_ParcelCIs, _, = parcel_subcortical_network(NKI_network_plus_tha_adj, Cortical_Network_CIs_plus_thalamus, \
 	Thalamus_voxels, Cortical_Network_CIs, Cortical_Network_CIs)
 save_object(NKI_Thalamo_ParcelCIs, path_to_data_folder +'/NKI_Thalamo_ParcelCIs')
 
@@ -146,12 +146,12 @@ save_object(NKI_Cortical_plus_thalamus_CI, path_to_data_folder +'/NKI_Cortical_p
 
 #### define this messy function....
 def cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocortical_corrmat, Cortical_adj, \
-	Cortical_plus_thalamus_CI, cost_thresholds, dset):
+	Cortical_plus_thalamus_CI, Thalamus_CIs, cost_thresholds, dset):
 	global Cortical_ROIs_positions, Cortical_CI, path_to_ROIs, path_to_data_folder, \
-	Thalamus_voxel_positions, Thalamus_CIs, ROIs, Cortical_ROIs 
+	Thalamus_voxel_positions, ROIs, Cortical_ROIs 
 
 	#PC
-	Tha_PCs = np.empty(Cortical_plus_thalamus_CI.size)
+	Tha_PCs = np.zeros(Cortical_plus_thalamus_CI.size)
 	for c in cost_thresholds:
 		Par_adj = Thalamocortical_corrmat.copy()
 		Par_adj[Cortical_ROIs_positions[Cortical_CI==0],:]=0
@@ -171,7 +171,7 @@ def cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocortical_corrmat, Cor
 	save_object(Tha_PCs, file_path) 
 
 	#BNWR
-	Tha_BNWR = np.empty(Cortical_plus_thalamus_CI.size)
+	Tha_BNWR = np.zeros(Cortical_plus_thalamus_CI.size)
 	for c in cost_thresholds:
 		Par_adj = Thalamocortical_corrmat.copy()
 		Par_adj[Par_adj<c]=0
@@ -200,7 +200,7 @@ def cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocortical_corrmat, Cor
 	Cortical_wm_std = {}
 	Cortical_PCs = np.zeros(Cortical_CI.size)
 	Cortical_WMDs = np.zeros(Cortical_CI.size)
-	Cortical_BNWR = np.empty(Cortical_CI.size)
+	Cortical_BNWR = np.zeros(Cortical_CI.size)
 	for ix, c in enumerate(np.arange(0.01,0.16, 0.01)):
 
 		Cortical_PCs += bct.participation_coef(bct.threshold_proportional(Cortical_adj, c, copy=True), Cortical_CI)
@@ -243,7 +243,7 @@ def cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocortical_corrmat, Cor
 	save_object(Cortical_BNWR, file_path) 
 
 	#get thlamus WMD, using mean and STD from cortex. 
-	Tha_WMDs = np.empty(Cortical_plus_thalamus_CI.size)
+	Tha_WMDs = np.zeros(Cortical_plus_thalamus_CI.size)
 	for ix, c in enumerate(cost_thresholds):
 		Par_adj = Thalamocortical_corrmat.copy()
 		Par_adj[Cortical_ROIs_positions[Cortical_CI==0],:]=0
@@ -253,8 +253,8 @@ def cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocortical_corrmat, Cor
 
 		tha_wmd = np.zeros(Cortical_plus_thalamus_CI.size)
 		for i in np.unique(Cortical_CI):
-			tha_wmd[Cortical_plus_thalamus_CI==i] = (np.sum(M[Cortical_plus_thalamus_CI==1][:, Cortical_ROIs_positions],1) \
-			 - Cortical_wm_mean[ix+1,i])/Cortical_wm_std[ix+1,i]
+			tha_wmd[Cortical_plus_thalamus_CI==i] = (np.sum(M[Cortical_plus_thalamus_CI==i][:, Cortical_ROIs_positions],1)\
+			- Cortical_wm_mean[ix+1,i])/Cortical_wm_std[ix+1,i]
 		tha_wmd = np.nan_to_num(tha_wmd)
 		Tha_WMDs += tha_wmd
 
@@ -268,7 +268,7 @@ def cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocortical_corrmat, Cor
 
 
 	#get number of networks/communities connected
-	NNCs = np.empty(Cortical_plus_thalamus_CI.size)
+	NNCs = np.zeros(Cortical_plus_thalamus_CI.size)
 	for ic, c in enumerate(cost_thresholds):
 		Par_adj = Thalamocortical_corrmat.copy()
 		Par_adj[Par_adj<c]=0
@@ -280,7 +280,7 @@ def cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocortical_corrmat, Cor
 		NNCs += Tha_NNCs
 
 
-	Cortical_NNCs = np.empty(Cortical_plus_thalamus_CI.size)
+	Cortical_NNCs = np.zeros(Cortical_plus_thalamus_CI.size)
 	for ic, c in enumerate(np.arange(0.01,0.16, 0.01)):
 		M= bct.threshold_proportional(Cortical_adj, c, copy=True)
 
@@ -299,22 +299,22 @@ def cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocortical_corrmat, Cor
 	save_object(NNCs, file_path) 
 
 #### run function
-cal_thalamus_and_cortical_ROIs_nodal_properties(MGH_thalamocor_adj, MGH_cor_adj, \
-	MGH_Cortical_plus_thalamus_CI, MGH_cost_thresholds, 'MGH')
+#cal_thalamus_and_cortical_ROIs_nodal_properties(MGH_thalamocor_adj, MGH_cor_adj, \
+#	MGH_Cortical_plus_thalamus_CI, MGH_Thalamus_CIs, MGH_cost_thresholds, 'MGH')
 cal_thalamus_and_cortical_ROIs_nodal_properties(NKI_thalamocor_adj, NKI_cor_adj, \
-	NKI_Cortical_plus_thalamus_CI, NKI_cost_thresholds, 'NKI')
+	NKI_Cortical_plus_thalamus_CI, NKI_Thalamus_CIs, NKI_cost_thresholds, 'NKI')
 
 ################################################################
 #### Thalamus's nodal properties based on within thalamus weight
 ################################################################
 
 
-def cal_within_thalamus_nodal_roles(Thalamus_corrmat, dset):
+def cal_within_thalamus_nodal_roles(Thalamus_corrmat, Thalamus_CIs, dset):
 	global Thalamus_voxel_positions, path_to_ROIs, path_to_data_folder
 
 	#get PC and WMD
-	within_Tha_PCs = np.empty(Thalamus_voxel_positions.size)
-	within_Tha_WMDs = np.empty(Thalamus_voxel_positions.size)
+	within_Tha_PCs = np.zeros(Thalamus_voxel_positions.size)
+	within_Tha_WMDs = np.zeros(Thalamus_voxel_positions.size)
 
 	for c in np.arange(0.01,0.16,0.01):
 		
@@ -340,8 +340,8 @@ def cal_within_thalamus_nodal_roles(Thalamus_corrmat, dset):
 	save_object(within_Tha_WMDs, file_path)
 
 #### cal function
-cal_within_thalamus_nodal_roles(MGH_Thalamus_corrmat, 'MGH')
-cal_within_thalamus_nodal_roles(NKI_Thalamus_corrmat, 'NKI')
+cal_within_thalamus_nodal_roles(MGH_Thalamus_corrmat,MGH_Thalamus_CIs, 'MGH')
+cal_within_thalamus_nodal_roles(NKI_Thalamus_corrmat,NKI_Thalamus_CIs, 'NKI')
 
 ################################################################
 #### get descriptive stats of nodal rols per parcel

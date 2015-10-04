@@ -94,20 +94,49 @@ save_object(Control_AdjMats, path_to_data_folder +'/Control_AdjMats')
 ###### Create patient data dataframe
 ################################################################
 
+Control_AdjMats = pickle.load(open('/home/despoB/kaihwang/bin/FuncParcel/Data/Control_AdjMats', "rb"))
+Cortical_targets = pickle.load(open(path_to_data_folder +'/Cortical_targets', "rb"))
+Cortical_nontargets = pickle.load(open(path_to_data_folder +'/Cortical_nontargets', "rb"))
+
+Tha_PC = pickle.load(open(path_to_data_folder+'Tha_PCs', "rb"))
+Tha_WMD = pickle.load(open(path_to_data_folder+'Tha_WMDs', "rb"))
+Tha_BNWR = pickle.load(open(path_to_data_folder+'Tha_BNWR', "rb"))
+
 
 for patient in thalamic_patients:
 	Patient_adjmat = np.loadtxt(path_to_adjmat + 'Tha_' + patient + '_Craddock_300_cortical_corrmat' )
 
-	patient_df = pd.DataFrame()
-	patient_df = pd.DataFrame(columns=('SubjID', 'Voxel', 'Cost', 'CI', 'PC', 'WMD', 'BNCR', 'NNC', \
+	tmp_df = pd.DataFrame()
+	tmp_df = pd.DataFrame(columns=('SubjID', 'Voxel', 'CI', 'PC', 'WMD', 'BNCR', \
 		'Target_total_Weight', 'nonTarget_total_Weight', \
 		'Target_total_Weight_bn', 'nonTarget_total_Weight_wn', \
 		'Target_total_Weight_wn', 'nonTarget_total_Weight_wn', \
 		'Target_connected_Weight', 'nonTarget_connected_Weight', \
-		'Target_connected_Weight_bn', 'nonTarget_connected_Weight_wn', \
-		'Target_connected_Weight_wn', 'nonTarget_connected_Weight_wn', ), index = range(Lesioned_voxels[patient].size * 15))
+		'Target_connected_Weight_bn', 'nonTarget_connected_Weight_bn', \
+		'Target_connected_Weight_wn', 'nonTarget_connected_Weight_wn', ))
 
-	
+	for i, v in enumerate(Lesioned_voxels[patient]):
+		tmp_df.set_value(i, 'SubjID', patient)
+		tmp_df.set_value(i, 'Voxel', v)
+		tmp_df.set_value(i, 'CI', Thalamus_CIs[Thalamus_voxels==v])
+		tmp_df.set_value(i, 'PC', Tha_PC[Thalamus_voxels==v])
+		tmp_df.set_value(i, 'WMD', Tha_WMD[Thalamus_voxels==v])
+		tmp_df.set_value(i, 'BNCR', Tha_BNWR[Thalamus_voxels==v])
+
+		target_pos = np.in1d(Cortical_ROIs,Cortical_targets[v])
+		nontarget_pos =  np.in1d(Cortical_ROIs,Cortical_nontargets[v])
+
+		padj_t_tmp = Patient_adjmat[target_pos,:][:,target_pos]		
+		padj_nt_tmp = Patient_adjmat[nontarget_pos,:][:,nontarget_pos]	
+
+		cadj_t_tmp = Control_AdjMats[target_pos,:,:][:,target_pos,:]
+		cadj_nt_tmp = Control_AdjMats[nontarget_pos,:,:][:,nontarget_pos,:]
+		
+		a=np.triu_indices(sum(target_pos),1)[0]
+		b=np.triu_indices(sum(target_pos),1)[1]
+
+		np.mean(padj_t_tmp[np.triu_indices(sum(target_pos),1)])
+		np.mean(cadj_t_tmp[a,b,:])
 
 
 

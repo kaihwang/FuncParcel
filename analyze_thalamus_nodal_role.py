@@ -332,12 +332,14 @@ def cal_WMD(Cortical_adj, Thalamocortical_corrmat , Cortical_plus_thalamus_CI, d
 
 ## run function, first extract cortical adj and thalamocortical adj using full corr matrices
 #Extract cortico thalamus weight
+
 MGH_Thalamus_corrmat = np.loadtxt(AvgMat_path + '/MGH/_Craddock_300_plus_thalamus_ROIs_ncsreg_corrmatavg')
 NKI_Thalamus_corrmat = np.loadtxt(AvgMat_path + '/NKI/_Craddock_300_plus_thalamus_ROIs__mx_645_ncsreg_corrmatavg')
 MGH_cor_adjmat = MGH_Thalamus_corrmat[Cortical_ROIs_positions,:][:,Cortical_ROIs_positions]
 NKI_cor_adjmat = NKI_Thalamus_corrmat[Cortical_ROIs_positions,:][:,Cortical_ROIs_positions]
-cal_WMD(MGH_cor_adjmat, MGH_Thalamus_corrmat , MGH_Cortical_plus_thalamus_CI, 'MGH')
-cal_WMD(NKI_cor_adjmat, NKI_Thalamus_corrmat , NKI_Cortical_plus_thalamus_CI, 'NKI')
+
+#cal_WMD(MGH_cor_adjmat, MGH_Thalamus_corrmat , MGH_Cortical_plus_thalamus_CI, 'MGH')
+#cal_WMD(NKI_cor_adjmat, NKI_Thalamus_corrmat , NKI_Cortical_plus_thalamus_CI, 'NKI')
 
 
 
@@ -379,6 +381,37 @@ def cal_within_thalamus_nodal_roles(Thalamus_corrmat, Thalamus_CIs, dset):
 #### cal function
 #cal_within_thalamus_nodal_roles(MGH_Thalamus_corrmat, MGH_Thalamus_CIs, 'MGH')
 #cal_within_thalamus_nodal_roles(NKI_Thalamus_corrmat, NKI_Thalamus_CIs, 'NKI')
+
+
+
+################################################################################
+#### Thalamus's nodal properties: between network centrality, or "bridge"
+################################################################################
+
+dset = 'MGH'
+MGH_Thalamus_corrmat = np.loadtxt(AvgMat_path + '/MGH/_Craddock_300_plus_thalamus_ROIs_ncsreg_corrmatavg')
+MGH_Cortical_plus_thalamus_CI = pickle.load(open(path_to_data_folder+'/MGH_Cortical_plus_thalamus_CI', "rb"))
+
+bcc_n = np.zeros(MGH_Cortical_plus_thalamus_CI.size)
+for c in np.arange(0.01,0.16,0.01):
+	graph = matrix_to_igraph(MGH_Thalamus_corrmat.copy(),cost=c)
+	bcc_graph = brain_graph(VertexClustering(graph, membership = MGH_Cortical_plus_thalamus_CI))
+	bcc = between_community_centrality(bcc_graph,Cortical_ROIs_positions ,weight=False)
+	bcc_n +=(bcc/sum(bcc))/max(bcc/sum(bcc))
+
+bcc_percentage = (bcc_n/15)*100
+
+#tha
+atlas_path = path_to_ROIs+'/Thalamus_indices.nii.gz' 
+image_path = '/home/despoB/connectome-thalamus/Thalamic_parcel/%s_tha_nodal_role_bcc.nii.gz' %dset
+make_image(atlas_path, image_path, Thalamus_voxels, bcc_percentage[320:])
+#cpr
+atlas_path = path_to_ROIs+'/Craddock_300_plus_thalamus_ROIs.nii.gz' 
+image_path = '/home/despoB/connectome-thalamus/Thalamic_parcel/%s_cortical_nodal_role_bcc.nii.gz' %dset
+make_image(atlas_path, image_path, Cortical_ROIs, bcc_percentage[0:320])
+
+file_path = path_to_data_folder + '/%s_bcc' %dset
+save_object(bcc_n, file_path)
 
 ################################################################
 #### get descriptive stats of nodal rols per parcel

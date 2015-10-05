@@ -35,6 +35,9 @@ Cortical_WMD = pickle.load(open(path_to_data_folder+'Cortical_WMDs', "rb"))
 Tha_BNWR = pickle.load(open(path_to_data_folder+'Tha_BNWR', "rb"))
 Cortical_BNWR = pickle.load(open(path_to_data_folder+'Cortical_BNWR', "rb"))
 
+#BCC
+bcc = pickle.load(open(path_to_data_folder+'MGH_bcc', "rb"))
+
 
 ################################################################
 ###### create Dataframe
@@ -81,11 +84,13 @@ Thalamus_df['PC'] = Tha_PC[320:]/13.5  #take out cortical ones, normalize by max
 Thalamus_df['WMD'] = Tha_WMD[320:]/15 
 Thalamus_df['NNC'] = NNCs[320:]/15 
 Thalamus_df['BNWR'] = Tha_BNWR[320:]/15
+Thalamus_df['bcc'] = bcc[320:]/15
 
 Cortical_df['PC'] = Cortical_PC[0:320]/13.5  #take out cortical ones, normalize by max PC
 Cortical_df['WMD'] = Cortical_WMD[0:320]/15 
 Cortical_df['NNC'] = NNCs[0:320]/15 
 Cortical_df['BNWR'] = Cortical_BNWR[0:320]/15
+Cortical_df['bcc'] = bcc[0:320]/15
 
 #within thalamus stuff
 within_Tha_PC = pickle.load(open(path_to_data_folder+'within_Tha_PCs', "rb"))

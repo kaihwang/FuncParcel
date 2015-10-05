@@ -68,7 +68,8 @@ for patient in thalamic_patients:
 
 Lesioned_values = np.array([])
 for patient in thalamic_patients:
-	Lesioned_values = np.concatenate((Lesioned_values, Tha_WMDs_percentage[np.in1d(Thalamus_voxels, Lesioned_voxels[patient]).nonzero()[0]]))
+	Lesioned_values = np.concatenate((Lesioned_values, \
+		Tha_WMDs_percentage[np.in1d(Thalamus_voxels, Lesioned_voxels[patient]).nonzero()[0]]))
 
 plt.hist(Lesioned_values, 20)
 plt.show()
@@ -98,50 +99,148 @@ Control_AdjMats = pickle.load(open('/home/despoB/kaihwang/bin/FuncParcel/Data/Co
 Cortical_targets = pickle.load(open(path_to_data_folder +'/Cortical_targets', "rb"))
 Cortical_nontargets = pickle.load(open(path_to_data_folder +'/Cortical_nontargets', "rb"))
 
-Tha_PC = pickle.load(open(path_to_data_folder+'Tha_PCs', "rb"))
-Tha_WMD = pickle.load(open(path_to_data_folder+'Tha_WMDs', "rb"))
-Tha_BNWR = pickle.load(open(path_to_data_folder+'Tha_BNWR', "rb"))
+Tha_PC = pickle.load(open(path_to_data_folder+'/Tha_PCs', "rb"))
+Tha_WMD = pickle.load(open(path_to_data_folder+'/Tha_WMDs', "rb"))
+Tha_BNWR = pickle.load(open(path_to_data_folder+'/Tha_BNWR', "rb"))
 
-
+patient_df = pd.DataFrame()
 for patient in thalamic_patients:
 	Patient_adjmat = np.loadtxt(path_to_adjmat + 'Tha_' + patient + '_Craddock_300_cortical_corrmat' )
 
 	tmp_df = pd.DataFrame()
-	tmp_df = pd.DataFrame(columns=('SubjID', 'Voxel', 'CI', 'PC', 'WMD', 'BNCR', \
-		'Target_total_Weight', 'nonTarget_total_Weight', \
-		'Target_total_Weight_bn', 'nonTarget_total_Weight_wn', \
-		'Target_total_Weight_wn', 'nonTarget_total_Weight_wn', \
-		'Target_connected_Weight', 'nonTarget_connected_Weight', \
-		'Target_connected_Weight_bn', 'nonTarget_connected_Weight_bn', \
-		'Target_connected_Weight_wn', 'nonTarget_connected_Weight_wn', ))
+	#tmp_df = pd.DataFrame(columns=('SubjID', 'Voxel', 'CI', 'PC', 'WMD', 'BNCR', \ #strange issue with indexing... 
+	#	'Target_total_Weight', 'nonTarget_total_Weight', \
+	#	'Target_total_Weight_bn', 'nonTarget_total_Weight_wn', \
+	#	'Target_total_Weight_wn', 'nonTarget_total_Weight_wn', \
+	#	'Target_connected_Weight', 'nonTarget_connected_Weight', \
+	#	'Target_connected_Weight_bn', 'nonTarget_connected_Weight_bn', \
+	#	'Target_connected_Weight_wn', 'nonTarget_connected_Weight_wn', ))
 
 	for i, v in enumerate(Lesioned_voxels[patient]):
 		tmp_df.set_value(i, 'SubjID', patient)
 		tmp_df.set_value(i, 'Voxel', v)
 		tmp_df.set_value(i, 'CI', Thalamus_CIs[Thalamus_voxels==v])
-		tmp_df.set_value(i, 'PC', Tha_PC[Thalamus_voxels==v])
-		tmp_df.set_value(i, 'WMD', Tha_WMD[Thalamus_voxels==v])
-		tmp_df.set_value(i, 'BNCR', Tha_BNWR[Thalamus_voxels==v])
+		tmp_df.set_value(i, 'PC', Tha_PC[Thalamus_voxels==v]/13.5)
+		tmp_df.set_value(i, 'WMD', Tha_WMD[Thalamus_voxels==v]/15.)
+		tmp_df.set_value(i, 'BNCR', Tha_BNWR[Thalamus_voxels==v]/15.)
 
+		#logical position vecotros for targets and nontargets
 		target_pos = np.in1d(Cortical_ROIs,Cortical_targets[v])
-		nontarget_pos =  np.in1d(Cortical_ROIs,Cortical_nontargets[v])
+		nontarget_pos =  np.in1d(Cortical_ROIs,Cortical_nontargets[v])	
 
+		#total weight
+		tmp_df.set_value(i, 'Target_total_weight', \
+			(np.nanmean(Patient_adjmat[target_pos,:]) - \
+				np.nanmean(Control_AdjMats[target_pos,:,:])) / np.nanstd(Control_AdjMats[target_pos,:,:]))
+		tmp_df.set_value(i, 'nonTarget_total_weight', \
+			(np.nanmean(Patient_adjmat[nontarget_pos,:]) - \
+				np.nanmean(Control_AdjMats[nontarget_pos,:,:])) / np.nanstd(Control_AdjMats[nontarget_pos,:,:]))
+
+		#total weight bn
+		tmp_df.set_value(i, 'Target_total_weight_bn', \
+			(np.nanmean(Patient_adjmat[target_pos,:][:,Cortical_CI != Thalamus_CIs[Thalamus_voxels == v]]) - \
+				np.nanmean(Control_AdjMats[target_pos,:,:][:,Cortical_CI != Thalamus_CIs[Thalamus_voxels == v],:])) \
+			/ np.nanstd(Control_AdjMats[target_pos,:,:][:,Cortical_CI != Thalamus_CIs[Thalamus_voxels == v],:]))
+		tmp_df.set_value(i, 'nonTarget_total_weight_bn', \
+			(np.nanmean(Patient_adjmat[nontarget_pos,:][:,Cortical_CI != Thalamus_CIs[Thalamus_voxels == v]]) - \
+				np.nanmean(Control_AdjMats[nontarget_pos,:,:][:,Cortical_CI != Thalamus_CIs[Thalamus_voxels == v],:])) \
+			/ np.nanstd(Control_AdjMats[nontarget_pos,:,:][:,Cortical_CI != Thalamus_CIs[Thalamus_voxels == v],:]))
+
+		#total weight wn
+		tmp_df.set_value(i, 'Target_total_weight_wn', \
+			(np.nanmean(Patient_adjmat[target_pos,:][:,Cortical_CI == Thalamus_CIs[Thalamus_voxels == v]]) - \
+				np.nanmean(Control_AdjMats[target_pos,:,:][:,Cortical_CI == Thalamus_CIs[Thalamus_voxels == v],:])) \
+			/ np.nanstd(Control_AdjMats[target_pos,:,:][:,Cortical_CI == Thalamus_CIs[Thalamus_voxels == v],:]))
+		tmp_df.set_value(i, 'nonTarget_total_weight_wn', \
+			(np.nanmean(Patient_adjmat[nontarget_pos,:][:,Cortical_CI == Thalamus_CIs[Thalamus_voxels == v]]) - \
+				np.nanmean(Control_AdjMats[nontarget_pos,:,:][:,Cortical_CI == Thalamus_CIs[Thalamus_voxels == v],:])) \
+			/ np.nanstd(Control_AdjMats[nontarget_pos,:,:][:,Cortical_CI == Thalamus_CIs[Thalamus_voxels == v],:]))
+		
+		#logical positional vectors for targets and non targets that are the same CI as the thalamic voxel
+		target_wn_pos = np.in1d(Cortical_ROIs,Cortical_targets[v]) & (Cortical_CI == Thalamus_CIs[Thalamus_voxels == v])
+		nontarget_wn_pos = np.in1d(Cortical_ROIs,Cortical_nontargets[v]) & (Cortical_CI == Thalamus_CIs[Thalamus_voxels == v])
+
+		#logical positional vectors for targets and non targets that are not the same CI as the thalamic voxel
+		target_bn_pos = np.in1d(Cortical_ROIs,Cortical_targets[v]) & (Cortical_CI != Thalamus_CIs[Thalamus_voxels == v])
+		nontarget_bn_pos = np.in1d(Cortical_ROIs,Cortical_nontargets[v]) & (Cortical_CI != Thalamus_CIs[Thalamus_voxels == v])
+
+		## extract the adj matrices using the positional vectors
 		padj_t_tmp = Patient_adjmat[target_pos,:][:,target_pos]		
 		padj_nt_tmp = Patient_adjmat[nontarget_pos,:][:,nontarget_pos]	
 
 		cadj_t_tmp = Control_AdjMats[target_pos,:,:][:,target_pos,:]
 		cadj_nt_tmp = Control_AdjMats[nontarget_pos,:,:][:,nontarget_pos,:]
-		
-		a=np.triu_indices(sum(target_pos),1)[0]
-		b=np.triu_indices(sum(target_pos),1)[1]
 
-		np.mean(padj_t_tmp[np.triu_indices(sum(target_pos),1)])
-		np.mean(cadj_t_tmp[a,b,:])
+		padj_t_wn_tmp = Patient_adjmat[target_wn_pos,:][:,target_wn_pos]		
+		padj_nt_wn_tmp = Patient_adjmat[nontarget_wn_pos,:][:,nontarget_wn_pos]	
 
+		cadj_t_wn_tmp = Control_AdjMats[target_wn_pos,:,:][:,target_wn_pos,:]
+		cadj_nt_wn_tmp = Control_AdjMats[nontarget_wn_pos,:,:][:,nontarget_wn_pos,:]
 
+		padj_t_bn_tmp = Patient_adjmat[target_bn_pos,:][:,target_bn_pos]		
+		padj_nt_bn_tmp = Patient_adjmat[nontarget_bn_pos,:][:,nontarget_bn_pos]	
 
+		cadj_t_bn_tmp = Control_AdjMats[target_bn_pos,:,:][:,target_bn_pos,:]
+		cadj_nt_bn_tmp = Control_AdjMats[nontarget_bn_pos,:,:][:,nontarget_bn_pos,:]
+
+		#target_connected_weight
+		#only get upper triangle, get indices for that
+		a = np.triu_indices(sum(target_pos),1)[0]
+		b = np.triu_indices(sum(target_pos),1)[1]
+		c = np.triu_indices(sum(nontarget_pos),1)[0]
+		d = np.triu_indices(sum(nontarget_pos),1)[1]
+
+		if any(a) and any(b):
+			tmp_df.set_value(i, 'Target_connected_weight', (np.mean(padj_t_tmp[a,b]) - np.mean(cadj_t_tmp[a,b,:])) \
+			/ np.std(cadj_t_tmp[a,b,:]))
+		else:
+			tmp_df.set_value(i, 'Target_connected_weight', 0)
+
+		if any(c) and any(d):	
+			tmp_df.set_value(i, 'nonTarget_connected_weight', (np.mean(padj_nt_tmp[c,d]) - np.mean(cadj_nt_tmp[c,d,:])) \
+			/ np.std(cadj_nt_tmp[c,d,:]))
+		else:
+			tmp_df.set_value(i, 'nonTarget_connected_weight', 0)
+
+		#target_connected_weight_bn
+		a = np.triu_indices(sum(target_bn_pos),1)[0]
+		b = np.triu_indices(sum(target_bn_pos),1)[1]
+		c = np.triu_indices(sum(nontarget_bn_pos),1)[0]
+		d = np.triu_indices(sum(nontarget_bn_pos),1)[1]
+
+		if any(a) and any(b):
+			tmp_df.set_value(i, 'Target_connected_weight_bn', (np.mean(padj_t_bn_tmp[a,b]) - np.mean(cadj_t_bn_tmp[a,b,:])) \
+			/ np.std(cadj_t_bn_tmp[a,b,:]))
+		else: 
+			tmp_df.set_value(i, 'Target_connected_weight_bn', 0)
+
+		if any(c) and any(d):	
+			tmp_df.set_value(i, 'nonTarget_connected_weight_bn', (np.mean(padj_nt_bn_tmp[c,d]) - np.mean(cadj_nt_bn_tmp[c,d,:])) \
+			/ np.std(cadj_nt_bn_tmp[c,d,:]))
+		else:
+			tmp_df.set_value(i, 'nonTarget_connected_weight_bn', 0)
+
+		#target_connected_weight_wn
+		a = np.triu_indices(sum(target_wn_pos),1)[0]
+		b = np.triu_indices(sum(target_wn_pos),1)[1]
+		c = np.triu_indices(sum(nontarget_wn_pos),1)[0]
+		d = np.triu_indices(sum(nontarget_wn_pos),1)[1]
+
+		if any(a) and any(b):
+			tmp_df.set_value(i, 'Target_connected_weight_wn', (np.mean(padj_t_wn_tmp[a,b]) - np.mean(cadj_t_wn_tmp[a,b,:])) \
+			/ np.std(cadj_t_wn_tmp[a,b,:]))
+		else:
+			tmp_df.set_value(i, 'Target_connected_weight_wn', 0)
+
+		if any(c) and any(d):	
+			tmp_df.set_value(i, 'nonTarget_connected_weight_wn', (np.mean(padj_nt_wn_tmp[c,d]) - np.mean(cadj_nt_wn_tmp[c,d,:])) \
+			/ np.std(cadj_nt_wn_tmp[c,d,:]))
+		else:
+			tmp_df.set_value(i, 'nonTarget_connected_weight_wn', 0)
+
+	patient_df = patient_df.append(tmp_df)		
 	
-
+patient_df.to_csv(path_to_data_folder + '/patient_df.csv', index = False)
 
 
 

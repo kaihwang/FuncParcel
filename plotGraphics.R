@@ -3,7 +3,7 @@ setwd('/Volumes/neuro/bin/FuncParcel/Data/')
 
 # import libraries
 library(ggplot2)
-
+library(reshape2)
 
 #load data
 
@@ -40,10 +40,29 @@ plot(Thalamus_pc_plot)
 Thalamus_Target_Data = read.csv('Thalamus_target.csv', header=TRUE)
 total <- merge(Thalamus_Target_Data,Thalamus_Data,by="Voxel")
 
-Thalamus_pc_plot <-ggplot(data = total, aes(x=Associated.System.y , y=Target.PC))+geom_boxplot()+geom_point() + geom_jitter(position = position_jitter(width = .1))
+Thalamus_pc_plot <-ggplot(data = total, aes(x=Associated.System.y , y=Target.PC))+geom_point() + geom_jitter(position = position_jitter(width = .1))
 plot(Thalamus_pc_plot)
 
 
 ## look at tsnr
 Thalamus_boxplot <- ggplot(data = Thalamus_Data, aes_string(x="Associated.System", y="TSNR", fill="Associated.System")) + geom_boxplot() #+geom_point() + geom_jitter(position = position_jitter(width = .1))
 plot(Thalamus_boxplot)
+
+
+
+
+## look at patient data
+WarmScale<-c("#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#b10026")
+BlueScale<-c("#9ecae1", "#6baed6",  "#4292c6", "#2171b5", "#084594")
+cScale <- c("#e7298a",
+"#beaed4",
+"#fdc086",
+"#ffff99",
+"#386cb0")
+patient_data = read.csv('patient_df.csv', header=TRUE)
+
+plot_data = melt(patient_data, id_vars = c("SubjID", "Voxel", "CI", "PC"), measure.vars = c("Target_total_weight_wn", "nonTarget_total_weight_wn"))
+
+patient_plot <-ggplot(plot_data , aes(x=PC , y=value, colour=variable))+geom_point(size=3, aes(shape = factor(SubjID)))+ scale_colour_manual(values=c("Red", "Black")) + facet_grid(.~CI)
+                                                                                                                                            
+patient_plot

@@ -239,7 +239,21 @@ for patient in thalamic_patients:
 			tmp_df.set_value(i, 'nonTarget_connected_weight_wn', 0)
 
 	patient_df = patient_df.append(tmp_df)		
-	
+
+
+################################################################
+###### save
+################################################################
+patient_df['CI'].loc[patient_df['CI'] ==1] = 'Default'
+patient_df['CI'].loc[patient_df['CI'] ==2] = 'Visual'
+patient_df['CI'].loc[patient_df['CI'] ==3] = 'Somatomotor'
+patient_df['CI'].loc[patient_df['CI'] ==4] = 'Fronto-parietal'
+patient_df['CI'].loc[patient_df['CI'] ==5] = 'Attention'
+patient_df['CI'].loc[patient_df['CI'] ==6] = 'Cingulo-opercular'
+patient_df['CI'].loc[patient_df['CI'] ==7] = 'Temporal'
+patient_df['CI'].loc[patient_df['CI'] ==8] = 'Cingulo-parietal'
+patient_df['CI'].loc[patient_df['CI'] ==11] = 'Sailency'
+
 patient_df.to_csv(path_to_data_folder + '/patient_df.csv', index = False)
 
 

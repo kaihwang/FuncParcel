@@ -18,15 +18,19 @@ Cortical_Data <- Cortical_Data[Cortical_Data$Associated.System!='Other',]
 CI_colors <- c("#008080", "purple", "green", "red", "yellow", "black", "cyan", "pink", "blue")
 
 ### boxplot to compare nodal roles between each partition, for thalamus and cortex
-Variables_to_plot <- c('PC', 'WMD', 'NNC', 'BNWR', 'bcc')
+Variables_to_plot <- c('WMD'  ) #'NNC', 'BNWR', 'bcc' 'WMD'
 for (v in Variables_to_plot){
   Thalamus_boxplot <- ggplot(data = Thalamus_Data, aes_string(x="Associated.System", y=v, fill="Associated.System", colour="Associated.System")) + geom_boxplot(outlier.colour = NULL) #+geom_point() + geom_jitter(position = position_jitter(width = .1))
-  Thalamus_boxplot <- Thalamus_boxplot + ggtitle(paste("Thalamus", v)) + scale_fill_manual(values=CI_colors)  + theme_grey(base_size = 32)  + theme(axis.text.x=element_text(angle=90, hjust=1))
+  Thalamus_boxplot <- Thalamus_boxplot + ggtitle(paste("Thalamus", v)) + scale_fill_manual(values=CI_colors)  + theme_grey(base_size = 32)  + theme(axis.text.x=element_text(angle=90, hjust=1), axis.title.x=element_blank(), legend.position="none")
+  Thalamus_boxplot <- Thalamus_boxplot + ylim( -1, 5)
   plot(Thalamus_boxplot)
+  ggsave(filename = paste(v,'_tha_box.pdf', sep=''), plot = Thalamus_boxplot, units = c("in"),width=8, height=8) 
 
   Cortical_boxplot <- ggplot(data = Cortical_Data, aes_string(x="Associated.System", y=v, fill="Associated.System", colour="Associated.System")) + geom_boxplot(outlier.colour = NULL) #+geom_point() + geom_jitter(position = position_jitter(width = .1))
-  Cortical_boxplot <- Cortical_boxplot + ggtitle(paste("Cortical", v))+ scale_fill_manual(values=CI_colors) + theme_grey(base_size = 32)  + theme(axis.text.x=element_text(angle=90, hjust=1))
+  Cortical_boxplot <- Cortical_boxplot + ggtitle(paste("Cortical", v))+ scale_fill_manual(values=CI_colors) + theme_grey(base_size = 32)  + theme(axis.text.x=element_text(angle=90, hjust=1), axis.title.x=element_blank(), legend.position="none")
+  Cortical_boxplot <- Cortical_boxplot + ylim( -1, 5)
   plot(Cortical_boxplot)
+  ggsave(filename = paste(v,'_cortical_box.pdf', sep=''), plot = Cortical_boxplot, units = c("in"),width=8, height=8) 
 }
 
 ### plot to compare within thalamus nodal role
@@ -44,9 +48,15 @@ plot(Thalamus_pc_plot)
 Thalamus_Target_Data = read.csv('Thalamus_target.csv', header=TRUE)
 total <- merge(Thalamus_Target_Data,Thalamus_Data,by="Voxel")
 
-Thalamus_pc_plot <-ggplot(data = total, aes(x=Associated.System.y , y=Target.PC, color =Associated.System.y ))+geom_point() + geom_jitter(position = position_jitter(width = .1)) +  scale_colour_manual(values=CI_colors) 
+Thalamus_pc_plot <-ggplot(data = total, aes(x=PC , y=Target.PC))+geom_point() + geom_jitter(position = position_jitter(width = .1)) +  scale_colour_manual(values=CI_colors) 
+Thalamus_pc_plot <- Thalamus_pc_plot + stat_smooth(method = 'lm', fill="blue", colour="darkblue", size=2) + theme_grey(base_size = 32) + ylab("Cortical ROIs' PC")+ xlab("Thalamic Voxels' PC")    
 plot(Thalamus_pc_plot)
+ggsave(filename = "Thalamocortical_PC.pdf", plot = Thalamus_pc_plot, units = c("in"),width=8, height=8) 
 
+Thalamus_wmd_plot <-ggplot(data = total, aes(x=WMD , y=Target.WMD))+geom_point() + geom_jitter(position = position_jitter(width = .1)) +  scale_colour_manual(values=CI_colors) 
+Thalamus_wmd_plot <- Thalamus_pc_plot + stat_smooth(method = 'lm', fill="blue", colour="darkblue", size=2) + theme_grey(base_size = 32)+ ylab("Cortical ROIs' WMD")+ xlab("Thalamic Voxels' WMD") 
+plot(Thalamus_wmd_plot)
+ggsave(filename = "Thalamocortical_WMD.pdf", plot = Thalamus_wmd_plot, units = c("in"),width=8, height=8) 
 
 ## look at tsnr
 Thalamus_boxplot <- ggplot(data = Thalamus_Data, aes_string(x="Associated.System", y="TSNR", fill="Associated.System")) + geom_boxplot() #+geom_point() + geom_jitter(position = position_jitter(width = .1))

@@ -15,7 +15,7 @@ Cortical_Data = read.csv('Cortical_nodal.csv', header=TRUE)
 Cortical_Data <- Cortical_Data[Cortical_Data$PC>0,]  
 Cortical_Data <- Cortical_Data[Cortical_Data$Associated.System!='Other',] 
 
-CI_colors <- c("#008080", "purple", "green", "red", "yellow", "black", "cyan", "pink", "blue")
+CI_colors <- c("#008080", "purple", "green", "red", "yellow", "magenta", "cyan", "pink", "blue")
 
 ### boxplot to compare nodal roles between each partition, for thalamus and cortex
 Variables_to_plot <- c('WMD'  ) #'NNC', 'BNWR', 'bcc' 'WMD'
@@ -51,12 +51,12 @@ total <- merge(Thalamus_Target_Data,Thalamus_Data,by="Voxel")
 Thalamus_pc_plot <-ggplot(data = total, aes(x=PC , y=Target.PC))+geom_point() + geom_jitter(position = position_jitter(width = .1)) +  scale_colour_manual(values=CI_colors) 
 Thalamus_pc_plot <- Thalamus_pc_plot + stat_smooth(method = 'lm', fill="blue", colour="darkblue", size=2) + theme_grey(base_size = 32) + ylab("Cortical ROIs' PC")+ xlab("Thalamic Voxels' PC")    
 plot(Thalamus_pc_plot)
-ggsave(filename = "Thalamocortical_PC.pdf", plot = Thalamus_pc_plot, units = c("in"),width=8, height=8) 
+ggsave(filename = "Thalamocortical_PC.pdf", plot = Thalamus_pc_plot, units = c("in"),width=15, height=8) 
 
 Thalamus_wmd_plot <-ggplot(data = total, aes(x=WMD , y=Target.WMD))+geom_point() + geom_jitter(position = position_jitter(width = .1)) +  scale_colour_manual(values=CI_colors) 
-Thalamus_wmd_plot <- Thalamus_pc_plot + stat_smooth(method = 'lm', fill="blue", colour="darkblue", size=2) + theme_grey(base_size = 32)+ ylab("Cortical ROIs' WMD")+ xlab("Thalamic Voxels' WMD") 
+Thalamus_wmd_plot <- Thalamus_wmd_plot + stat_smooth(method = 'lm', fill="blue", colour="darkblue", size=2) + theme_grey(base_size = 32)+ ylab("Cortical ROIs' WMD")+ xlab("Thalamic Voxels' WMD") 
 plot(Thalamus_wmd_plot)
-ggsave(filename = "Thalamocortical_WMD.pdf", plot = Thalamus_wmd_plot, units = c("in"),width=8, height=8) 
+ggsave(filename = "Thalamocortical_WMD.pdf", plot = Thalamus_wmd_plot, units = c("in"),width=15, height=8) 
 
 ## look at tsnr
 Thalamus_boxplot <- ggplot(data = Thalamus_Data, aes_string(x="Associated.System", y="TSNR", fill="Associated.System")) + geom_boxplot() #+geom_point() + geom_jitter(position = position_jitter(width = .1))

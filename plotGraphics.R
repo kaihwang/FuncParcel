@@ -4,7 +4,7 @@ setwd('/Volumes/neuro/bin/FuncParcel/Data/')
 # import libraries
 library(ggplot2)
 library(reshape2)
-
+library(plyr)
 #load data
 
 Thalamus_Data = read.csv('Thalamus_nodal.csv', header=TRUE)
@@ -74,9 +74,16 @@ cScale <- c("#e7298a",
 "#ffff99",
 "#386cb0")
 patient_data = read.csv('patient_df.csv', header=TRUE)
-
-plot_data = melt(patient_data, id_vars = c("SubjID", "Voxel", "CI", "PC"), measure.vars = c("Target_connected_weight", "nonTarget_connected_weight"))
-
-patient_plot <-ggplot(plot_data , aes(x=PC , y=value, colour=variable))+geom_point(size=3, aes(shape = factor(SubjID)))+ scale_colour_manual(values=c("Red", "Black")) + facet_grid(.~CI)
-                                                                                                                                            
+melt_data <- melt(patient_data, id_vars = c("SubjID", "Voxel", "CI", "PC"), measure.vars = c("Target_total_weight_bn", "nonTarget_total_weight_bn"))
+plot_data <- ddply(melt_data, c("SubjID", "CI", "variable"), summarise, mean = mean(value, na.rm=TRUE))
+patient_plot <-ggplot(plot_data , aes(x=SubjID , y=mean, colour=variable))+geom_point(size=3, aes(shape = factor(SubjID)))+ scale_colour_manual(values=c("Red", "Black")) + facet_grid(.~CI)
+patient_plot <- patient_plot + theme_grey(base_size = 16) # + theme(axis.text.x=element_text(angle=90, hjust=1))                                                                                                                                            
 patient_plot
+
+
+patient_data = read.csv('patient_nework_df.csv', header=TRUE)
+patient_data$SubjID <- factor(patient_data$SubjID)
+patient_plot <-ggplot(patient_data, aes(x=SubjID, y=Between_network_connectivity_weight))+geom_bar(stat="identity")
+patient_plot                      
+                      
+                      

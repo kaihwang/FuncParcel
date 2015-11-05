@@ -677,9 +677,63 @@ def map_subcortical_cortical_targets(corrmat, Cortical_ROIs, Subcortical_voxels)
 	return cortical_targets, cortical_nontargets, thresholds
 
 
-	
+def pcorr_cortico_cortical_connectivity(cortical_ts):
+    ''' function to do partial correlation within different ROIs of a cortical ROI
+    timeseries. Based off of pcorr_subcortico_cortical_connectivity
+    usage: pcorr_mat = pcorr_subcortico-cortical(cortical_ts)
+    ----
+    Parameters
+    ----
+    cortical_ts: txt file of timeseries data from cortical ROIs, each roi is an ROI
+    pcorr_mat: output partial correlation matrix
+    '''
 
+    # transpose so that column is ROI, this is because output from 3dNetcorr is row-based.
+    # subcortical_ts = subcortical_ts.T
+    cortical_ts = cortical_ts.T
 
+    # check length of data
+    # assert cortical_ts.shape[0] == subcortical_ts.shape[0]
+    num_vol = cortical_ts.shape[0]
+
+    #first check that the dimension is appropriate
+    num_cort = cortical_ts.shape[1]
+    # num_subcor = subcortical_ts.shape[1]
+    # num_cort = num_cort + num_subcor
+
+    #maximum number of regressors that we can use
+    max_num_components = int(num_vol/20)
+    if max_num_components > num_cort:
+        max_num_components = num_cort-1 
+
+    pcorr_mat = np.zeros((num_cort, num_cort), dtype=np.float)
+    for i in range(num_cort):
+        pcorr_mat[i][i] = 1.0
+
+    for j in range(num_cort):
+        for i in range(j+1, num_cort):
+            k = np.ones(num_cort, dtype=np.bool)
+            k[j] = False
+            k[i] = False
+
+            #use PCA to reduce cortical data dimensionality
+            pca = PCA(n_components=max_num_components)
+            pca.fit(cortical_ts[:,k])
+            reduced_cortical_ts = pca.fit_transform(cortical_ts[:,k])
+            
+            #print("Amount of varaince explanined after PCA: %s" %np.sum(pca.explained_variance_ratio_))  
+            
+            # fit cortical signal to cortical ROI TS, get betas
+            beta_cortical_j = linalg.lstsq(reduced_cortical_ts, cortical_ts[:,j])[0]
+            beta_cortical_i = linalg.lstsq(reduced_cortical_ts, cortical_ts[:,i])[0]
+
+            #get residuals
+            res_cortical_j = cortical_ts[:, j] - reduced_cortical_ts.dot(beta_cortical_j)
+            res_cortical_i = cortical_ts[:, i] - reduced_cortical_ts.dot(beta_cortical_i)
+            pcorr_mat[i, j] = stats.pearsonr(res_cortical_i, res_cortical_j)[0]
+            pcorr_mat[j,i] = stats.pearsonr(res_cortical_i, res_cortical_j)[0]
+
+    return pcorr_mat	
 
 
 

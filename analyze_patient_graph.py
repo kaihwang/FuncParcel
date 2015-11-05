@@ -313,54 +313,86 @@ Left_ROIs_pos = np.in1d(Cortical_ROIs, Left_ROIs)
 Right_ROIs_pos = np.in1d(Cortical_ROIs, Right_ROIs)
 
 patient_df = pd.DataFrame()
-for i, patient in enumerate(thalamic_patients):
+for patient in thalamic_patients:
 	m = np.loadtxt(path_to_adjmat + 'Tha_' + patient + '_Craddock_300_cortical_corrmat' )
-	Patient_adjmat = bct.weight_conversion(bct.threshold_proportional(m, .1),'binarize')
+	Patient_adjmat = bct.threshold_proportional(m, 1)
+	#Patient_adjmat[Patient_adjmat==0] = np.nan
+	#Patient_adjmat_b = bct.weight_conversion(bct.threshold_proportional(m, 1),'binarize')
+
 	tmp_df = pd.DataFrame()
+
+	#initiate
 	Left_p_wn = np.zeros(1) 
 	Left_p_bn = np.zeros(1) 
-
 	Right_p_wn = np.zeros(1) 
 	Right_p_bn = np.zeros(1) 
-
 	Left_p_tn = np.zeros(1) 
 	Right_p_tn = np.zeros(1) 
 
-	tmp_df.set_value(i, 'SubjID', patient)
+	Left_p_ww = np.zeros(1) 
+	Left_p_bw = np.zeros(1) 
+	Right_p_ww = np.zeros(1) 
+	Right_p_bw = np.zeros(1) 
+	Left_p_tw = np.zeros(1) 
+	Right_p_tw = np.zeros(1) 
 
-	for CI in range(0,10):
+	
+	for CI in range(1,10):
+		#total weight, sum
+		Right_p_tw += np.nan_to_num(np.nansum(Patient_adjmat[(Cortical_CI==CI) & Right_ROIs_pos,:][:, Right_ROIs_pos]))
+		Left_p_tw += np.nan_to_num(np.nansum(Patient_adjmat[(Cortical_CI==CI) & Left_ROIs_pos,:][:, Left_ROIs_pos]))
+
+		#between weight, sum
+		#Right_p_bw += np.nan_to_num(np.nansum(Patient_adjmat[(Cortical_CI==CI) & Right_ROIs_pos,:][:,(Cortical_CI!=CI) & Right_ROIs_pos]))
+		#Left_p_bw += np.nan_to_num(np.nansum(Patient_adjmat[(Cortical_CI==CI) & Left_ROIs_pos,:][:,(Cortical_CI!=CI) & Left_ROIs_pos]))
+		#within weight, sum
+		
+
+	for i, CI in enumerate(range(1,10)):
+
+		#between weight, average
+		Right_p_bn = np.nan_to_num(np.nanmean(Patient_adjmat[(Cortical_CI==CI) & Right_ROIs_pos,:][:,(Cortical_CI!=CI) & Right_ROIs_pos]))
+		Left_p_bn = np.nan_to_num(np.nanmean(Patient_adjmat[(Cortical_CI==CI) & Left_ROIs_pos,:][:,(Cortical_CI!=CI) & Left_ROIs_pos]))
+		#within weight, average
+		Right_p_wn = np.nan_to_num(np.nanmean(Patient_adjmat[(Cortical_CI==CI) & Right_ROIs_pos,:][:,(Cortical_CI==CI) & Right_ROIs_pos]))
+		Left_p_wn = np.nan_to_num(np.nanmean(Patient_adjmat[(Cortical_CI==CI) & Left_ROIs_pos,:][:,(Cortical_CI==CI) & Left_ROIs_pos]))
+		
+		#total weight, average
+		Right_p_tn = np.nan_to_num(np.nanmean(Patient_adjmat[(Cortical_CI==CI) & Right_ROIs_pos,:][:, Right_ROIs_pos]))
+		Left_p_tn = np.nan_to_num(np.nanmean(Patient_adjmat[(Cortical_CI==CI) & Left_ROIs_pos,:][:, Left_ROIs_pos]))
+
+		Right_p_ww = np.nan_to_num(np.nansum(Patient_adjmat[(Cortical_CI==CI) & Right_ROIs_pos,:][:,(Cortical_CI==CI) & Right_ROIs_pos]))
+		Left_p_ww = np.nan_to_num(np.nansum(Patient_adjmat[(Cortical_CI==CI) & Left_ROIs_pos,:][:,(Cortical_CI==CI) & Left_ROIs_pos]))
 
 
-		Right_p_wn += np.nan_to_num(np.nansum(Patient_adjmat[(Cortical_CI==CI) & Right_ROIs_pos,:][:,(Cortical_CI==CI) & Right_ROIs_pos]) \
-		/ np.size(Patient_adjmat[(Cortical_CI==CI) & Right_ROIs_pos,:][:,(Cortical_CI==CI) & Right_ROIs_pos]))
+		#get modularity Q
+		Right_sum_bw = np.zeros(1) 
+		Left_sum_bw = np.zeros(1) 
 
-		Right_p_bn += np.nan_to_num(np.nansum(Patient_adjmat[(Cortical_CI==CI) & Right_ROIs_pos,:][:,(Cortical_CI!=CI) & Right_ROIs_pos]) \
-		/ np.size(Patient_adjmat[(Cortical_CI==CI) & Right_ROIs_pos,:][:,(Cortical_CI!=CI) & Right_ROIs_pos]))
+		for CI2 in range(1,10):
+			Right_tmp_bw = np.nan_to_num(np.nansum(Patient_adjmat[(Cortical_CI==CI) & Right_ROIs_pos,:][:,(Cortical_CI==CI2) & Right_ROIs_pos]))
+			Right_sum_bw += (Right_tmp_bw / Right_p_tw)**2
 
-		Left_p_wn += np.nan_to_num(np.nansum(Patient_adjmat[(Cortical_CI==CI) & Left_ROIs_pos,:][:,(Cortical_CI==CI) & Left_ROIs_pos]) \
-		/ np.size(Patient_adjmat[(Cortical_CI==CI) & Left_ROIs_pos,:][:,(Cortical_CI==CI) & Left_ROIs_pos]))
+			Left_tmp_bw = np.nan_to_num(np.nansum(Patient_adjmat[(Cortical_CI==CI) & Left_ROIs_pos,:][:,(Cortical_CI==CI2) & Left_ROIs_pos]))
+			Left_sum_bw += (Left_tmp_bw / Left_p_tw)**2
 
-		Left_p_bn += np.nan_to_num(np.nansum(Patient_adjmat[(Cortical_CI==CI) & Left_ROIs_pos,:][:,(Cortical_CI!=CI) & Left_ROIs_pos]) \
-		/ np.size(Patient_adjmat[(Cortical_CI==CI) & Left_ROIs_pos,:][:,(Cortical_CI!=CI) & Left_ROIs_pos]))
-
-		Right_p_tn += np.nan_to_num(np.nansum(Patient_adjmat[(Cortical_CI==CI) & Right_ROIs_pos,:][:, Right_ROIs_pos]) \
-		/ np.size(Patient_adjmat[(Cortical_CI==CI) & Right_ROIs_pos,:][:,Right_ROIs_pos]))
-
-		Left_p_tn += np.nan_to_num(np.nansum(Patient_adjmat[(Cortical_CI==CI) & Left_ROIs_pos,:][:, Left_ROIs_pos]) \
-		/ np.size(Patient_adjmat[(Cortical_CI==CI) & Left_ROIs_pos,:][:, Left_ROIs_pos]))
+		Right_Q = (Right_p_ww / Right_p_tw) - Right_sum_bw
+		Left_Q = (Left_p_ww / Left_p_tw) - Left_sum_bw
 
 
-	tmp_df.set_value(i, 'Left_Between_network_connectivity_weight', Left_p_bn/9)
-	tmp_df.set_value(i, 'Right_Between_network_connectivity_weight', Right_p_bn/9)
-	tmp_df.set_value(i, 'Left_Within_network_connectivity_weight', Left_p_wn/9)
-	tmp_df.set_value(i, 'Right_Within_network_connectivity_weight', Right_p_wn/9)
-	tmp_df.set_value(i, 'Left_Total_network_connectivity_weight', Left_p_tn/9)
-	tmp_df.set_value(i, 'Right_Total_network_connectivity_weight', Right_p_tn/9)
-	tmp_df.set_value(i, 'Left_Q', Left_p_wn/ (Left_p_bn + Left_p_wn))
-	tmp_df.set_value(i, 'Right_Q', Right_p_wn/ (Right_p_bn + Right_p_wn))
+		tmp_df.set_value(i, 'SubjID', patient)
+		tmp_df.set_value(i, 'CI', CI)
+		tmp_df.set_value(i, 'Left_Between_network_connectivity_weight', Left_p_bn)
+		tmp_df.set_value(i, 'Right_Between_network_connectivity_weight', Right_p_bn)
+		tmp_df.set_value(i, 'Left_Within_network_connectivity_weight', Left_p_wn)
+		tmp_df.set_value(i, 'Right_Within_network_connectivity_weight', Right_p_wn)
+		tmp_df.set_value(i, 'Left_Total_network_connectivity_weight', Left_p_tn)
+		tmp_df.set_value(i, 'Right_Total_network_connectivity_weight', Right_p_tn)
+		tmp_df.set_value(i, 'Left_Q', Left_Q)
+		tmp_df.set_value(i, 'Right_Q', Right_Q)
 	patient_df = patient_df.append(tmp_df)	
 
-
+patient_df.to_csv(path_to_data_folder + '/patient_nework_df.csv', index = False)
 ################################################################
 ###### old stuff from HBM poster
 ################################################################

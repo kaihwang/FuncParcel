@@ -19,7 +19,7 @@ cd ${WD}
 
 for s in $(ls -d 0*); do
 
-	for seqq in __mx_1400; do #__mx_1400 __mx_645
+	for seqq in __mx_1400 __mx_645; do #__mx_1400 __mx_645
 		sed "s/128/NKI_${s}${seqq}_/g" < ${SCRIPT}/python_brainx_mod.sh > ~/tmp/pcorr${s}${seqq}.sh
 		qsub -V -M kaihwang -m e -e ~/tmp -o ~/tmp ~/tmp/pcorr${s}${seqq}.sh
 

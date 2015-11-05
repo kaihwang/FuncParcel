@@ -18,7 +18,7 @@ pcorr_path = '/home/despoB/connectome-thalamus/Partial_CorrMats/'
 fn = ts_path + subject + 'Thalamus_indices_TS_000.netts'
 thalamus_ts = np.loadtxt(fn)
 
-ROIs = ['Craddock_300_cortical'] #'Craddock_300_cortical' 'Cortical_CI', 'Cortical_ROIs' 'Craddock_300_cortical'
+ROIs = ['Gordon_333_cortical'] #'Craddock_300_cortical' 'Cortical_CI', 'Cortical_ROIs' 'Craddock_300_cortical'
 for roi in ROIs:
 	fn = ts_path + subject + roi + '_TS_000.netts' 
 	cortical_roi_ts = np.loadtxt(fn)
@@ -33,10 +33,12 @@ for roi in ROIs:
 	# 	pcorr_mat.flat[idx] = r
 
 	pcorr_mat = pcorr_subcortico_cortical_connectivity(thalamus_ts, cortical_roi_ts)
-
+	
 	fn = pcorr_path + subject + roi + '_pcorr_mat'
 	#np.savetxt(fn, pcorr_mat, fmt='%.4f')
 	save_object(pcorr_mat, fn)
+
+	#pcorr_mat = pcorr_cortico_cortical_connectivity(cortical_roi_ts)
 
 
 

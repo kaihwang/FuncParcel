@@ -75,15 +75,15 @@ cScale <- c("#e7298a",
 "#386cb0")
 patient_data = read.csv('patient_df.csv', header=TRUE)
 melt_data <- melt(patient_data, id_vars = c("SubjID", "Voxel", "CI", "PC"), measure.vars = c("Target_total_weight_bn", "nonTarget_total_weight_bn"))
-plot_data <- ddply(melt_data, c("SubjID", "CI", "variable"), summarise, mean = mean(value, na.rm=TRUE))
-patient_plot <-ggplot(plot_data , aes(x=SubjID , y=mean, colour=variable))+geom_point(size=3, aes(shape = factor(SubjID)))+ scale_colour_manual(values=c("Red", "Black")) + facet_grid(.~CI)
+plot_data <- ddply(melt_data, c("SubjID", "CI", "PC", "variable"), summarise, mean = mean(value, na.rm=TRUE))
+patient_plot <-ggplot(plot_data , aes(x=SubjID , y=mean, colour=variable))+geom_point(size=3, aes(shape = factor(SubjID)))+ scale_colour_manual(values=c("Red", "Black")) #+ facet_grid(.~CI)
 patient_plot <- patient_plot + theme_grey(base_size = 16) # + theme(axis.text.x=element_text(angle=90, hjust=1))                                                                                                                                            
 patient_plot
 
 
 patient_data = read.csv('patient_nework_df.csv', header=TRUE)
 patient_data$SubjID <- factor(patient_data$SubjID)
-patient_plot <-ggplot(patient_data, aes(x=SubjID, y=Between_network_connectivity_weight))+geom_bar(stat="identity")
+patient_plot <-ggplot(patient_data, aes(x=CI, y=Between_network_connectivity_weight))+geom_bar(stat="identity")+ facet_grid(.~SubjID) + theme_grey(base_size = 16)  + theme(axis.text.x=element_text(angle=90, hjust=1))                 
 patient_plot                      
                       
                       

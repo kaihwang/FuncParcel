@@ -20,8 +20,8 @@ cd ${WD}
 for s in $(ls -d 0*); do
 
 	for seqq in __mx_1400 __mx_645; do #__mx_1400 __mx_645
-		sed "s/128/NKI_${s}${seqq}_/g" < ${SCRIPT}/python_brainx_mod.sh > ~/tmp/pcorr${s}${seqq}.sh
-		qsub -V -M kaihwang -m e -e ~/tmp -o ~/tmp ~/tmp/pcorr${s}${seqq}.sh
+		sed "s/128/NKI_${s}${seqq}_/g" < ${SCRIPT}/python_brainx_mod.sh > ~/tmp/consensus_${s}${seqq}.sh
+		qsub -V -M kaihwang -m e -e ~/tmp -o ~/tmp ~/tmp/consensus_${s}${seqq}.sh
 
 	done
 
@@ -34,7 +34,7 @@ cd ${WD}
 
 for s in $(ls -d Sub*); do
 	if [ -e ${WD}/${s}/MNINonLinear/rfMRI_REST_ncsreg.nii.gz ]; then
-		sed "s/128/MGH_${s}_/g" < ${SCRIPT}/python_brainx_mod.sh > ~/tmp/pcorr${s}.sh
-		qsub -V -M kaihwang -m e -e ~/tmp -o ~/tmp ~/tmp/pcorr${s}.sh
+		sed "s/128/MGH_${s}_/g" < ${SCRIPT}/python_brainx_mod.sh > ~/tmp/consensus_${s}.sh
+		qsub -V -M kaihwang -m e -e ~/tmp -o ~/tmp ~/tmp/consensus_${s}.sh
 	fi
 done

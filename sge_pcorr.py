@@ -18,7 +18,7 @@ pcorr_path = '/home/despoB/connectome-thalamus/Partial_CorrMats/'
 fn = ts_path + subject + 'Thalamus_indices_TS_000.netts'
 thalamus_ts = np.loadtxt(fn)
 
-ROIs = ['Gordon_333_cortical'] #'Craddock_300_cortical' 'Cortical_CI', 'Cortical_ROIs' 'Craddock_300_cortical'
+ROIs = ['MGH_Gordon_333_consensus_CI'] #'Craddock_300_cortical' 'Cortical_CI', 'Cortical_ROIs' 'Craddock_300_cortical' Gordon_333_cortical
 for roi in ROIs:
 	fn = ts_path + subject + roi + '_TS_000.netts' 
 	cortical_roi_ts = np.loadtxt(fn)

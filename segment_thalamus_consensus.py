@@ -52,7 +52,7 @@ def group_thalamus_consensus(file_pattern):
 	''' average consensus matrices across subjects, run partition on averaged matrix'''
 	AveMat = ave_consensus(file_pattern)
 	ave_path = output_path + 'Group_thalamus_consensus'
-	np.savetxt(ave_path, np.nan_to_num(AveMat), fmt='%2.1f')
+	np.savetxt(save_path, np.nan_to_num(AveMat))
 	graph = recursive_network_partition(matrix=AveMat, min_cost=.01, max_cost=0.25, min_community_size=100 ,min_weight=2)
 	return graph
 

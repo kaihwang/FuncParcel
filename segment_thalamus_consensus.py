@@ -54,7 +54,8 @@ def group_thalamus_consensus(file_pattern):
 	AveMat = ave_consensus(file_pattern)
 	ave_path = output_path + 'Group_thalamus_consensus'
 	np.savetxt(ave_path, AveMat)
-	graph = recursive_network_partition(matrix=AveMat, min_cost=.01, max_cost=0.10, min_community_size=25 ,min_weight=2)
+	graph = recursive_network_partition(matrix=AveMat, min_cost=.01, max_cost=0.07, min_community_size=100 ,min_weight=0.5)
+	#graph = partition_avg_costs(matrix=AveMat, costs = np.arange(0.01,0.16, 0.01), min_community_size=75 ,graph_cost=0.05)
 	return graph
 
 
@@ -64,23 +65,30 @@ if __name__ == "__main__":
 	#indiv_thalamus_parcel_consensus(subject)
 
 	## cluster group results
+	#MGH
 	#file_pattern = 'MGH*consensus'
 	#AveMat = ave_consensus(file_pattern)
+	#np.savetxt(Parcel_path + '/Group_thalamus_consensus', AveMat)
 
+	#NKI
+	#file_pattern = 'NKI*consensus'
+	#AveMat = ave_consensus(file_pattern)
+	#np.savetxt(Parcel_path + '/NKI_thalamus_consensus', AveMat)
 
 	# write out clustering results
 	AveMat = np.loadtxt(output_path +'Group_thalamus_consensus')
-	graph = recursive_network_partition(matrix=AveMat, min_cost=.02, max_cost=0.15, min_community_size=50 ,min_weight=2)
-	save_object(graph, Parcel_path +'/Tha_consensus_parc_graph')
+	graph = recursive_network_partition(matrix=AveMat, min_cost=.01, max_cost=0.15, min_community_size=40 ,min_weight=0.5)
+	#graph = partition_avg_costs(matrix=AveMat, costs = np.arange(0.01,0.15, 0.01), min_community_size=50 ,graph_cost=0.05)
+	#save_object(graph, Parcel_path +'/Tha_consensus_parc_graph')
 	Tha_CI = np.array(graph.community.membership)+1
 	for i in Counter(Tha_CI):
-		if Counter(Tha_CI)[i] < 50:
+		if Counter(Tha_CI)[i] < 40:
 			Tha_CI[Tha_CI==i] = 0
 
-
+	print(Counter(Tha_CI))
 	atlas_path = path_to_ROIs+'/Thalamus_indices.nii.gz' 
 	ROI_list = path_to_ROIs + '/thalamus_voxel_indices' 
-	image_path = Parcel_path + '/MGH_gordon_consensus_based_thalamus_parcel.nii.gz' 
+	image_path = Parcel_path + '/MGH_gordon_consensus_based_thalamus_parcels.nii.gz' 
 	make_image(atlas_path, image_path, ROI_list, Tha_CI)
 
 

@@ -31,7 +31,8 @@ def indiv_thalamus_parcel_consensus(subject):
 	M = pickle.load(open(fn, "rb"))
 
 	# winner take out ranking
-	_, Thalamo_voxCIs, _, = parcel_subcortical_network(M, Cortical_Network_CIs_plus_thalamus, Thalamus_voxels, Cortical_Network_CIs, Cortical_Network_CIs)
+	_, Thalamo_voxCIs, _, = parcel_subcortical_network(M, Cortical_Network_CIs_plus_thalamus, \
+		Thalamus_voxels, Cortical_Network_CIs, Cortical_Network_CIs)
 
 	# sort through, keep the strongest connected CI
 	Tha_CIs = sort_CIs(Thalamo_voxCIs)

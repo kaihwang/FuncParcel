@@ -740,12 +740,15 @@ def pcorr_cortico_cortical_connectivity(cortical_ts):
 
 def cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocortical_corrmat, Cortical_adj, \
 	Cortical_plus_thalamus_CI, Thalamus_CIs, Cortical_CI, Cortical_ROIs_positions, Thalamus_voxel_positions, cost_thresholds):
-	'''Function to calculate voxel-wise nodal properties of the thalamus. Metrics to be calculated include:
+	'''Function to calculate voxel-wise nodal properties of the thalamus, and nodal properties of cortical ROIs. 
+	Metrics to be calculated include:
+	
 	Participation Coefficient (PC)
-	Between network connectivity weiight (ratio of connection weight devoted to between network interactions)
+	Between network connectivity weiight (BNWR)
+		Ratio of connection weight devoted to between network interactions
 	Number of network/modules/components connected (NNC)
 	Within module degree zscore (WMD)
-	For WMD, matrices will be binarzied, and normalized to corticocortical connections' mean and SD
+		For WMD, matrices will be binarzied, and normalized to corticocortical connections' mean and SD
 
 	usage: PC, BNWR, NNC, WMD = cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocor_adj,
                 Cortical_adj,
@@ -766,7 +769,7 @@ def cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocortical_corrmat, Cor
     Cortical_CI: A vector of network assignments for cortical ROIs 
     Cortical_ROIs_positions: a position vector indicating in the thalamocortical adj matrix which rows/columns are cortical ROIs
     Thalamus_voxel_posistions: a position vector indicating in the thalamocortical adj matrix which rows/columns are thalamic voxels
-    cost_thresholds: the thoresholds that can threshold the thalamocortical edges at density .01 to .15. Now this is hard coded
+    cost_thresholds: the thoresholds that can threshold the thalamocortical edges at density .01 to .15. For now this is hard coded
     '''
 
 	##Thalamus nodal roles
@@ -782,7 +785,7 @@ def cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocortical_corrmat, Cor
 	for c in cost_thresholds:
 		#copy adj matrix and then threshold
 		Par_adj = Thalamocortical_corrmat.copy()
-		# remove weights connected to isolated communities (CI==0)
+		#remove weights connected to low SNR communities (CI==0, orbital frontal, inferior temporal)
 		Par_adj[Cortical_ROIs_positions[Cortical_CI==0],:]=0
 		Par_adj[:,Cortical_ROIs_positions[Cortical_CI==0]]=0
 		Par_adj[Par_adj<c]=0
@@ -804,7 +807,11 @@ def cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocortical_corrmat, Cor
 		NNCs += Tha_NNCs
 
 	##Cortical nodal roles
+	#remove weights connected to low SNR communities (CI==0, orbital frontal, inferior temporal)
 	Cortical_adj[np.isnan(Cortical_adj)] = 0
+	Cortical_adj[Cortical_CI==0,:]=0
+	Cortical_adj[:,Cortical_CI==0]=0
+
 	Cortical_PCs = np.zeros(Cortical_CI.size)
 	Cortical_BNWR = np.zeros(Cortical_CI.size)
 	Cortical_NNCs = np.zeros(Cortical_plus_thalamus_CI.size)
@@ -857,6 +864,7 @@ def cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocortical_corrmat, Cor
 	BNWRs[Cortical_ROIs_positions] = Cortical_BNWR[Cortical_ROIs_positions]
 	PCs[Cortical_ROIs_positions] = Cortical_PCs[Cortical_ROIs_positions]	
 	WMDs[Cortical_ROIs_positions] = Cortical_WMDs[Cortical_ROIs_positions]
+	# average across thresholds, convert into percentage
 	NNCs = (NNCs/15.0) * 100
 	BNWRs = (BNWRs/15.0) * 100
 	PCs = (PCs/13.5) * 100 #this is the thoretical upperbound

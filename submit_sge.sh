@@ -13,28 +13,38 @@
 # done
 
 
-WD='/home/despoB/connectome-thalamus/NKI'
+# WD='/home/despoB/connectome-thalamus/NKI'
+# SCRIPT='/home/despoB/kaihwang/bin/FuncParcel'
+# cd ${WD}
+
+# for s in $(ls -d 0*); do
+
+# 	for seqq in __mx_1400 __mx_645; do #__mx_1400 __mx_645
+# 		sed "s/128/NKI_${s}${seqq}_/g" < ${SCRIPT}/python_brainx_mod.sh > ~/tmp/consensus_${s}${seqq}.sh
+# 		qsub -V -M kaihwang -m e -e ~/tmp -o ~/tmp ~/tmp/consensus_${s}${seqq}.sh
+
+# 	done
+
+# done
+
+
+# WD='/home/despoB/connectome-thalamus/MGH'
+# SCRIPT='/home/despoB/kaihwang/bin/FuncParcel'
+# cd ${WD}
+
+# for s in $(ls -d Sub*); do
+# 	if [ -e ${WD}/${s}/MNINonLinear/rfMRI_REST_ncsreg.nii.gz ]; then
+# 		sed "s/128/MGH_${s}_/g" < ${SCRIPT}/python_brainx_mod.sh > ~/tmp/consensus_${s}.sh
+# 		qsub -V -M kaihwang -m e -e ~/tmp -o ~/tmp ~/tmp/consensus_${s}.sh
+# 	fi
+# done
+
+WD='/home/despoB/connectome-thalamus'
 SCRIPT='/home/despoB/kaihwang/bin/FuncParcel'
 cd ${WD}
 
-for s in $(ls -d 0*); do
 
-	for seqq in __mx_1400 __mx_645; do #__mx_1400 __mx_645
-		sed "s/128/NKI_${s}${seqq}_/g" < ${SCRIPT}/python_brainx_mod.sh > ~/tmp/consensus_${s}${seqq}.sh
-		qsub -V -M kaihwang -m e -e ~/tmp -o ~/tmp ~/tmp/consensus_${s}${seqq}.sh
-
-	done
-
-done
-
-
-WD='/home/despoB/connectome-thalamus/MGH'
-SCRIPT='/home/despoB/kaihwang/bin/FuncParcel'
-cd ${WD}
-
-for s in $(ls -d Sub*); do
-	if [ -e ${WD}/${s}/MNINonLinear/rfMRI_REST_ncsreg.nii.gz ]; then
-		sed "s/128/MGH_${s}_/g" < ${SCRIPT}/python_brainx_mod.sh > ~/tmp/consensus_${s}.sh
-		qsub -V -M kaihwang -m e -e ~/tmp -o ~/tmp ~/tmp/consensus_${s}.sh
-	fi
+for s in $(cat MGH_subjs); do
+	sed "s/128/${s}/g" < ${SCRIPT}/python_brainx_mod.sh > ~/tmp/tha_nodal_${s}.sh
+	qsub -V -M kaihwang -m e -e ~/tmp -o ~/tmp ~/tmp/tha_nodal_${s}.sh
 done

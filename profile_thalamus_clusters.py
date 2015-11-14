@@ -27,7 +27,7 @@ def sort_CIs(Thalamo_ParcelCIs):
 # the file pattern, MGH subjects (303 of them), and then with this ROI template: MGH_Gordon_333_consensus_CI*
 # MGH*MGH_Gordon_333_consensus_CI*
 
-file_pattern = 'MGH*Gordon*consensus*'
+file_pattern = 'NKI*Gordon*consensus*'
 pcorrMat_Files = glob.glob(corrmat_path + file_pattern)
 
 Indiv_Subject_Thalamus_Winner_CIs = np.empty((len(Thalamus_voxels), len(pcorrMat_Files)))

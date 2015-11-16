@@ -313,7 +313,7 @@ def cal_graph_z_score(PatientDataframe, ControlDataframe, rois, metric):
 	can use 'convert_matlab_graph_str' and append
 		results from each subject
 
-	rois: np array of list of ROIs, empty if for gobal data
+	rois: np array of list of ROIs, empty if for global data
 
 	metric: string of the graph metric you want to convert to z-score
 

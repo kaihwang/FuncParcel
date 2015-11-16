@@ -897,4 +897,9 @@ def cal_within_thalamus_nodal_roles(Thalamus_corrmat, Thalamus_CIs, Thalamus_vox
 
 	return within_Tha_PCs_percentage, within_Tha_WMDs_percentage
 
-
+def sort_CIs(Thalamo_ParcelCIs, Thalamus_voxels):
+	Thalamus_CIs = np.zeros(len(Thalamus_voxels))
+	for i, thalamus_voxel_index in enumerate(Thalamus_voxels):
+		Thalamus_CIs[i] = Thalamo_ParcelCIs[thalamus_voxel_index][0]
+	Thalamus_CIs = Thalamus_CIs.astype(int)
+	return Thalamus_CIs

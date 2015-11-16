@@ -35,7 +35,7 @@ def average_corrmat(file_path, np_txt=False, pickle_object=True):
 	# Averaging
 	AdjMat_Files = glob.glob(file_path)
 
-	M_Sum =[];
+	M_Sum =[]
 	for f in AdjMat_Files:
 		if np_txt:
 			M = np.loadtxt(f)

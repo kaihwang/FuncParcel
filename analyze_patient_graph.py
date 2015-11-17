@@ -104,16 +104,27 @@ for s in range(0, np.shape(Control_AdjMats)[2]):
 	left_M = Control_AdjMats[Gordon_left_ROI_positions,:,:][:,Gordon_left_ROI_positions,:][:,:,s].copy()
 	right_M = np.nan_to_num(right_M)
 	left_M = np.nan_to_num(left_M)
+	M = np.nan_to_num(Control_AdjMats[:,:,s].copy())
 
 	tmp_df = pd.DataFrame()
 	for i, p in enumerate(np.arange(0.02, 0.16, 0.01)):
-		right_Q = bct.modularity_und(bct.threshold_proportional(right_M, p))[1]
-		left_Q = bct.modularity_und(bct.threshold_proportional(left_M, p))[1]
+		right_Q = cal_modularity_w_imposed_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions])
+		left_Q = cal_modularity_w_imposed_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions])
 
 		tmp_df.set_value(i, 'SubjID', s)
 		tmp_df.set_value(i, 'Density', p)
 		tmp_df.set_value(i, 'left_Q', left_Q)
 		tmp_df.set_value(i, 'right_Q', right_Q)
+		tmp_df.set_value(i, 'DF_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 1))
+		tmp_df.set_value(i, 'CO_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 2))
+		tmp_df.set_value(i, 'SM_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 3))
+		tmp_df.set_value(i, 'FP_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 4))
+		tmp_df.set_value(i, 'OP_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 5))
+		tmp_df.set_value(i, 'V_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 6))
+		tmp_df.set_value(i, 'RS_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 7))
+		tmp_df.set_value(i, 'ST_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 8))
+		tmp_df.set_value(i, 'ATTN_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 9))
+		tmp_df.set_value(i, 'T_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 12))
 
 	control_df = control_df.append(tmp_df)
 
@@ -123,18 +134,65 @@ for s in range(0, np.shape(Patient_AdjMats)[2]):
 	left_M = Patient_AdjMats[Gordon_left_ROI_positions,:,:][:,Gordon_left_ROI_positions,:][:,:,s].copy()
 	right_M = np.nan_to_num(right_M)
 	left_M = np.nan_to_num(left_M)
+	M = np.nan_to_num(Patient_AdjMats[:,:,s].copy())
 
 	tmp_df = pd.DataFrame()
 	for i, p in enumerate(np.arange(0.02, 0.16, 0.01)):
-		right_Q = bct.modularity_und(bct.threshold_proportional(right_M, p))[1]
-		left_Q = bct.modularity_und(bct.threshold_proportional(left_M, p))[1]
+		right_Q = cal_modularity_w_imposed_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions])
+		left_Q = cal_modularity_w_imposed_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions])
 
 		tmp_df.set_value(i, 'SubjID', s)
 		tmp_df.set_value(i, 'Density', p)
 		tmp_df.set_value(i, 'left_Q', left_Q)
 		tmp_df.set_value(i, 'right_Q', right_Q)
-		
+		tmp_df.set_value(i, 'DF_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 1))
+		tmp_df.set_value(i, 'CO_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 2))
+		tmp_df.set_value(i, 'SM_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 3))
+		tmp_df.set_value(i, 'FP_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 4))
+		tmp_df.set_value(i, 'OP_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 5))
+		tmp_df.set_value(i, 'V_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 6))
+		tmp_df.set_value(i, 'RS_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 7))
+		tmp_df.set_value(i, 'ST_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 8))
+		tmp_df.set_value(i, 'ATTN_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 9))
+		tmp_df.set_value(i, 'T_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 12))
+
 	Patient_df = Patient_df.append(tmp_df)
+
+Patient_df['L-R_Q'] = Patient_df['left_Q'] - Patient_df['right_Q']
+Patient_df['R-L_Q'] = Patient_df['right_Q'] - Patient_df['left_Q']
+
+control_df['R-L_Q'] = control_df['right_Q'] - control_df['left_Q']
+control_df['L-R_Q'] = control_df['left_Q'] - control_df['right_Q']
+
+
+
+def cal_modularity_w_imposed_community(M, CI):
+	Total_weight = M.sum()
+	Q=0.0
+	for i in np.unique(CI):
+		Within_weight = np.sum(M[CI==i,:][:,CI==i])
+		Within_weight_ratio = Within_weight / Total_weight
+		Between_weight = 0.0
+		for j in np.unique(CI):
+			if i !=j:
+				Between_weight += (np.sum(M[CI==i,:][:,CI==j]) / Total_weight)
+		Between_weight_ratio = (Between_weight)**2
+		Q += (Within_weight_ratio - Between_weight_ratio)
+	return Q
+
+def cal_modularity_community(M, CI, targetCI):
+	Total_weight = M.sum()
+	Q=0.0
+	for i in np.unique(targetCI):
+		Within_weight = np.sum(M[CI==i,:][:,CI==i])
+		Within_weight_ratio = Within_weight / Total_weight
+		Between_weight = 0.0
+		for j in np.unique(CI):
+			if i !=j:
+				Between_weight += (np.sum(M[CI==i,:][:,CI==j]) / Total_weight)
+		Between_weight_ratio = (Between_weight)**2
+		Q += (Within_weight_ratio - Between_weight_ratio)
+	return Q
 
 ################################################################
 ###### Create patient data dataframe
@@ -303,140 +361,7 @@ patient_df.to_csv(path_to_data_folder + '/patient_df.csv', index = False)
 
 
 
-################################################################
-###### organize data not at node/roi level but at Network level
-################################################################
-
-Control_AdjMats = pickle.load(open('/home/despoB/connectome-thalamus/AvgMatrices/Control_AdjMats', "rb"))
 
 
-patient_df = pd.DataFrame()
-for patient in thalamic_patients:
-	Patient_adjmat = np.loadtxt(path_to_adjmat + 'Tha_' + patient + '_Craddock_300_cortical_corrmat' )
-
-	tmp_df = pd.DataFrame()
-	for i, CI in enumerate(range(1,10)):
-
-		tmp_df.set_value(i, 'SubjID', patient)
-		tmp_df.set_value(i, 'CI', CI)
-
-		p_bn = np.nanmean(Patient_adjmat[Cortical_CI==CI,:][:,Cortical_CI!=CI])
-		c_bn_m = np.nanmean(Control_AdjMats[Cortical_CI==CI,:,:][:,Cortical_CI!=CI,:])
-		c_bn_std = np.nanstd(Control_AdjMats[Cortical_CI==CI,:,:][:,Cortical_CI!=CI,:])
-
-		p_wn = np.nanmean(Patient_adjmat[Cortical_CI==CI,:][:,Cortical_CI==CI])
-		c_wn_m = np.nanmean(Control_AdjMats[Cortical_CI==CI,:,:][:,Cortical_CI==CI,:])
-		c_wn_std = np.nanstd(Control_AdjMats[Cortical_CI==CI,:,:][:,Cortical_CI==CI,:])
-
-		tmp_df.set_value(i, 'Between_network_connectivity_weight', p_bn)
-		tmp_df.set_value(i, 'Within_network_connectivity_weight', p_wn)
-	patient_df = patient_df.append(tmp_df)	
-
-
-patient_df['CI'].loc[patient_df['CI'] ==1] = 'Default'
-patient_df['CI'].loc[patient_df['CI'] ==2] = 'Visual'
-patient_df['CI'].loc[patient_df['CI'] ==3] = 'Somatomotor'
-patient_df['CI'].loc[patient_df['CI'] ==4] = 'Fronto-parietal'
-patient_df['CI'].loc[patient_df['CI'] ==5] = 'Attention'
-patient_df['CI'].loc[patient_df['CI'] ==6] = 'Cingulo-opercular'
-patient_df['CI'].loc[patient_df['CI'] ==7] = 'Temporal'
-patient_df['CI'].loc[patient_df['CI'] ==8] = 'Cingulo-parietal'
-patient_df['CI'].loc[patient_df['CI'] ==9] = 'Sailency'
-
-patient_df.to_csv(path_to_data_folder + '/patient_nework_df.csv', index = False)
-
-
-
-
-################################################################
-###### left v right
-################################################################
-Right_ROIs = np.unique(np.loadtxt(path_to_ROIs + '/Craddock_right_rois', dtype=int))
-Left_ROIs = np.unique(np.loadtxt(path_to_ROIs + '/Craddock_left_rois', dtype=int))
-
-Left_ROIs_pos = np.in1d(Cortical_ROIs, Left_ROIs)
-Right_ROIs_pos = np.in1d(Cortical_ROIs, Right_ROIs)
-
-patient_df = pd.DataFrame()
-for patient in thalamic_patients:
-	m = np.loadtxt(path_to_adjmat + 'Tha_' + patient + '_Craddock_300_cortical_corrmat' )
-	Patient_adjmat = bct.threshold_proportional(m, 1)
-	#Patient_adjmat[Patient_adjmat==0] = np.nan
-	#Patient_adjmat_b = bct.weight_conversion(bct.threshold_proportional(m, 1),'binarize')
-
-	tmp_df = pd.DataFrame()
-
-	#initiate
-	Left_p_wn = np.zeros(1) 
-	Left_p_bn = np.zeros(1) 
-	Right_p_wn = np.zeros(1) 
-	Right_p_bn = np.zeros(1) 
-	Left_p_tn = np.zeros(1) 
-	Right_p_tn = np.zeros(1) 
-
-	Left_p_ww = np.zeros(1) 
-	Left_p_bw = np.zeros(1) 
-	Right_p_ww = np.zeros(1) 
-	Right_p_bw = np.zeros(1) 
-	Left_p_tw = np.zeros(1) 
-	Right_p_tw = np.zeros(1) 
-
-	
-	for CI in range(1,10):
-		#total weight, sum
-		Right_p_tw += np.nan_to_num(np.nansum(Patient_adjmat[(Cortical_CI==CI) & Right_ROIs_pos,:][:, Right_ROIs_pos]))
-		Left_p_tw += np.nan_to_num(np.nansum(Patient_adjmat[(Cortical_CI==CI) & Left_ROIs_pos,:][:, Left_ROIs_pos]))
-
-		#between weight, sum
-		#Right_p_bw += np.nan_to_num(np.nansum(Patient_adjmat[(Cortical_CI==CI) & Right_ROIs_pos,:][:,(Cortical_CI!=CI) & Right_ROIs_pos]))
-		#Left_p_bw += np.nan_to_num(np.nansum(Patient_adjmat[(Cortical_CI==CI) & Left_ROIs_pos,:][:,(Cortical_CI!=CI) & Left_ROIs_pos]))
-		#within weight, sum
-		
-
-	for i, CI in enumerate(range(1,10)):
-
-		#between weight, average
-		Right_p_bn = np.nan_to_num(np.nanmean(Patient_adjmat[(Cortical_CI==CI) & Right_ROIs_pos,:][:,(Cortical_CI!=CI) & Right_ROIs_pos]))
-		Left_p_bn = np.nan_to_num(np.nanmean(Patient_adjmat[(Cortical_CI==CI) & Left_ROIs_pos,:][:,(Cortical_CI!=CI) & Left_ROIs_pos]))
-		#within weight, average
-		Right_p_wn = np.nan_to_num(np.nanmean(Patient_adjmat[(Cortical_CI==CI) & Right_ROIs_pos,:][:,(Cortical_CI==CI) & Right_ROIs_pos]))
-		Left_p_wn = np.nan_to_num(np.nanmean(Patient_adjmat[(Cortical_CI==CI) & Left_ROIs_pos,:][:,(Cortical_CI==CI) & Left_ROIs_pos]))
-		
-		#total weight, average
-		Right_p_tn = np.nan_to_num(np.nanmean(Patient_adjmat[(Cortical_CI==CI) & Right_ROIs_pos,:][:, Right_ROIs_pos]))
-		Left_p_tn = np.nan_to_num(np.nanmean(Patient_adjmat[(Cortical_CI==CI) & Left_ROIs_pos,:][:, Left_ROIs_pos]))
-
-		Right_p_ww = np.nan_to_num(np.nansum(Patient_adjmat[(Cortical_CI==CI) & Right_ROIs_pos,:][:,(Cortical_CI==CI) & Right_ROIs_pos]))
-		Left_p_ww = np.nan_to_num(np.nansum(Patient_adjmat[(Cortical_CI==CI) & Left_ROIs_pos,:][:,(Cortical_CI==CI) & Left_ROIs_pos]))
-
-
-		#get modularity Q
-		Right_sum_bw = np.zeros(1) 
-		Left_sum_bw = np.zeros(1) 
-
-		for CI2 in range(1,10):
-			Right_tmp_bw = np.nan_to_num(np.nansum(Patient_adjmat[(Cortical_CI==CI) & Right_ROIs_pos,:][:,(Cortical_CI==CI2) & Right_ROIs_pos]))
-			Right_sum_bw += (Right_tmp_bw / Right_p_tw)**2
-
-			Left_tmp_bw = np.nan_to_num(np.nansum(Patient_adjmat[(Cortical_CI==CI) & Left_ROIs_pos,:][:,(Cortical_CI==CI2) & Left_ROIs_pos]))
-			Left_sum_bw += (Left_tmp_bw / Left_p_tw)**2
-
-		Right_Q = (Right_p_ww / Right_p_tw) - Right_sum_bw
-		Left_Q = (Left_p_ww / Left_p_tw) - Left_sum_bw
-
-
-		tmp_df.set_value(i, 'SubjID', patient)
-		tmp_df.set_value(i, 'CI', CI)
-		tmp_df.set_value(i, 'Left_Between_network_connectivity_weight', Left_p_bn)
-		tmp_df.set_value(i, 'Right_Between_network_connectivity_weight', Right_p_bn)
-		tmp_df.set_value(i, 'Left_Within_network_connectivity_weight', Left_p_wn)
-		tmp_df.set_value(i, 'Right_Within_network_connectivity_weight', Right_p_wn)
-		tmp_df.set_value(i, 'Left_Total_network_connectivity_weight', Left_p_tn)
-		tmp_df.set_value(i, 'Right_Total_network_connectivity_weight', Right_p_tn)
-		tmp_df.set_value(i, 'Left_Q', Left_Q)
-		tmp_df.set_value(i, 'Right_Q', Right_Q)
-	patient_df = patient_df.append(tmp_df)	
-
-patient_df.to_csv(path_to_data_folder + '/patient_nework_df.csv', index = False)
 
 

@@ -55,7 +55,7 @@ save_object(Cluster_profile, Parcel_path + '/31Cluster_profiles')
 
 Thalamus_parcel_CI = np.zeros(len(Thalamus_voxels))
 for i in np.unique(Thalamus_clusters):
-	Thalamus_parcel_CI[Thalamus_clusters==i] = np.argmax(Cluster_profile[i])
+	Thalamus_parcel_CI[Thalamus_clusters==i] = np.argmax(zscore(Cluster_profile[i]))
 
 np.savetxt(Parcel_path + '/Thalamus_clusters_corticalCI', Thalamus_parcel_CI)
 
@@ -63,3 +63,48 @@ atlas_path = path_to_ROIs+'/Thalamus_indices.nii.gz'
 ROI_list = path_to_ROIs + '/thalamus_voxel_indices' 
 image_path = Parcel_path + '/MGH_gordon_consensus_based_thalamus_parcels_corticalCIs.nii.gz' 
 make_image(atlas_path, image_path, ROI_list, Thalamus_parcel_CI)
+
+
+
+#### new profile summary dictionary
+
+Cluster_profile_summary = {}
+
+Cluster_profile_summary[26] = np.array([6])
+Cluster_profile_summary[6] = np.array([5, 6])
+Cluster_profile_summary[22] = np.array([5])
+Cluster_profile_summary[19] = np.array([5])
+Cluster_profile_summary[4] = np.array([5, 9])
+Cluster_profile_summary[8] = np.array([5, 6])
+Cluster_profile_summary[27] = np.array([5, 7])
+Cluster_profile_summary[7] = np.array([5, 7])
+Cluster_profile_summary[15] = np.array([5, 8])
+
+Cluster_profile_summary[10] = np.array([2, 7])
+Cluster_profile_summary[5] = np.array([2, 7])
+Cluster_profile_summary[24] = np.array([2, 7])
+Cluster_profile_summary[11] = np.array([2, 7])
+Cluster_profile_summary[25] = np.array([2, 7])
+
+Cluster_profile_summary[12] = np.array([2])
+Cluster_profile_summary[31] = np.array([2])
+
+Cluster_profile_summary[1] = np.array([2, 9])
+Cluster_profile_summary[2] = np.array([2, 3])
+
+Cluster_profile_summary[18] = np.array([3])
+Cluster_profile_summary[9] = np.array([3])
+
+Cluster_profile_summary[13] = np.array([3, 5, 8])
+Cluster_profile_summary[16] = np.array([3, 5, 8])
+
+Cluster_profile_summary[20] = np.array([2, 3, 4, 5, 7])
+Cluster_profile_summary[28] = np.array([9, 4, 1])
+Cluster_profile_summary[14] = np.array([9, 4, 2, 1])
+Cluster_profile_summary[21] = np.array([9, 1])
+Cluster_profile_summary[29] = np.array([9, 2, 1])
+Cluster_profile_summary[30] = np.array([9, 4, 1])
+Cluster_profile_summary[3] = np.array([9, 1, 3])
+
+Cluster_profile_summary[17] = np.array([8, 2])
+Cluster_profile_summary[23] = np.array([8, 6])

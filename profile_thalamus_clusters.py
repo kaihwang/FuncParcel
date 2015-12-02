@@ -108,3 +108,19 @@ Cluster_profile_summary[3] = np.array([9, 1, 3])
 
 Cluster_profile_summary[17] = np.array([8, 2])
 Cluster_profile_summary[23] = np.array([8, 6])
+
+
+
+
+#### look at segmentation confidence
+os.chdir(corrmat_path)
+#files = glob.glob('MGH*MGH_Gordon_333_consensus_CI_pcorr_mat')
+#seg_confidence = np.zeros(3539)
+#for fn in files:
+#	M = pickle.load(open(fn, "rb"))
+#	seg_confidence += np.sort(M[10:,0:10])[:,-2:][:,0] / np.sort(M[10:,0:10])[:,-2:][:,1]
+
+M = average_corrmat('MGH*MGH_Gordon_333_consensus_CI_pcorr_mat')
+seg_confidence = np.sort(M[10:,0:10])[:,-2:][:,0] / np.sort(M[10:,0:10])[:,-2:][:,1]
+#seg_confidence = seg_confidence/ len(files)
+Thalamus_parcel_CI = np.loadtxt(Parcel_path + '/Thalamus_clusters_corticalCI')

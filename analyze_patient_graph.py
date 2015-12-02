@@ -1,5 +1,5 @@
 #analyze patient data
-
+from __future__ import division, print_function
 from brain_graphs import *
 from FuncParcel import *
 import matplotlib.pylab as plt
@@ -47,22 +47,46 @@ for patient in thalamic_patients:
 
 
 #look at ditribution of CI
+Thalamus_clusters = np.loadtxt(Parcel_path + '/Thalamus_clusters')
+Cluster_profile_summary = pickle.load(open(Parcel_path + '/31Cluster_profile_summary', 'rb'))
 Lesioned_CIs = {}
 for patient in thalamic_patients:
-	Lesioned_CIs[patient] = Thalamus_CIs[np.in1d(Thalamus_voxels, Lesioned_voxels[patient]).nonzero()[0]]
+	Lesioned_CIs[patient] = []
+	tmp = np.empty(1)
+	for c in Thalamus_clusters[np.in1d(Thalamus_voxels, Lesioned_voxels[patient])]:
+		if c != 0:
+			tmp = np.concatenate((Cluster_profile_summary[c], tmp))
+	Lesioned_CIs[patient] = tmp
 
+# get total voxel count for each CI
+CIs_voxcount = np.empty(1)
+for c in Thalamus_clusters:
+	if c != 0:
+		CIs_voxcount = np.concatenate((Cluster_profile_summary[c],tmp))
 
-for patient in thalamic_patients:	
+# plot for each patient
+for patient in thalamic_patients:
 	To_Plot = np.zeros(Partition_CIs.size)
 	for i, ci in enumerate(Partition_CIs):
-		To_Plot[i] = sum(Lesioned_CIs[patient]==ci) 
-
-	plt.figure()	
+		To_Plot[i] = sum(Lesioned_CIs[patient]==ci)/Counter(CIs_voxcount)[ci] 
+	plt.figure()
 	plt.bar(Partition_CIs, To_Plot, align='center')
 	plt.xticks(Partition_CIs, Network_names, rotation=30)
 	plt.title(patient)
+	plt.ylim(ymax =.3)
 	plt.show()
-	cd 
+	
+
+Thalamus_CIs = np.loadtxt(Parcel_path + '/Thalamus_clusters_cortical_CI')
+Cortical_CI = np.loadtxt(path_to_ROIs + '/Gordon_consensus_CI')
+Cortical_plus_thalamus_CI = np.append(Cortical_CI, Thalamus_CIs)
+Cortical_ROIs_positions = np.arange(0,len(Cortical_CI),1)
+Thalamus_voxel_positions = np.arange(len(Cortical_CI),len(Cortical_plus_thalamus_CI),1)
+
+PC = pickle.load(open('MGH_avemat_tha_nodal_pcorr_PCs', 'rb'))
+Lesioned_voxels_PC = {}
+for patient in thalamic_patients:
+	Lesioned_voxels_PC[patient] = np.nanmean(PC[Thalamus_voxel_positions[np.in1d(Thalamus_voxels, Lesioned_voxels[patient])]])
 
 ################################################################
 ###### Load adj mats for all subjects, in 3d array ROIxROIxsubject
@@ -97,6 +121,13 @@ save_object(Control_AdjMats, path_to_data_folder +'/Patient_AdjMats_Gordon')
 ################################################################
 ###### Look at changes in overal network modular structure
 ################################################################
+Gordon_right_ROI_positions = np.loadtxt(path_to_ROIs + '/Gordon_right_ROIs_positions')
+Gordon_right_ROI_positions = Gordon_right_ROI_positions.astype(bool)
+Gordon_left_ROI_positions = np.loadtxt(path_to_ROIs + '/Gordon_left_ROIs_positions')
+Gordon_left_ROI_positions  = Gordon_left_ROI_positions.astype(bool)
+
+Patient_AdjMats = pickle.load(open(path_to_data_folder +'/Patient_AdjMats_Gordon', 'rb'))
+Control_AdjMats = pickle.load(open(path_to_data_folder +'/Control_AdjMats_Gordon', 'rb'))
 
 control_df = pd.DataFrame()
 for s in range(0, np.shape(Control_AdjMats)[2]):
@@ -107,9 +138,9 @@ for s in range(0, np.shape(Control_AdjMats)[2]):
 	M = np.nan_to_num(Control_AdjMats[:,:,s].copy())
 
 	tmp_df = pd.DataFrame()
-	for i, p in enumerate(np.arange(0.02, 0.16, 0.01)):
-		right_Q = cal_modularity_w_imposed_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions])
-		left_Q = cal_modularity_w_imposed_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions])
+	for i, p in enumerate(np.arange(0.02, 0.26, 0.01)):
+		right_Q = bct.modularity_und(bct.threshold_proportional(right_M, p))[1]#cal_modularity_w_imposed_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions])
+		left_Q = bct.modularity_und(bct.threshold_proportional(left_M, p))[1]#cal_modularity_w_imposed_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions])
 
 		tmp_df.set_value(i, 'SubjID', s)
 		tmp_df.set_value(i, 'Density', p)
@@ -125,6 +156,28 @@ for s in range(0, np.shape(Control_AdjMats)[2]):
 		tmp_df.set_value(i, 'ST_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 8))
 		tmp_df.set_value(i, 'ATTN_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 9))
 		tmp_df.set_value(i, 'T_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 12))
+
+		tmp_df.set_value(i, 'left_DF_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 1))
+		tmp_df.set_value(i, 'left_CO_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 2))
+		tmp_df.set_value(i, 'left_SM_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 3))
+		tmp_df.set_value(i, 'left_FP_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 4))
+		tmp_df.set_value(i, 'left_OP_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 5))
+		tmp_df.set_value(i, 'left_V_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 6))
+		tmp_df.set_value(i, 'left_RS_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 7))
+		tmp_df.set_value(i, 'left_ST_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 8))
+		tmp_df.set_value(i, 'left_ATTN_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 9))
+		tmp_df.set_value(i, 'left_T_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 12))
+
+		tmp_df.set_value(i, 'right_DF_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 1))
+		tmp_df.set_value(i, 'right_CO_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 2))
+		tmp_df.set_value(i, 'right_SM_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 3))
+		tmp_df.set_value(i, 'right_FP_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 4))
+		tmp_df.set_value(i, 'right_OP_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 5))
+		tmp_df.set_value(i, 'right_V_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 6))
+		tmp_df.set_value(i, 'right_RS_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 7))
+		tmp_df.set_value(i, 'right_ST_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 8))
+		tmp_df.set_value(i, 'right_ATTN_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 9))
+		tmp_df.set_value(i, 'right_T_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 12))
 
 	control_df = control_df.append(tmp_df)
 
@@ -137,9 +190,9 @@ for s in range(0, np.shape(Patient_AdjMats)[2]):
 	M = np.nan_to_num(Patient_AdjMats[:,:,s].copy())
 
 	tmp_df = pd.DataFrame()
-	for i, p in enumerate(np.arange(0.02, 0.16, 0.01)):
-		right_Q = cal_modularity_w_imposed_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions])
-		left_Q = cal_modularity_w_imposed_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions])
+	for i, p in enumerate(np.arange(0.02, 0.26, 0.01)):
+		right_Q =  bct.modularity_und(bct.threshold_proportional(right_M, p))[1]#cal_modularity_w_imposed_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions])
+		left_Q =  bct.modularity_und(bct.threshold_proportional(left_M, p))[1]#cal_modularity_w_imposed_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions])
 
 		tmp_df.set_value(i, 'SubjID', s)
 		tmp_df.set_value(i, 'Density', p)
@@ -156,7 +209,31 @@ for s in range(0, np.shape(Patient_AdjMats)[2]):
 		tmp_df.set_value(i, 'ATTN_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 9))
 		tmp_df.set_value(i, 'T_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 12))
 
+		tmp_df.set_value(i, 'left_DF_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 1))
+		tmp_df.set_value(i, 'left_CO_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 2))
+		tmp_df.set_value(i, 'left_SM_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 3))
+		tmp_df.set_value(i, 'left_FP_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 4))
+		tmp_df.set_value(i, 'left_OP_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 5))
+		tmp_df.set_value(i, 'left_V_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 6))
+		tmp_df.set_value(i, 'left_RS_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 7))
+		tmp_df.set_value(i, 'left_ST_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 8))
+		tmp_df.set_value(i, 'left_ATTN_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 9))
+		tmp_df.set_value(i, 'left_T_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 12))
+
+		tmp_df.set_value(i, 'right_DF_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 1))
+		tmp_df.set_value(i, 'right_CO_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 2))
+		tmp_df.set_value(i, 'right_SM_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 3))
+		tmp_df.set_value(i, 'right_FP_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 4))
+		tmp_df.set_value(i, 'right_OP_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 5))
+		tmp_df.set_value(i, 'right_V_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 6))
+		tmp_df.set_value(i, 'right_RS_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 7))
+		tmp_df.set_value(i, 'right_ST_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 8))
+		tmp_df.set_value(i, 'right_ATTN_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 9))
+		tmp_df.set_value(i, 'right_T_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 12))
+
+
 	Patient_df = Patient_df.append(tmp_df)
+
 
 Patient_df['L-R_Q'] = Patient_df['left_Q'] - Patient_df['right_Q']
 Patient_df['R-L_Q'] = Patient_df['right_Q'] - Patient_df['left_Q']
@@ -164,7 +241,27 @@ Patient_df['R-L_Q'] = Patient_df['right_Q'] - Patient_df['left_Q']
 control_df['R-L_Q'] = control_df['right_Q'] - control_df['left_Q']
 control_df['L-R_Q'] = control_df['left_Q'] - control_df['right_Q']
 
+Patient_df['L-R_V_Q'] = Patient_df['left_V_Q'] - Patient_df['right_V_Q']
+Patient_df['R-L_V_Q'] = Patient_df['right_V_Q'] - Patient_df['left_V_Q']
 
+control_df['R-L_V_Q'] = control_df['right_V_Q'] - control_df['left_V_Q']
+control_df['L-R_V_Q'] = control_df['left_V_Q'] - control_df['right_V_Q']
+
+Patient_df['L-R_DF_Q'] = Patient_df['left_DF_Q'] - Patient_df['right_DF_Q']
+Patient_df['R-L_DF_Q'] = Patient_df['right_DF_Q'] - Patient_df['left_DF_Q']
+
+control_df['R-L_DF_Q'] = control_df['right_DF_Q'] - control_df['left_DF_Q']
+control_df['L-R_DF_Q'] = control_df['left_DF_Q'] - control_df['right_DF_Q']
+
+Patient_df['L-R_CO_Q'] = Patient_df['left_CO_Q'] - Patient_df['right_CO_Q']
+Patient_df['R-L_CO_Q'] = Patient_df['right_CO_Q'] - Patient_df['left_CO_Q']
+
+control_df['R-L_CO_Q'] = control_df['right_CO_Q'] - control_df['left_CO_Q']
+control_df['L-R_CO_Q'] = control_df['left_CO_Q'] - control_df['right_CO_Q']
+
+
+Patient_df.to_csv(path_to_data_folder + '/patient_df.csv', index = False)
+control_df.to_csv(path_to_data_folder + '/control_df.csv', index = False)
 
 def cal_modularity_w_imposed_community(M, CI):
 	Total_weight = M.sum()
@@ -193,6 +290,8 @@ def cal_modularity_community(M, CI, targetCI):
 		Between_weight_ratio = (Between_weight)**2
 		Q += (Within_weight_ratio - Between_weight_ratio)
 	return Q
+
+
 
 ################################################################
 ###### Create patient data dataframe

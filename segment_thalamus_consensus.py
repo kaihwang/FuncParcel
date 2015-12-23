@@ -77,35 +77,41 @@ if __name__ == "__main__":
 	#np.savetxt(Parcel_path + '/NKI_thalamus_consensus', AveMat)
 
 	# write out clustering results
+	#for c in np.arange(0.05, 0.16, 0.1):
 	AveMat = np.loadtxt(output_path +'Group_thalamus_consensus')
-	graph = recursive_network_partition(matrix=AveMat, min_cost=.01, max_cost=0.15, min_community_size=40 ,min_weight=0.5)
+	#graph = matrix_to_igraph(AveMat,cost=c)
+	graph = recursive_network_partition(matrix=AveMat, min_cost=.07, max_cost=0.15, min_community_size=40 ,min_weight=0.1)
 	#graph = partition_avg_costs(matrix=AveMat, costs = np.arange(0.01,0.15, 0.01), min_community_size=50 ,graph_cost=0.05)
-	#save_object(graph, Parcel_path +'/Tha_consensus_parc_graph')
+	save_object(graph, Parcel_path +'/MGH_tha_consensus_parcel_graph')
 	Tha_CI = np.array(graph.community.membership)+1
-	for i in Counter(Tha_CI):
-		if Counter(Tha_CI)[i] < 40:
-			Tha_CI[Tha_CI==i] = 0
+	# for i in Counter(Tha_CI):
+	# 	if Counter(Tha_CI)[i] < 40:
+	# 		Tha_CI[Tha_CI==i] = 0
 
 	print(Counter(Tha_CI))
+	np.savetxt(Parcel_path + '/MGH_thalamus_clusters_c07-15', Tha_CI)
 	atlas_path = path_to_ROIs+'/Thalamus_indices.nii.gz' 
 	ROI_list = path_to_ROIs + '/thalamus_voxel_indices' 
-	image_path = Parcel_path + '/MGH_gordon_consensus_based_thalamus_parcels.nii.gz' 
-	make_image(atlas_path, image_path, ROI_list, Tha_CI)
+	image_path = Parcel_path + '/MGH_gordon_consensus_based_thalamus_parcels_c07-15.nii.gz' 
+	# make_image(atlas_path, image_path, ROI_list, Tha_CI)
 
 	#repeat for NKI
 	AveMat = np.loadtxt(output_path +'NKI_thalamus_consensus')
-	graph = recursive_network_partition(matrix=AveMat, min_cost=.01, max_cost=0.15, min_community_size=40 ,min_weight=0.5)
+	#graph = matrix_to_igraph(AveMat,cost=c)
+	graph = recursive_network_partition(matrix=AveMat, min_cost=.07, max_cost=0.15, min_community_size=40 ,min_weight=0.1)
+	save_object(graph, Parcel_path +'/NKI_tha_consensus_parcel_graph')
 	#graph = partition_avg_costs(matrix=AveMat, costs = np.arange(0.01,0.15, 0.01), min_community_size=50 ,graph_cost=0.05)
 	#save_object(graph, Parcel_path +'/Tha_consensus_parc_graph')
 	Tha_CI = np.array(graph.community.membership)+1
-	for i in Counter(Tha_CI):
-		if Counter(Tha_CI)[i] < 40:
-			Tha_CI[Tha_CI==i] = 0
+	# for i in Counter(Tha_CI):
+	# 	if Counter(Tha_CI)[i] < 40:
+	# 		Tha_CI[Tha_CI==i] = 0
 
 	print(Counter(Tha_CI))
+	np.savetxt(Parcel_path + '/NKI_thalamus_clusters_c07-15', Tha_CI)
 	atlas_path = path_to_ROIs+'/Thalamus_indices.nii.gz' 
 	ROI_list = path_to_ROIs + '/thalamus_voxel_indices' 
-	image_path = Parcel_path + '/NKI_gordon_consensus_based_thalamus_parcels.nii.gz' 
+	image_path = Parcel_path + '/NKI_gordon_consensus_based_thalamus_parcels_c07-15.nii.gz' 
 	make_image(atlas_path, image_path, ROI_list, Tha_CI)
 
 

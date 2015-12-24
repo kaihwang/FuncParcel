@@ -93,7 +93,7 @@ if __name__ == "__main__":
 	atlas_path = path_to_ROIs+'/Thalamus_indices.nii.gz' 
 	ROI_list = path_to_ROIs + '/thalamus_voxel_indices' 
 	image_path = Parcel_path + '/MGH_gordon_consensus_based_thalamus_parcels_c07-15.nii.gz' 
-	# make_image(atlas_path, image_path, ROI_list, Tha_CI)
+	make_image(atlas_path, image_path, ROI_list, Tha_CI)
 
 	#repeat for NKI
 	AveMat = np.loadtxt(output_path +'NKI_thalamus_consensus')

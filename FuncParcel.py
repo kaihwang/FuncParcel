@@ -6,7 +6,7 @@ from scipy import stats, linalg
 import glob
 import pandas as pd
 import networkx as nx
-from brainx import weighted_modularity
+#from brainx import weighted_modularity
 import bct
 import nibabel as nib
 from collections import Counter

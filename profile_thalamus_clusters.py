@@ -53,12 +53,7 @@ save_object(Cluster_profile, Parcel_path + '/NKI_c07-15_Cluster_profiles')
 
 Thalamus_parcel_CI = np.zeros(len(Thalamus_voxels))
 for i in np.unique(Thalamus_clusters):
-	if i ==5:
-		Thalamus_parcel_CI[Thalamus_clusters==i] = 5
-	elif i == 15:
-		Thalamus_parcel_CI[Thalamus_clusters==i] = 5
-	else:
-		Thalamus_parcel_CI[Thalamus_clusters==i] = np.argmax(zscore(Cluster_profile[i]))
+	Thalamus_parcel_CI[Thalamus_clusters==i] = np.argmax(zscore(Cluster_profile[i]))
 
 np.savetxt(Parcel_path + '/NKI_Thalamus_clusters_sort_by_max_corticalCI', Thalamus_parcel_CI)
 

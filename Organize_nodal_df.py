@@ -15,7 +15,7 @@ path_to_ROIs = '/home/despoB/connectome-thalamus/ROIs/'
 
 
 #### load data
-Thalamus_CIs = pickle.load(open(path_to_data_folder+'MGH_Thalamus_CIs', "rb"))
+Thalamus_CIs = np.loadtxt(Parcel_path+'MGH_Thalamus_clusters_sort_by_max_corticalCI')
 Thalamus_voxels = np.loadtxt(path_to_ROIs+'thalamus_voxel_indices', dtype=int)
 Cortical_ROIs = np.loadtxt(path_to_ROIs+'Craddock_300_cortical_ROIs', dtype=int)
 Cortical_CI = Cortical_CI = np.loadtxt(path_to_ROIs+'/Cortical_CI', dtype='int')
@@ -48,14 +48,14 @@ Thalamus_df['Voxel'] = Thalamus_voxels
 Thalamus_df['Associated System'] = Thalamus_CIs
 
 Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==1] = 'Default'
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==2] = 'Visual'
+Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==2] = 'Cingulo-opercular'
 Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==3] = 'Somatomotor'
 Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==4] = 'Fronto-parietal'
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==5] = 'Attention'
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==6] = 'Cingulo-opercular'
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==7] = 'Temporal'
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==8] = 'Cingulo-parietal'
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==11] = 'Sailency'
+Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==5] = 'Occipital-Parietal'
+Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==6] = 'Visual'
+Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==7] = 'Retrospinal'
+Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==8] = 'Temporal'
+Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==9] = 'Attention'
 
 
 #cortical
@@ -68,10 +68,10 @@ Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==2] = 'Vi
 Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==3] = 'Somatomotor'
 Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==4] = 'Fronto-parietal'
 Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==5] = 'Attention'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==6] = 'Cingulo-opercular'
+Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==6] = 'Retrospinal'
 Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==7] = 'Temporal'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==8] = 'Cingulo-parietal'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==9] = 'Sailency'
+Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==8] = 'Occipital-parietal'
+Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==9] = 'Cingulo-opercular'
 Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==0] = 'Other' 
 
 ##########################################
@@ -112,8 +112,8 @@ NKI_NNC = pickle.load(open(path_to_data_folder+'NKI_NNCs', "rb"))
 MGH_Tha_BNWR = pickle.load(open(path_to_data_folder+'MGH_Tha_BNWR', "rb"))
 NKI_Tha_BNWR = pickle.load(open(path_to_data_folder+'NKI_Tha_BNWR', "rb"))
 
-tsnr = np.loadtxt('/home/despoB/kaihwang/Rest/ROIs/tsnr')
-Thalamus_df['TSNR'] = tsnr
+# tsnr = np.loadtxt('/home/despoB/kaihwang/Rest/ROIs/tsnr')
+# Thalamus_df['TSNR'] = tsnr
 
 Thalamus_df['MGH_PC'] = MGH_Tha_PC[320:]/13.5  #take out cortical ones, normalize by max PC
 Thalamus_df['MGH_WMD'] = MGH_Tha_WMD[320:]/15 
@@ -129,44 +129,44 @@ Thalamus_df['NKI_BNWR'] = NKI_Tha_BNWR[320:]/15
 ####### thalamo-cortical target's nodal role for each thalamus voxel
 ################################################################
 
-Thalamus_target_df = pd.DataFrame(columns=('Voxel', 'Associated System', 'Cortical Target','Target PC','Target WMD' )) 
+# Thalamus_target_df = pd.DataFrame(columns=('Voxel', 'Associated System', 'Cortical Target','Target PC','Target WMD' )) 
 
-Cortical_targets = pickle.load(open(path_to_data_folder +'/Cortical_targets', "rb"))
+# Cortical_targets = pickle.load(open(path_to_data_folder +'/Cortical_targets', "rb"))
 
-for i, v in enumerate(Thalamus_voxels):
+# for i, v in enumerate(Thalamus_voxels):
 
-	tmp_df = pd.DataFrame(columns=('Voxel', 'Associated System', 'Cortical CI', 'Cortical Target','Target PC','Target WMD' ))
-	tmp_PC = Cortical_PC[np.in1d(Cortical_ROIs, Cortical_targets[v])]
-	tmp_WMD = Cortical_WMD[np.in1d(Cortical_ROIs, Cortical_targets[v])]
-	tmp_targets = Cortical_ROIs[np.in1d(Cortical_ROIs, Cortical_targets[v])]
-	tmp_CIs = Cortical_CI[np.in1d(Cortical_ROIs, Cortical_targets[v])]
-	for u in range(len(tmp_PC)):
-		tmp_df.set_value(u, 'Voxel', v)
-		tmp_df.set_value(u, 'Associated System', Thalamus_CIs[i])
-		tmp_df.set_value(u, 'Cortical CI', tmp_CIs[u])
-		tmp_df.set_value(u, 'Cortical Target', tmp_targets[u])
-		tmp_df.set_value(u, 'Target PC', tmp_PC[u]/13.5)
-		tmp_df.set_value(u, 'Target WMD', tmp_WMD[u]/15)
-	Thalamus_target_df = pd.concat([Thalamus_target_df, tmp_df], ignore_index=True)	
+# 	tmp_df = pd.DataFrame(columns=('Voxel', 'Associated System', 'Cortical CI', 'Cortical Target','Target PC','Target WMD' ))
+# 	tmp_PC = Cortical_PC[np.in1d(Cortical_ROIs, Cortical_targets[v])]
+# 	tmp_WMD = Cortical_WMD[np.in1d(Cortical_ROIs, Cortical_targets[v])]
+# 	tmp_targets = Cortical_ROIs[np.in1d(Cortical_ROIs, Cortical_targets[v])]
+# 	tmp_CIs = Cortical_CI[np.in1d(Cortical_ROIs, Cortical_targets[v])]
+# 	for u in range(len(tmp_PC)):
+# 		tmp_df.set_value(u, 'Voxel', v)
+# 		tmp_df.set_value(u, 'Associated System', Thalamus_CIs[i])
+# 		tmp_df.set_value(u, 'Cortical CI', tmp_CIs[u])
+# 		tmp_df.set_value(u, 'Cortical Target', tmp_targets[u])
+# 		tmp_df.set_value(u, 'Target PC', tmp_PC[u]/13.5)
+# 		tmp_df.set_value(u, 'Target WMD', tmp_WMD[u]/15)
+# 	Thalamus_target_df = pd.concat([Thalamus_target_df, tmp_df], ignore_index=True)	
 
-Thalamus_target_df['Associated System'].loc[Thalamus_target_df['Associated System'] ==1] = 'Default'
-Thalamus_target_df['Associated System'].loc[Thalamus_target_df['Associated System'] ==2] = 'Visual'
-Thalamus_target_df['Associated System'].loc[Thalamus_target_df['Associated System'] ==3] = 'Somatomotor'
-Thalamus_target_df['Associated System'].loc[Thalamus_target_df['Associated System'] ==4] = 'Fronto-parietal'
-Thalamus_target_df['Associated System'].loc[Thalamus_target_df['Associated System'] ==5] = 'Attention'
-Thalamus_target_df['Associated System'].loc[Thalamus_target_df['Associated System'] ==6] = 'Cingulo-opercular'
-Thalamus_target_df['Associated System'].loc[Thalamus_target_df['Associated System'] ==7] = 'Temporal'
-Thalamus_target_df['Associated System'].loc[Thalamus_target_df['Associated System'] ==8] = 'Cingulo-parietal'
-Thalamus_target_df['Associated System'].loc[Thalamus_target_df['Associated System'] ==11] = 'Sailency'
+# Thalamus_target_df['Associated System'].loc[Thalamus_target_df['Associated System'] ==1] = 'Default'
+# Thalamus_target_df['Associated System'].loc[Thalamus_target_df['Associated System'] ==2] = 'Visual'
+# Thalamus_target_df['Associated System'].loc[Thalamus_target_df['Associated System'] ==3] = 'Somatomotor'
+# Thalamus_target_df['Associated System'].loc[Thalamus_target_df['Associated System'] ==4] = 'Fronto-parietal'
+# Thalamus_target_df['Associated System'].loc[Thalamus_target_df['Associated System'] ==5] = 'Attention'
+# Thalamus_target_df['Associated System'].loc[Thalamus_target_df['Associated System'] ==6] = 'Cingulo-opercular'
+# Thalamus_target_df['Associated System'].loc[Thalamus_target_df['Associated System'] ==7] = 'Temporal'
+# Thalamus_target_df['Associated System'].loc[Thalamus_target_df['Associated System'] ==8] = 'Cingulo-parietal'
+# Thalamus_target_df['Associated System'].loc[Thalamus_target_df['Associated System'] ==11] = 'Sailency'
 
 
 
 ################################################################
 ###### save
 ################################################################
-Thalamus_df.to_csv(path_to_data_folder+'Thalamus_nodal.csv')
-Cortical_df.to_csv(path_to_data_folder+'Cortical_nodal.csv')
-Thalamus_target_df.to_csv(path_to_data_folder+'Thalamus_target.csv')
+Thalamus_df.to_csv(path_to_data_folder+'Thalamus_nodal_consensus.csv')
+Cortical_df.to_csv(path_to_data_folder+'Cortical_nodal_consensus.csv')
+#Thalamus_target_df.to_csv(path_to_data_folder+'Thalamus_target.csv')
 
 
 

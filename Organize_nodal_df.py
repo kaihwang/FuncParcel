@@ -11,32 +11,33 @@ from scipy.stats.mstats import zscore as zscore
 ################################################################
 Parcel_path = '/home/despoB/connectome-thalamus/Thalamic_parcel/'
 path_to_data_folder = '/home/despoB/kaihwang/bin/FuncParcel/Data/'
+path_to_graph = '/home/despoB/kaihwang/Rest/Graph/'
 path_to_ROIs = '/home/despoB/connectome-thalamus/ROIs/'
 
 
 #### load data
-Thalamus_CIs = np.loadtxt(Parcel_path+'MGH_Thalamus_clusters_sort_by_max_corticalCI')
+Thalamus_CIs = np.loadtxt(Parcel_path+'MGH_Thalamus_WTA_CIs')
 Thalamus_voxels = np.loadtxt(path_to_ROIs+'thalamus_voxel_indices', dtype=int)
-Cortical_ROIs = np.loadtxt(path_to_ROIs+'Craddock_300_cortical_ROIs', dtype=int)
-Cortical_CI = Cortical_CI = np.loadtxt(path_to_ROIs+'/Cortical_CI', dtype='int')
+Cortical_ROIs = np.loadtxt(path_to_ROIs+'Gordon_333', dtype=int)
+Cortical_CI = Cortical_CI = np.loadtxt(path_to_ROIs+'/Gordon_consensus_CI', dtype='int')
 
 #PC
-Tha_PC = pickle.load(open(path_to_data_folder+'Tha_PCs', "rb"))
-Cortical_PC = pickle.load(open(path_to_data_folder+'Cortical_PCs', "rb"))
+Tha_PC = pickle.load(open(path_to_graph+'MGH_avemat_tha_nodal_pcorr_PCs', "rb"))
+Cortical_PC = pickle.load(open(path_to_graph+'MGH_avemat_tha_nodal_pcorr_PCs', "rb"))
 
 #NNCs
-NNCs = pickle.load(open(path_to_data_folder+'NNCs', "rb"))
+NNCs = pickle.load(open(path_to_graph+'MGH_avemat_tha_nodal_pcorr_NNCs', "rb"))
 
 #WMDs
-Tha_WMD = pickle.load(open(path_to_data_folder+'Tha_WMDs', "rb"))
-Cortical_WMD = pickle.load(open(path_to_data_folder+'Cortical_WMDs', "rb"))
+Tha_WMD = pickle.load(open(path_to_graph+'MGH_avemat_tha_nodal_pcorr_WMDs', "rb"))
+Cortical_WMD = pickle.load(open(path_to_graph+'MGH_avemat_tha_nodal_pcorr_WMDs', "rb"))
 
 #BNWR
-Tha_BNWR = pickle.load(open(path_to_data_folder+'Tha_BNWR', "rb"))
-Cortical_BNWR = pickle.load(open(path_to_data_folder+'Cortical_BNWR', "rb"))
+Tha_BNWR = pickle.load(open(path_to_graph+'MGH_avemat_tha_nodal_pcorr_BNWRs', "rb"))
+Cortical_BNWR = pickle.load(open(path_to_graph+'MGH_avemat_tha_nodal_pcorr_BNWRs', "rb"))
 
 #BCC
-bcc = pickle.load(open(path_to_data_folder+'MGH_bcc', "rb"))
+#bcc = pickle.load(open(path_to_graph+'MGH_bcc', "rb"))
 
 
 ################################################################
@@ -65,15 +66,16 @@ Cortical_df['ROI'] = Cortical_ROIs
 Cortical_df['Associated System'] = Cortical_CI
 
 Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==1] = 'Default'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==2] = 'Visual'
+Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==2] = 'Cingulo-opercular'
 Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==3] = 'Somatomotor'
 Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==4] = 'Fronto-parietal'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==5] = 'Attention'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==6] = 'Retrospinal'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==7] = 'Temporal'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==8] = 'Occipital-parietal'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==9] = 'Cingulo-opercular'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==0] = 'Other' 
+Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==5] = 'Occipital-Parietal'
+Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==6] = 'Visual'
+Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==7] = 'Retrospinal'
+Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==8] = 'Temporal'
+Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==9] = 'Attention'
+Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==10] = 'Temporal'
+
 
 ##########################################
 ###### populate data
@@ -81,50 +83,18 @@ Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==0] = 'Ot
 
 
 #nodal roles
-Thalamus_df['PC'] = Tha_PC[320:]/13.5  #take out cortical ones, normalize by max PC
-Thalamus_df['WMD'] = Tha_WMD[320:]/15 
-Thalamus_df['NNC'] = NNCs[320:]/15 
-Thalamus_df['BNWR'] = Tha_BNWR[320:]/15
-Thalamus_df['bcc'] = bcc[320:]/15
+Thalamus_df['PC'] = Tha_PC[333:]  
+Thalamus_df['WMD'] = Tha_WMD[333:] 
+Thalamus_df['NNC'] = NNCs[333:] 
+Thalamus_df['BNWR'] = Tha_BNWR[333:]
 
-Cortical_df['PC'] = Cortical_PC[0:320]/13.5  #take out cortical ones, normalize by max PC
-Cortical_df['WMD'] = Cortical_WMD[0:320]/15 
-Cortical_df['NNC'] = NNCs[0:320]/15 
-Cortical_df['BNWR'] = Cortical_BNWR[0:320]/15
-Cortical_df['bcc'] = bcc[0:320]/15
 
-#within thalamus stuff
-within_Tha_PC = pickle.load(open(path_to_data_folder+'within_Tha_PCs', "rb"))
-within_Tha_WMD = pickle.load(open(path_to_data_folder+'within_Tha_WMDs', "rb"))
+Cortical_df['PC'] = Cortical_PC[0:333]  
+Cortical_df['WMD'] = Cortical_WMD[0:333] 
+Cortical_df['NNC'] = NNCs[0:333]
+Cortical_df['BNWR'] = Cortical_BNWR[0:333]
 
-Thalamus_df['within_PC'] = within_Tha_PC/15
-Thalamus_df['within_WMD'] = within_Tha_WMD/15
 
-#correlation bewteen datasets
-MGH_Tha_PC = pickle.load(open(path_to_data_folder+'MGH_Tha_PCs', "rb"))
-NKI_Tha_PC = pickle.load(open(path_to_data_folder+'NKI_Tha_PCs', "rb"))
-
-MGH_Tha_WMD = pickle.load(open(path_to_data_folder+'MGH_Tha_WMDs', "rb"))
-NKI_Tha_WMD = pickle.load(open(path_to_data_folder+'NKI_Tha_WMDs', "rb"))
-
-MGH_NNC = pickle.load(open(path_to_data_folder+'MGH_NNCs', "rb"))
-NKI_NNC = pickle.load(open(path_to_data_folder+'NKI_NNCs', "rb"))
-
-MGH_Tha_BNWR = pickle.load(open(path_to_data_folder+'MGH_Tha_BNWR', "rb"))
-NKI_Tha_BNWR = pickle.load(open(path_to_data_folder+'NKI_Tha_BNWR', "rb"))
-
-# tsnr = np.loadtxt('/home/despoB/kaihwang/Rest/ROIs/tsnr')
-# Thalamus_df['TSNR'] = tsnr
-
-Thalamus_df['MGH_PC'] = MGH_Tha_PC[320:]/13.5  #take out cortical ones, normalize by max PC
-Thalamus_df['MGH_WMD'] = MGH_Tha_WMD[320:]/15 
-Thalamus_df['MGH_NNC'] = MGH_NNC[320:]/15 
-Thalamus_df['MGH_BNWR'] = MGH_Tha_BNWR[320:]/15
-
-Thalamus_df['NKI_PC'] = NKI_Tha_PC[320:]/13.5  #take out cortical ones, normalize by max PC
-Thalamus_df['NKI_WMD'] = NKI_Tha_WMD[320:]/15 
-Thalamus_df['NKI_NNC'] = NKI_NNC[320:]/15 
-Thalamus_df['NKI_BNWR'] = NKI_Tha_BNWR[320:]/15
 
 ################################################################
 ####### thalamo-cortical target's nodal role for each thalamus voxel
@@ -165,8 +135,8 @@ Thalamus_df['NKI_BNWR'] = NKI_Tha_BNWR[320:]/15
 ################################################################
 ###### save
 ################################################################
-Thalamus_df.to_csv(path_to_data_folder+'Thalamus_nodal_consensus.csv')
-Cortical_df.to_csv(path_to_data_folder+'Cortical_nodal_consensus.csv')
+Thalamus_df.to_csv(path_to_data_folder+'Thalamus_nodal_WTA.csv')
+Cortical_df.to_csv(path_to_data_folder+'Cortical_nodal_WTA.csv')
 #Thalamus_target_df.to_csv(path_to_data_folder+'Thalamus_target.csv')
 
 

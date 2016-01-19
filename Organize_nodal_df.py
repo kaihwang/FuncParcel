@@ -19,8 +19,8 @@ path_to_ROIs = '/home/despoB/connectome-thalamus/ROIs/'
 Thalamus_CIs = np.loadtxt(Parcel_path+'MGH_Thalamus_WTA_CIs')
 Thalamus_voxels = np.loadtxt(path_to_ROIs+'thalamus_voxel_indices', dtype=int)
 Cortical_ROIs = np.loadtxt(path_to_ROIs+'Gordon_333', dtype=int)
-Cortical_CI = Cortical_CI = np.loadtxt(path_to_ROIs+'/Gordon_consensus_CI', dtype='int')
-
+Cortical_CI = Cortical_CI = np.loadtxt(path_to_ROIs+'/Gordon_consensus_CI')
+Cortical_CI = int(Cortical_CI)
 #PC
 Tha_PC = pickle.load(open(path_to_graph+'MGH_avemat_tha_nodal_pcorr_PCs', "rb"))
 Cortical_PC = pickle.load(open(path_to_graph+'MGH_avemat_tha_nodal_pcorr_PCs', "rb"))

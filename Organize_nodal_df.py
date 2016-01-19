@@ -1,7 +1,7 @@
 
 from FuncParcel import *
 import pandas as pd
-from ggplot import *
+#from ggplot import *
 import pickle
 import matplotlib.pyplot as plt
 from scipy.stats.mstats import zscore as zscore
@@ -56,6 +56,7 @@ Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==6] = 'Vi
 Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==7] = 'Retrospinal'
 Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==8] = 'Temporal'
 Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==9] = 'Attention'
+Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==10] = 'Temporal'
 
 
 #cortical

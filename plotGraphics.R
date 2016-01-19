@@ -1,3 +1,4 @@
+
 setwd('/Volumes/neuro/bin/FuncParcel/Data/')
 
 
@@ -15,22 +16,22 @@ Cortical_Data = read.csv('Cortical_nodal.csv', header=TRUE)
 Cortical_Data <- Cortical_Data[Cortical_Data$PC>0,]  
 Cortical_Data <- Cortical_Data[Cortical_Data$Associated.System!='Other',] 
 
-CI_colors <- c("#008080", "purple", "green", "red", "yellow", "magenta", "cyan", "pink", "blue")
+CI_colors <- c("#008080", "purple", "green", "red", "yellow", "magenta", "cyan", "pink", "blue", "pink")
 
 ### boxplot to compare nodal roles between each partition, for thalamus and cortex
-Variables_to_plot <- c('WMD'  ) #'NNC', 'BNWR', 'bcc' 'WMD'
+Variables_to_plot <- c('PC'  ) #'NNC', 'BNWR', 'bcc' 'WMD'
 for (v in Variables_to_plot){
   Thalamus_boxplot <- ggplot(data = Thalamus_Data, aes_string(x="Associated.System", y=v, fill="Associated.System", colour="Associated.System")) + geom_boxplot(outlier.colour = NULL) #+geom_point() + geom_jitter(position = position_jitter(width = .1))
   Thalamus_boxplot <- Thalamus_boxplot + ggtitle(paste("Thalamus", v)) + scale_fill_manual(values=CI_colors)  + theme_grey(base_size = 32)  + theme(axis.text.x=element_text(angle=90, hjust=1), axis.title.x=element_blank(), legend.position="none")
   Thalamus_boxplot <- Thalamus_boxplot + ylim( -1, 5)
   plot(Thalamus_boxplot)
-  ggsave(filename = paste(v,'_tha_box.pdf', sep=''), plot = Thalamus_boxplot, units = c("in"),width=8, height=8) 
+  #ggsave(filename = paste(v,'_tha_box.pdf', sep=''), plot = Thalamus_boxplot, units = c("in"),width=8, height=8) 
 
   Cortical_boxplot <- ggplot(data = Cortical_Data, aes_string(x="Associated.System", y=v, fill="Associated.System", colour="Associated.System")) + geom_boxplot(outlier.colour = NULL) #+geom_point() + geom_jitter(position = position_jitter(width = .1))
   Cortical_boxplot <- Cortical_boxplot + ggtitle(paste("Cortical", v))+ scale_fill_manual(values=CI_colors) + theme_grey(base_size = 32)  + theme(axis.text.x=element_text(angle=90, hjust=1), axis.title.x=element_blank(), legend.position="none")
   Cortical_boxplot <- Cortical_boxplot + ylim( -1, 5)
   plot(Cortical_boxplot)
-  ggsave(filename = paste(v,'_cortical_box.pdf', sep=''), plot = Cortical_boxplot, units = c("in"),width=8, height=8) 
+  #ggsave(filename = paste(v,'_cortical_box.pdf', sep=''), plot = Cortical_boxplot, units = c("in"),width=8, height=8) 
 }
 
 ### plot to compare within thalamus nodal role

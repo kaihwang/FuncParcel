@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 
 setwd('/Volumes/neuro/bin/FuncParcel/Data/')
+=======
+setwd('~/bin/FuncParcel/Data/')
+>>>>>>> 0459784402ba1f96060580ecef917b82fdf28450
 
 
 # import libraries
@@ -8,23 +12,31 @@ library(reshape2)
 library(plyr)
 #load data
 
-Thalamus_Data = read.csv('Thalamus_nodal.csv', header=TRUE)
+Thalamus_Data = read.csv('Thalamus_nodal_consensus.csv', header=TRUE)
 Thalamus_Data <- Thalamus_Data[Thalamus_Data$PC<1,]  
 #Thalamus_Data <- Thalamus_Data[Thalamus_Data$target_PC<20,]
 
-Cortical_Data = read.csv('Cortical_nodal.csv', header=TRUE)
+Cortical_Data = read.csv('Cortical_nodal_consensus.csv', header=TRUE)
 Cortical_Data <- Cortical_Data[Cortical_Data$PC>0,]  
 Cortical_Data <- Cortical_Data[Cortical_Data$Associated.System!='Other',] 
 
+<<<<<<< HEAD
 CI_colors <- c("#008080", "purple", "green", "red", "yellow", "magenta", "cyan", "pink", "blue", "pink")
 
 ### boxplot to compare nodal roles between each partition, for thalamus and cortex
 Variables_to_plot <- c('PC'  ) #'NNC', 'BNWR', 'bcc' 'WMD'
+=======
+CI_colors <- c("#008080", "purple", "red", "yellow", "cyan", "brown", "green", "pink", "blue")
+CI_colors <- c("#008080", "purple", "red", "cyan", "green", "pink", "blue")
+### boxplot to compare nodal roles between each partition, for thalamus and cortex
+Variables_to_plot <- c('WMD') #'NNC', 'BNWR', 'bcc' 'WMD'
+>>>>>>> 0459784402ba1f96060580ecef917b82fdf28450
 for (v in Variables_to_plot){
   Thalamus_boxplot <- ggplot(data = Thalamus_Data, aes_string(x="Associated.System", y=v, fill="Associated.System", colour="Associated.System")) + geom_boxplot(outlier.colour = NULL) #+geom_point() + geom_jitter(position = position_jitter(width = .1))
-  Thalamus_boxplot <- Thalamus_boxplot + ggtitle(paste("Thalamus", v)) + scale_fill_manual(values=CI_colors)  + theme_grey(base_size = 32)  + theme(axis.text.x=element_text(angle=90, hjust=1), axis.title.x=element_blank(), legend.position="none")
-  Thalamus_boxplot <- Thalamus_boxplot + ylim( -1, 5)
+  Thalamus_boxplot <- Thalamus_boxplot + ggtitle(paste("Thalamus", v)) + scale_fill_manual(values=CI_colors)  + theme_grey(base_size = 32)  + theme(axis.text.x=element_blank(), axis.title.x=element_blank(), legend.position="none")
+  Thalamus_boxplot <- Thalamus_boxplot + ylim( -1, 5) 
   plot(Thalamus_boxplot)
+<<<<<<< HEAD
   #ggsave(filename = paste(v,'_tha_box.pdf', sep=''), plot = Thalamus_boxplot, units = c("in"),width=8, height=8) 
 
   Cortical_boxplot <- ggplot(data = Cortical_Data, aes_string(x="Associated.System", y=v, fill="Associated.System", colour="Associated.System")) + geom_boxplot(outlier.colour = NULL) #+geom_point() + geom_jitter(position = position_jitter(width = .1))
@@ -32,8 +44,31 @@ for (v in Variables_to_plot){
   Cortical_boxplot <- Cortical_boxplot + ylim( -1, 5)
   plot(Cortical_boxplot)
   #ggsave(filename = paste(v,'_cortical_box.pdf', sep=''), plot = Cortical_boxplot, units = c("in"),width=8, height=8) 
+=======
+  ggsave(filename = paste(v,'_tha_box_consensus.pdf', sep=''), plot = Thalamus_boxplot, units = c("in"),width=6, height=4) 
+
+  #Cortical_boxplot <- ggplot(data = Cortical_Data, aes_string(x="Associated.System", y=v, fill="Associated.System", colour="Associated.System")) + geom_boxplot(outlier.colour = NULL) #+geom_point() + geom_jitter(position = position_jitter(width = .1))
+  #Cortical_boxplot <- Cortical_boxplot + ggtitle(paste("Cortical", v))+ scale_fill_manual(values=CI_colors) + theme_grey(base_size = 32)  + theme(axis.text.x=element_blank(), axis.title.x=element_blank(), legend.position="none")
+  #Cortical_boxplot <- Cortical_boxplot + ylim( -1, 5)
+  #plot(Cortical_boxplot)
+  #ggsave(filename = paste(v,'_cortical_box_consensus.pdf', sep=''), plot = Cortical_boxplot, units = c("in"),width=6, height=4) 
+>>>>>>> 0459784402ba1f96060580ecef917b82fdf28450
 }
 
+
+#plot patient
+PT_Data = read.csv('Patient_Q_v_PC.csv', header=TRUE)
+pt_q_plot <- ggplot(data = PT_Data, aes(x=factor(SubjID), y=Hemispheric_Difference_in_Modularity))
+pt_q_plot <- pt_q_plot + geom_bar(stat = "identity")
+pt_q_plot <- pt_q_plot + labs(x= "Patients", y = "Hemispheric Difference in Modularity") + theme_grey(base_size = 20)
+ggsave(filename = "pt_q_plot.pdf", plot = pt_q_plot, units = c("in"),width=6, height=6) 
+plot(pt_q_plot)
+
+pt_pc_plot <- ggplot(data = PT_Data, aes(x=factor(SubjID), y=Lesioned_site_PC))
+pt_pc_plot <- pt_pc_plot + geom_bar(stat = "identity")
+pt_pc_plot <- pt_pc_plot + labs(x= "Patients", y = "Lesioned voxel's PC") + theme_grey(base_size = 20)
+ggsave(filename = "pt_pc_plot.pdf", plot = pt_pc_plot, units = c("in"),width=6, height=6) 
+plot(pt_q_plot)
 ### plot to compare within thalamus nodal role
 Variables_to_plot <- c('PC','within_PC','WMD', 'within_WMD', 'target_PC')
 

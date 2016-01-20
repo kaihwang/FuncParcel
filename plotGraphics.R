@@ -1,10 +1,4 @@
-<<<<<<< HEAD
-
 setwd('/Volumes/neuro/bin/FuncParcel/Data/')
-=======
-setwd('~/bin/FuncParcel/Data/')
->>>>>>> 0459784402ba1f96060580ecef917b82fdf28450
-
 
 # import libraries
 library(ggplot2)
@@ -12,47 +6,29 @@ library(reshape2)
 library(plyr)
 #load data
 
-Thalamus_Data = read.csv('Thalamus_nodal_consensus.csv', header=TRUE)
-Thalamus_Data <- Thalamus_Data[Thalamus_Data$PC<1,]  
-#Thalamus_Data <- Thalamus_Data[Thalamus_Data$target_PC<20,]
-
-Cortical_Data = read.csv('Cortical_nodal_consensus.csv', header=TRUE)
-Cortical_Data <- Cortical_Data[Cortical_Data$PC>0,]  
+Thalamus_Data = read.csv('Thalamus_nodal_WTA.csv', header=TRUE)
+Cortical_Data = read.csv('Cortical_nodal_WTA.csv', header=TRUE)
 Cortical_Data <- Cortical_Data[Cortical_Data$Associated.System!='Other',] 
 
-<<<<<<< HEAD
+
 CI_colors <- c("#008080", "purple", "green", "red", "yellow", "magenta", "cyan", "pink", "blue", "pink")
 
 ### boxplot to compare nodal roles between each partition, for thalamus and cortex
 Variables_to_plot <- c('PC'  ) #'NNC', 'BNWR', 'bcc' 'WMD'
-=======
-CI_colors <- c("#008080", "purple", "red", "yellow", "cyan", "brown", "green", "pink", "blue")
-CI_colors <- c("#008080", "purple", "red", "cyan", "green", "pink", "blue")
-### boxplot to compare nodal roles between each partition, for thalamus and cortex
-Variables_to_plot <- c('WMD') #'NNC', 'BNWR', 'bcc' 'WMD'
->>>>>>> 0459784402ba1f96060580ecef917b82fdf28450
+
+
 for (v in Variables_to_plot){
   Thalamus_boxplot <- ggplot(data = Thalamus_Data, aes_string(x="Associated.System", y=v, fill="Associated.System", colour="Associated.System")) + geom_boxplot(outlier.colour = NULL) #+geom_point() + geom_jitter(position = position_jitter(width = .1))
   Thalamus_boxplot <- Thalamus_boxplot + ggtitle(paste("Thalamus", v)) + scale_fill_manual(values=CI_colors)  + theme_grey(base_size = 32)  + theme(axis.text.x=element_blank(), axis.title.x=element_blank(), legend.position="none")
-  Thalamus_boxplot <- Thalamus_boxplot + ylim( -1, 5) 
+  Thalamus_boxplot <- Thalamus_boxplot + ylim( 0, 1) 
   plot(Thalamus_boxplot)
-<<<<<<< HEAD
-  #ggsave(filename = paste(v,'_tha_box.pdf', sep=''), plot = Thalamus_boxplot, units = c("in"),width=8, height=8) 
 
-  Cortical_boxplot <- ggplot(data = Cortical_Data, aes_string(x="Associated.System", y=v, fill="Associated.System", colour="Associated.System")) + geom_boxplot(outlier.colour = NULL) #+geom_point() + geom_jitter(position = position_jitter(width = .1))
-  Cortical_boxplot <- Cortical_boxplot + ggtitle(paste("Cortical", v))+ scale_fill_manual(values=CI_colors) + theme_grey(base_size = 32)  + theme(axis.text.x=element_text(angle=90, hjust=1), axis.title.x=element_blank(), legend.position="none")
-  Cortical_boxplot <- Cortical_boxplot + ylim( -1, 5)
-  plot(Cortical_boxplot)
-  #ggsave(filename = paste(v,'_cortical_box.pdf', sep=''), plot = Cortical_boxplot, units = c("in"),width=8, height=8) 
-=======
-  ggsave(filename = paste(v,'_tha_box_consensus.pdf', sep=''), plot = Thalamus_boxplot, units = c("in"),width=6, height=4) 
 
   #Cortical_boxplot <- ggplot(data = Cortical_Data, aes_string(x="Associated.System", y=v, fill="Associated.System", colour="Associated.System")) + geom_boxplot(outlier.colour = NULL) #+geom_point() + geom_jitter(position = position_jitter(width = .1))
   #Cortical_boxplot <- Cortical_boxplot + ggtitle(paste("Cortical", v))+ scale_fill_manual(values=CI_colors) + theme_grey(base_size = 32)  + theme(axis.text.x=element_blank(), axis.title.x=element_blank(), legend.position="none")
   #Cortical_boxplot <- Cortical_boxplot + ylim( -1, 5)
   #plot(Cortical_boxplot)
   #ggsave(filename = paste(v,'_cortical_box_consensus.pdf', sep=''), plot = Cortical_boxplot, units = c("in"),width=6, height=4) 
->>>>>>> 0459784402ba1f96060580ecef917b82fdf28450
 }
 
 
@@ -69,12 +45,13 @@ pt_pc_plot <- pt_pc_plot + geom_bar(stat = "identity")
 pt_pc_plot <- pt_pc_plot + labs(x= "Patients", y = "Lesioned voxel's PC") + theme_grey(base_size = 20)
 ggsave(filename = "pt_pc_plot.pdf", plot = pt_pc_plot, units = c("in"),width=6, height=6) 
 plot(pt_q_plot)
+
+
 ### plot to compare within thalamus nodal role
 Variables_to_plot <- c('PC','within_PC','WMD', 'within_WMD', 'target_PC')
 
 Thalamus_pc_plot <-ggplot(data = Thalamus_Data, aes(x=target_PC, y=PC))+geom_point()
 plot(Thalamus_pc_plot)
-
 
 ### look at correlation between dataset
 Thalamus_pc_plot <-ggplot(data = Thalamus_Data, aes(x=MGH_NNC, y=NKI_NNC))+geom_point()
@@ -99,27 +76,5 @@ Thalamus_boxplot <- ggplot(data = Thalamus_Data, aes_string(x="Associated.System
 plot(Thalamus_boxplot)
 
 
-
-
-## look at patient data
-WarmScale<-c("#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#b10026")
-BlueScale<-c("#9ecae1", "#6baed6",  "#4292c6", "#2171b5", "#084594")
-cScale <- c("#e7298a",
-"#beaed4",
-"#fdc086",
-"#ffff99",
-"#386cb0")
-patient_data = read.csv('patient_df.csv', header=TRUE)
-melt_data <- melt(patient_data, id_vars = c("SubjID", "Voxel", "CI", "PC"), measure.vars = c("Target_total_weight_bn", "nonTarget_total_weight_bn"))
-plot_data <- ddply(melt_data, c("SubjID", "CI", "PC", "variable"), summarise, mean = mean(value, na.rm=TRUE))
-patient_plot <-ggplot(plot_data , aes(x=SubjID , y=mean, colour=variable))+geom_point(size=3, aes(shape = factor(SubjID)))+ scale_colour_manual(values=c("Red", "Black")) #+ facet_grid(.~CI)
-patient_plot <- patient_plot + theme_grey(base_size = 16) # + theme(axis.text.x=element_text(angle=90, hjust=1))                                                                                                                                            
-patient_plot
-
-
-patient_data = read.csv('patient_nework_df.csv', header=TRUE)
-patient_data$SubjID <- factor(patient_data$SubjID)
-patient_plot <-ggplot(patient_data, aes(x=CI, y=Between_network_connectivity_weight))+geom_bar(stat="identity")+ facet_grid(.~SubjID) + theme_grey(base_size = 16)  + theme(axis.text.x=element_text(angle=90, hjust=1))                 
-patient_plot                      
-                      
+  
                       

@@ -114,4 +114,5 @@ if __name__ == "__main__":
 	image_path = Parcel_path + '/NKI_gordon_consensus_based_thalamus_parcels_c07-15.nii.gz' 
 	make_image(atlas_path, image_path, ROI_list, Tha_CI)
 
+	image_path = Parcel_path + '/MGH_WTA_parcel.nii.gz' 
 

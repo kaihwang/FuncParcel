@@ -19,6 +19,7 @@ path_to_ROIs = '/home/despoB/connectome-thalamus/ROIs/'
 Thalamus_CIs = np.loadtxt(Parcel_path+'MGH_Thalamus_WTA_CIs')
 Thalamus_voxels = np.loadtxt(path_to_ROIs+'thalamus_voxel_indices', dtype=int)
 Thalamus_ana_parcel = np.loadtxt(Parcel_path+'fsl_thalamus_ana_parcel') # this is diffusion based parcel from FSL
+Morel_parcel = np.loadtxt(Parcel_path+'Morel_parcel') # this is histology based parcel of the Morel atlas
 Cortical_ROIs = np.loadtxt(path_to_ROIs+'Craddock_300_cortical_ROIs', dtype=int)
 Cortical_CI = np.loadtxt(path_to_ROIs+'/Cortical_CI', dtype='int')
 #Cortical_CI = int(np.array(Cortical_CI))
@@ -72,6 +73,40 @@ Thalamus_df['Anatomical Parcellations'].loc[Thalamus_df['Anatomical Parcellation
 Thalamus_df['Anatomical Parcellations'].loc[Thalamus_df['Anatomical Parcellations'] ==7] = 'Temporal'
 
 
+Thalamus_df['Morel Parcellations'] = Morel_parcel
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==0] = 'Unclassified'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==10] = 'AD'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==11] = 'AM'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==12] = 'AV'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==13] = 'LD'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==20] = 'MD'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==21] = 'MD'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==22] = 'MV'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==23] = 'CL'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==24] = 'CeM'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==25] = 'CM'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==26] = 'Pf'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==30] = 'PuM'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==31] = 'PuI'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==32] = 'PuL'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==33] = 'PuA'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==34] = 'LP'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==35] = 'MGN'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==36] = 'SG'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==37] = 'Li'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==38] = 'Po'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==39] = 'LGN'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==40] = 'LGN'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==41] = 'VPL'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==42] = 'VPL'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==43] = 'VPM'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==44] = 'VPI'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==45] = 'VL'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==46] = 'VL'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==47] = 'VL'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==48] = 'VA'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==49] = 'VA'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==50] = 'VM'
 
 #cortical
 Cortical_df = pd.DataFrame(columns=('ROI', 'Associated System'))

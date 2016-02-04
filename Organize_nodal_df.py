@@ -22,6 +22,7 @@ Thalamus_ana_parcel = np.loadtxt(Parcel_path+'fsl_thalamus_ana_parcel') # this i
 Morel_parcel = np.loadtxt(Parcel_path+'Morel_parcel') # this is histology based parcel of the Morel atlas
 Cortical_ROIs = np.loadtxt(path_to_ROIs+'Craddock_300_cortical_ROIs', dtype=int)
 Cortical_CI = np.loadtxt(path_to_ROIs+'/Cortical_CI', dtype='int')
+Cog_component = np.loadtxt(Parcel_path+'Yeo_cogcomp')
 #Cortical_CI = int(np.array(Cortical_CI))
 
 #PC
@@ -48,20 +49,20 @@ Cortical_BNWR = pickle.load(open(path_to_data_folder+'Cortical_BNWR', "rb"))
 ################################################################
 
 #thalamus parcellations
-Thalamus_df = pd.DataFrame(columns=('Voxel', 'Associated System', 'Anatomical Parcellations')) 
+Thalamus_df = pd.DataFrame(columns=('Voxel', 'Associated System', 'Anatomical Parcellations', 'Morel Parcellation')) 
 Thalamus_df['Voxel'] = Thalamus_voxels
 
 Thalamus_df['Associated System'] = Thalamus_CIs
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==1] = 'Default'
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==2] = 'Cingulo-opercular'
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==3] = 'Somatomotor'
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==4] = 'Fronto-parietal'
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==5] = 'Occipital-Parietal'
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==6] = 'Visual'
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==7] = 'Retrospinal'
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==8] = 'Temporal'
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==9] = 'Attention'
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==10] = 'Temporal'
+Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==1] = 'DF'
+Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==2] = 'CO'
+Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==3] = 'SM'
+Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==4] = 'FP'
+Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==5] = 'OP'
+Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==6] = 'V'
+Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==7] = 'RS'
+Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==8] = 'T'
+Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==9] = 'ATTN'
+Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==10] = 'T'
 
 Thalamus_df['Anatomical Parcellations'] = Thalamus_ana_parcel
 Thalamus_df['Anatomical Parcellations'].loc[Thalamus_df['Anatomical Parcellations'] ==1] = 'Primary Motor'
@@ -75,9 +76,9 @@ Thalamus_df['Anatomical Parcellations'].loc[Thalamus_df['Anatomical Parcellation
 
 Thalamus_df['Morel Parcellations'] = Morel_parcel
 Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==0] = 'Unclassified'
-Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==10] = 'AD'
-Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==11] = 'AM'
-Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==12] = 'AV'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==10] = 'AN'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==11] = 'AN'
+Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==12] = 'AN'
 Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==13] = 'LD'
 Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==20] = 'MD'
 Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==21] = 'MD'
@@ -113,15 +114,15 @@ Cortical_df = pd.DataFrame(columns=('ROI', 'Associated System'))
 #Cortical_df['ROI'] = Cortical_ROIs
 Cortical_df['Associated System'] = Cortical_CI
 
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==1] = 'Default'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==2] = 'Visual'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==3] = 'Somatomotor'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==4] = 'Fronto-parietal'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==5] = 'Attention'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==6] = 'Retrospinal'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==7] = 'Temporal'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==8] = 'Occipital-parietal'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==9] = 'Cingulo-opercular'
+Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==1] = 'DF'
+Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==2] = 'V'
+Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==3] = 'SM'
+Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==4] = 'FP'
+Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==5] = 'ATTN'
+Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==6] = 'RS'
+Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==7] = 'T'
+Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==8] = 'OP'
+Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==9] = 'CO'
 Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==0] = 'Other' 
 
 ##########################################
@@ -134,6 +135,7 @@ Thalamus_df['PC'] = Tha_PC[320:]/13.5  #take out cortical ones, normalize by max
 Thalamus_df['WMD'] = Tha_WMD[320:]/15 
 Thalamus_df['NNC'] = NNCs[320:]/15 
 Thalamus_df['BNWR'] = Tha_BNWR[320:]/15
+Thalamus_df['cog'] = Cog_component
 
 Cortical_df['PC'] = Cortical_PC[0:320]/13.5  #take out cortical ones, normalize by max PC
 Cortical_df['WMD'] = Cortical_WMD[0:320]/15 
@@ -184,6 +186,6 @@ Cortical_df['BNWR'] = Cortical_BNWR[0:320]/15
 Thalamus_df.to_csv(path_to_data_folder+'Thalamus_nodal_WTA.csv')
 Cortical_df.to_csv(path_to_data_folder+'Cortical_nodal_WTA.csv')
 #Thalamus_target_df.to_csv(path_to_data_folder+'Thalamus_target.csv')
-
+#Thalamus_df.groupby(['Morel Parcellations']).mean()
 
 

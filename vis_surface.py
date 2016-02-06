@@ -32,6 +32,35 @@ for i, coord in enumerate(coords):
 			brain2.add_foci(coord, map_surface="white", color=colors[CIs[i]])
 
 
+
+### to visualize cortical ROI PC values
+subject_id = "fsaverage"
+subjects_dir = os.environ["SUBJECTS_DIR"]
+
+brain = Brain("fsaverage", "rh", "inflated", views=['lat', 'med'], background="white")
+#brain = Brain("fsaverage", "rh", "inflated", background="white")
+coords = np.loadtxt('/Volumes/neuro/Rest/ROIs/Gordon_coordinates')
+PC = np.loadtxt('//Volumes/neuro/Rest/Thalamic_parcel/roipc')
+
+from matplotlib import cm
+for i, coord in enumerate(coords):
+	if coord[0] > 0:
+		brain.add_foci(coord, map_surface="white", color=cm.spring(int(PC[i]/100*255))[0:3])
+
+
+###### to visualize cortical ROI wmd values
+subject_id = "fsaverage"
+subjects_dir = os.environ["SUBJECTS_DIR"]
+
+brain = Brain("fsaverage", "rh", "inflated", views=['lat', 'med'], background="white")
+#brain = Brain("fsaverage", "rh", "inflated", background="white")
+coords = np.loadtxt('/Volumes/neuro/Rest/ROIs/Gordon_coordinates')
+wmd = np.loadtxt('//Volumes/neuro/Rest/Thalamic_parcel/wmdroi')
+
+from matplotlib import cm
+for i, coord in enumerate(coords):
+	if coord[0] > 0:
+		brain.add_foci(coord, map_surface="white", color=cm.spring(int((wmd[i]/100+2.1)/4*255))[0:3])
 # 0 
 # 1 DF Red
 # 2 CO Purple

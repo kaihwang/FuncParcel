@@ -49,29 +49,29 @@ Cortical_BNWR = pickle.load(open(path_to_data_folder+'Cortical_BNWR', "rb"))
 ################################################################
 
 #thalamus parcellations
-Thalamus_df = pd.DataFrame(columns=('Voxel', 'Associated System', 'Anatomical Parcellations', 'Morel Parcellation')) 
+Thalamus_df = pd.DataFrame(columns=('Voxel', 'Functional Network', 'Anatomical Parcellations', 'Morel Parcellation')) 
 Thalamus_df['Voxel'] = Thalamus_voxels
 
-Thalamus_df['Associated System'] = Thalamus_CIs
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==1] = 'DF'
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==2] = 'CO'
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==3] = 'SM'
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==4] = 'FP'
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==5] = 'OP'
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==6] = 'V'
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==7] = 'RS'
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==8] = 'T'
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==9] = 'ATTN'
-Thalamus_df['Associated System'].loc[Thalamus_df['Associated System'] ==10] = 'T'
+Thalamus_df['Functional Network'] = Thalamus_CIs
+Thalamus_df['Functional Network'].loc[Thalamus_df['Functional Network'] ==1] = 'DF'
+Thalamus_df['Functional Network'].loc[Thalamus_df['Functional Network'] ==2] = 'CO'
+Thalamus_df['Functional Network'].loc[Thalamus_df['Functional Network'] ==3] = 'SM'
+Thalamus_df['Functional Network'].loc[Thalamus_df['Functional Network'] ==4] = 'FP'
+Thalamus_df['Functional Network'].loc[Thalamus_df['Functional Network'] ==5] = 'OP'
+Thalamus_df['Functional Network'].loc[Thalamus_df['Functional Network'] ==6] = 'V'
+Thalamus_df['Functional Network'].loc[Thalamus_df['Functional Network'] ==7] = 'RS'
+Thalamus_df['Functional Network'].loc[Thalamus_df['Functional Network'] ==8] = 'T'
+Thalamus_df['Functional Network'].loc[Thalamus_df['Functional Network'] ==9] = 'Attn'
+Thalamus_df['Functional Network'].loc[Thalamus_df['Functional Network'] ==10] = 'T'
 
 Thalamus_df['Anatomical Parcellations'] = Thalamus_ana_parcel
-Thalamus_df['Anatomical Parcellations'].loc[Thalamus_df['Anatomical Parcellations'] ==1] = 'Primary Motor'
-Thalamus_df['Anatomical Parcellations'].loc[Thalamus_df['Anatomical Parcellations'] ==2] = 'Sensory'
-Thalamus_df['Anatomical Parcellations'].loc[Thalamus_df['Anatomical Parcellations'] ==3] = 'Occipital'
-Thalamus_df['Anatomical Parcellations'].loc[Thalamus_df['Anatomical Parcellations'] ==4] = 'Prefrontal'
-Thalamus_df['Anatomical Parcellations'].loc[Thalamus_df['Anatomical Parcellations'] ==5] = 'Premotor'
-Thalamus_df['Anatomical Parcellations'].loc[Thalamus_df['Anatomical Parcellations'] ==6] = 'Parietal'
-Thalamus_df['Anatomical Parcellations'].loc[Thalamus_df['Anatomical Parcellations'] ==7] = 'Temporal'
+Thalamus_df['Anatomical Parcellations'].loc[Thalamus_df['Anatomical Parcellations'] ==1] = 'M'
+Thalamus_df['Anatomical Parcellations'].loc[Thalamus_df['Anatomical Parcellations'] ==2] = 'S'
+Thalamus_df['Anatomical Parcellations'].loc[Thalamus_df['Anatomical Parcellations'] ==3] = 'O'
+Thalamus_df['Anatomical Parcellations'].loc[Thalamus_df['Anatomical Parcellations'] ==4] = 'PFC'
+Thalamus_df['Anatomical Parcellations'].loc[Thalamus_df['Anatomical Parcellations'] ==5] = 'pM'
+Thalamus_df['Anatomical Parcellations'].loc[Thalamus_df['Anatomical Parcellations'] ==6] = 'PL'
+Thalamus_df['Anatomical Parcellations'].loc[Thalamus_df['Anatomical Parcellations'] ==7] = 'T'
 
 
 Thalamus_df['Morel Parcellations'] = Morel_parcel
@@ -110,20 +110,20 @@ Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==49] 
 Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==50] = 'VM'
 
 #cortical
-Cortical_df = pd.DataFrame(columns=('ROI', 'Associated System'))
+Cortical_df = pd.DataFrame(columns=('ROI', 'Functional Network'))
 #Cortical_df['ROI'] = Cortical_ROIs
-Cortical_df['Associated System'] = Cortical_CI
+Cortical_df['Functional Network'] = Cortical_CI
 
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==1] = 'DF'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==2] = 'V'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==3] = 'SM'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==4] = 'FP'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==5] = 'ATTN'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==6] = 'RS'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==7] = 'T'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==8] = 'OP'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==9] = 'CO'
-Cortical_df['Associated System'].loc[Cortical_df['Associated System'] ==0] = 'Other' 
+Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==1] = 'DF'
+Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==2] = 'V'
+Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==3] = 'SM'
+Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==4] = 'FP'
+Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==5] = 'Attn'
+Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==6] = 'RS'
+Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==7] = 'T'
+Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==8] = 'OP'
+Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==9] = 'CO'
+Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==0] = 'Other' 
 
 ##########################################
 ###### populate data

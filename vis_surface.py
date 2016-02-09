@@ -61,6 +61,38 @@ from matplotlib import cm
 for i, coord in enumerate(coords):
 	if coord[0] > 0:
 		brain.add_foci(coord, map_surface="white", color=cm.spring(int((wmd[i]/100+2.1)/4*255))[0:3])
+
+
+
+#### to visualize AN, MD, PuM, Intra ROI target
+
+subject_id = "fsaverage"
+subjects_dir = os.environ["SUBJECTS_DIR"]
+
+brain = Brain("fsaverage", "rh", "inflated", views=['lat', 'med'], background="white")
+#brain = Brain("fsaverage", "rh", "inflated", background="white")
+coords = np.loadtxt('/Volumes/neuro/Rest/ROIs/Gordon_coordinates')
+CIs = np.loadtxt('/Volumes/neuro/Rest/ROIs/Gordon_consensus_CI')
+targets = np.loadtxt('/Volumes/neuro/Rest/ROIs/Morel_PuM_targets')
+
+colors = {1:'red', 2:'purple', 3:'green', 4:'yellow', 5:'cyan', 6:'blue', 7:'brown', 8:'pink', 9:'teal', 12:'pink'}
+
+for i, coord in enumerate(coords):
+	if CIs[i] != 0:
+		if np.in1d(i+1, targets):
+			if coord[0] > 0:
+				brain.add_foci(coord, map_surface="white", color=colors[CIs[i]])
+
+brain2 = Brain("fsaverage", "lh", "inflated", views=['lat', 'med'], background="white")
+colors = {1:'red', 2:'purple', 3:'green', 4:'yellow', 5:'cyan', 6:'blue', 7:'brown', 8:'pink', 9:'teal', 12:'pink'}
+
+for i, coord in enumerate(coords):
+	if CIs[i] != 0:
+		if np.in1d(i+1, targets):
+			if coord[0] < 0:
+				brain2.add_foci(coord, map_surface="white", color=colors[CIs[i]])
+
+
 # 0 
 # 1 DF Red
 # 2 CO Purple

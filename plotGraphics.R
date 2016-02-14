@@ -4,17 +4,59 @@ setwd('/Volumes/neuro/bin/FuncParcel/Data/')
 library(ggplot2)
 library(reshape2)
 library(plyr)
+library("grid")
 #load data
 
 Thalamus_Data = read.csv('Thalamus_nodal_WTA.csv', header=TRUE)
 Cortical_Data = read.csv('Cortical_nodal_WTA.csv', header=TRUE)
 Cortical_Data <- Cortical_Data[Cortical_Data$Functional.Network!='Other',] 
-
+Thalamus_Data <- Thalamus_Data[Thalamus_Data$Morel.Parcellations!='Unclassified',] 
+Nuclei_order <-c('AN', 'LD', 'MD', 'CL', 'CeM', 'CM', 'Pf', 'Li', 'PuA', 'PuI', 'PuL','PuM','LP','Po','SG','MGN','LGN','VA','VL','VM','VPI','VPL','VPM' )
+Thalamus_Data$Morel.Parcellations_f = factor(Thalamus_Data$Morel.Parcellations, levels=Nuclei_order)
 
 #CI_colors <- c("#008080", "purple", "green", "red", "yellow", "magenta", "cyan", "pink", "blue", "pink")
 
+### volcano plot
+Variables_to_plot <- c('NNC'  ) #'NNC', 'BNWR', 'bcc' 'WMD'
+
+for (v in Variables_to_plot){
+  
+  volplot <- ggplot(data = Thalamus_Data, aes_string(x=v))
+  volplot <- volplot + stat_density(aes(ymax = ..density..,  ymin = -..density.. ),geom = "ribbon", position = "identity" )
+  volplot <- volplot + facet_grid(. ~ Functional.Network) + coord_flip() + theme_grey(base_size = 10) 
+  volplot <- volplot  + xlim( 0,9) + theme( axis.title.x=element_blank(),axis.ticks.x=element_blank(),axis.text.x=element_blank(), axis.text = element_text(colour = "black")) 
+  volplot <- volplot + ggtitle("Thalamus Functional Atlas")
+  plot(volplot)
+  ggsave(filename = paste(v,'_tha_fn_density.pdf', sep=''), plot = volplot, units = c("in"),width=3.4, height=1.5) 
+  
+  volplot <- ggplot(data = Cortical_Data, aes_string(x=v))
+  volplot <- volplot + stat_density(aes(ymax = ..density..,  ymin = -..density.. ),geom = "ribbon", position = "identity" )
+  volplot <- volplot + facet_grid(. ~ Functional.Network) + coord_flip() + theme_grey(base_size = 10) 
+  volplot <- volplot  + xlim( 0,9) + theme( axis.title.x=element_blank(),axis.ticks.x=element_blank(),axis.text.x=element_blank(), axis.text = element_text(colour = "black")) 
+  volplot <- volplot + ggtitle("Cortical ROI")
+  plot(volplot)
+  ggsave(filename = paste(v,'_cortical_fn_density.pdf', sep=''), plot = volplot, units = c("in"),width=3.4, height=1.5) 
+  
+  volplot <- ggplot(data = Thalamus_Data, aes_string(x=v))
+  volplot <- volplot + stat_density(aes(ymax = ..density..,  ymin = -..density.. ),geom = "ribbon", position = "identity" )
+  volplot <- volplot + facet_grid(. ~ Anatomical.Parcellations) + coord_flip() + theme_grey(base_size = 10) 
+  volplot <- volplot  + xlim( 0,9) +  theme( axis.title.x=element_blank(),axis.ticks.x=element_blank(),axis.text.x=element_blank(), axis.text = element_text(colour = "black")) 
+  volplot <- volplot + ggtitle("Thalamus Oxford-FSL Atlas")
+  plot(volplot)
+  ggsave(filename = paste(v,'_thalamus_an_density.pdf', sep=''), plot = volplot, units = c("in"),width=2.85, height=1.5) 
+  
+  Thalamus_Data <- Thalamus_Data[Thalamus_Data$Morel.Parcellations!='Unclassified',] 
+  volplot <- ggplot(data = Thalamus_Data, aes_string(x=v))
+  volplot <- volplot + stat_density(aes(ymax = ..density..,  ymin = -..density.. ),geom = "ribbon", position = "identity" )
+  volplot <- volplot + facet_wrap(~Morel.Parcellations_f, ncol = 8) + coord_flip() + theme_grey(base_size = 10) 
+  volplot <- volplot  + xlim( 0,9) +theme( axis.title.x=element_blank(),axis.ticks.x=element_blank(),axis.text.x=element_blank(), axis.text = element_text(colour = "black")) 
+  volplot <- volplot + ggtitle("Thalamus Morel Atlas") + theme(panel.margin.y = unit(1.25, "cm"))
+  plot(volplot)
+  ggsave(filename = paste(v,'_thalamus_morel_density.pdf', sep=''), plot = volplot, units = c("in"),width=3.4, height=4.25) 
+  
+}  
+
 ### boxplot to compare nodal roles between each partition, for thalamus and cortex
-Variables_to_plot <- c('PC'  ) #'NNC', 'BNWR', 'bcc' 'WMD'
 
 
 for (v in Variables_to_plot){

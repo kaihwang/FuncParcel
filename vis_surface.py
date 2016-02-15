@@ -73,7 +73,7 @@ brain = Brain("fsaverage", "rh", "inflated", views=['lat', 'med'], background="w
 #brain = Brain("fsaverage", "rh", "inflated", background="white")
 coords = np.loadtxt('/Volumes/neuro/Rest/ROIs/Gordon_coordinates')
 CIs = np.loadtxt('/Volumes/neuro/Rest/ROIs/Gordon_consensus_CI')
-targets = np.loadtxt('/Volumes/neuro/Rest/ROIs/Morel_PuM_targets')
+targets = np.loadtxt('/Volumes/neuro/Rest/ROIs/Morel_intralaminar_targets')
 
 colors = {1:'red', 2:'purple', 3:'green', 4:'yellow', 5:'cyan', 6:'blue', 7:'brown', 8:'pink', 9:'teal', 12:'pink'}
 

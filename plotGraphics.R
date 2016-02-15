@@ -10,21 +10,21 @@ library("grid")
 Thalamus_Data = read.csv('Thalamus_nodal_WTA.csv', header=TRUE)
 Cortical_Data = read.csv('Cortical_nodal_WTA.csv', header=TRUE)
 Cortical_Data <- Cortical_Data[Cortical_Data$Functional.Network!='Other',] 
-Thalamus_Data <- Thalamus_Data[Thalamus_Data$Morel.Parcellations!='Unclassified',] 
+
 Nuclei_order <-c('AN', 'LD', 'MD', 'CL', 'CeM', 'CM', 'Pf', 'Li', 'PuA', 'PuI', 'PuL','PuM','LP','Po','SG','MGN','LGN','VA','VL','VM','VPI','VPL','VPM' )
 Thalamus_Data$Morel.Parcellations_f = factor(Thalamus_Data$Morel.Parcellations, levels=Nuclei_order)
 
 #CI_colors <- c("#008080", "purple", "green", "red", "yellow", "magenta", "cyan", "pink", "blue", "pink")
 
 ### volcano plot
-Variables_to_plot <- c('NNC'  ) #'NNC', 'BNWR', 'bcc' 'WMD'
+Variables_to_plot <- c('WMD'  ) #'NNC', 'BNWR', 'bcc' 'WMD'
 
 for (v in Variables_to_plot){
   
   volplot <- ggplot(data = Thalamus_Data, aes_string(x=v))
   volplot <- volplot + stat_density(aes(ymax = ..density..,  ymin = -..density.. ),geom = "ribbon", position = "identity" )
   volplot <- volplot + facet_grid(. ~ Functional.Network) + coord_flip() + theme_grey(base_size = 10) 
-  volplot <- volplot  + xlim( 0,9) + theme( axis.title.x=element_blank(),axis.ticks.x=element_blank(),axis.text.x=element_blank(), axis.text = element_text(colour = "black")) 
+  volplot <- volplot  + xlim(-2,2) + theme( axis.title.x=element_blank(),axis.ticks.x=element_blank(),axis.text.x=element_blank(), axis.text = element_text(colour = "black")) 
   volplot <- volplot + ggtitle("Thalamus Functional Atlas")
   plot(volplot)
   ggsave(filename = paste(v,'_tha_fn_density.pdf', sep=''), plot = volplot, units = c("in"),width=3.4, height=1.5) 
@@ -146,7 +146,7 @@ for (v in Variables_to_plot){
 }
 
 
-
+#### patient stuff
 setwd('~/Google Drive/Projects/Thalamus-Rest/')
 #plot patient
 PT_Data = read.csv('Patient_Q_v_PC.csv', header=TRUE)
@@ -162,6 +162,19 @@ pt_pc_plot <- pt_pc_plot + ylim( 0, 80)
 pt_pc_plot <- pt_pc_plot + labs(x= "Patients", y = "Lesioned voxel's mean PC") + theme_grey(base_size = 10)+ theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black")) 
 ggsave(filename = "pt_pc_plot.pdf", plot = pt_pc_plot, units = c("in"),width=3, height=3) 
 plot(pt_pc_plot)
+
+
+#### AN, MD, PuM, Intra network stregnth 
+setwd('~/Google Drive/Projects/Thalamus-Rest/')
+CI_colors <- c("#0E6E6C", "#6B006C", "red", "yellow", "cyan", "brown", "#008100", "pink", "blue")
+Nuclei_Data <- read.csv('NucleiNetworkStrength.csv')
+plot_Data <- Nuclei_Data[Nuclei_Data$Nuclei=='MD',] 
+n_plot <- ggplot(data = plot_Data, aes(x=factor(Network), y=Connectivity.Strength))
+n_plot <- n_plot + geom_bar(stat = "identity", aes(fill=Network)) + labs(y = "Z-Score") + theme_classic(base_size = 10)
+n_plot <- n_plot +scale_fill_manual(values=CI_colors ) 
+n_plot <- n_plot + theme(axis.title.x=element_blank(), axis.ticks.x=element_blank(), axis.text.x=element_blank(), axis.text = element_text(colour = "black"), legend.position="none")
+ggsave(filename = "MD_plot.pdf", plot = n_plot, units = c("in"),width=2, height=1.25) 
+plot(n_plot)
 
 
 ### plot to compare within thalamus nodal role

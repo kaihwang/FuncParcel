@@ -49,7 +49,7 @@ Cortical_BNWR = pickle.load(open(path_to_data_folder+'Cortical_BNWR', "rb"))
 ################################################################
 
 #thalamus parcellations
-Thalamus_df = pd.DataFrame(columns=('Voxel', 'Functional Network', 'Anatomical Parcellations', 'Morel Parcellation')) 
+Thalamus_df = pd.DataFrame(columns=('Voxel', 'Functional Network', 'Anatomical Parcellations', 'Morel Parcellation', 'Classficiation')) 
 Thalamus_df['Voxel'] = Thalamus_voxels
 
 Thalamus_df['Functional Network'] = Thalamus_CIs
@@ -58,10 +58,10 @@ Thalamus_df['Functional Network'].loc[Thalamus_df['Functional Network'] ==2] = '
 Thalamus_df['Functional Network'].loc[Thalamus_df['Functional Network'] ==3] = 'SM'
 Thalamus_df['Functional Network'].loc[Thalamus_df['Functional Network'] ==4] = 'FP'
 Thalamus_df['Functional Network'].loc[Thalamus_df['Functional Network'] ==5] = 'OP'
-Thalamus_df['Functional Network'].loc[Thalamus_df['Functional Network'] ==6] = 'V'
-Thalamus_df['Functional Network'].loc[Thalamus_df['Functional Network'] ==7] = 'RS'
+Thalamus_df['Functional Network'].loc[Thalamus_df['Functional Network'] ==6] = 'O'
+Thalamus_df['Functional Network'].loc[Thalamus_df['Functional Network'] ==7] = 'mT'
 Thalamus_df['Functional Network'].loc[Thalamus_df['Functional Network'] ==8] = 'T'
-Thalamus_df['Functional Network'].loc[Thalamus_df['Functional Network'] ==9] = 'Attn'
+Thalamus_df['Functional Network'].loc[Thalamus_df['Functional Network'] ==9] = 'sFP'
 Thalamus_df['Functional Network'].loc[Thalamus_df['Functional Network'] ==10] = 'T'
 
 Thalamus_df['Anatomical Parcellations'] = Thalamus_ana_parcel
@@ -109,17 +109,53 @@ Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==48] 
 Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==49] = 'VA'
 Thalamus_df['Morel Parcellations'].loc[Thalamus_df['Morel Parcellations'] ==50] = 'VM'
 
+
+Thalamus_df['Classification'] = Morel_parcel
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==0] = 'Unclassified'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==10] = 'Ho'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==11] = 'Ho'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==12] = 'Ho'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==13] = 'Ho'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==20] = 'Ho'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==21] = 'Ho'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==22] = 'Ho'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==23] = 'NS'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==24] = 'NS'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==25] = 'NS'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==26] = 'NS'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==30] = 'Ho'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==31] = 'Ho'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==32] = 'Ho'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==33] = 'Ho'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==34] = 'Ho'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==35] = 'Fo'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==36] = 'Fo'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==37] = 'NS'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==38] = 'Ho'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==39] = 'Fo'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==40] = 'Fo'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==41] = 'Fo'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==42] = 'Fo'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==43] = 'Fo'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==44] = 'Ho'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==45] = 'Fo'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==46] = 'Fo'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==47] = 'Fo'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==48] = 'Fo'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==49] = 'Fo'
+Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==50] = 'Fo'
+
 #cortical
 Cortical_df = pd.DataFrame(columns=('ROI', 'Functional Network'))
 #Cortical_df['ROI'] = Cortical_ROIs
 Cortical_df['Functional Network'] = Cortical_CI
 
 Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==1] = 'DF'
-Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==2] = 'V'
+Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==2] = 'O'
 Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==3] = 'SM'
 Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==4] = 'FP'
-Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==5] = 'Attn'
-Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==6] = 'RS'
+Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==5] = 'sFP'
+Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==6] = 'mT'
 Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==7] = 'T'
 Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==8] = 'OP'
 Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==9] = 'CO'

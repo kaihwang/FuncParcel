@@ -178,7 +178,9 @@ Cortical_df['WMD'] = Cortical_WMD[0:320]/15
 Cortical_df['NNC'] = NNCs[0:320]/15 
 Cortical_df['BNWR'] = Cortical_BNWR[0:320]/15
 
-
+Cortical_df['Classification'] = 'None'
+Cortical_df['Classification'].loc[Cortical_df['WMD'] > .81] = 'Cortical Provincial'
+Cortical_df['Classification'].loc[Cortical_df['PC'] > .63] = 'Cortical Connector'
 
 ################################################################
 ####### thalamo-cortical target's nodal role for each thalamus voxel

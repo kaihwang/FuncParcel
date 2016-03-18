@@ -91,7 +91,7 @@ def parcel_subcortical_network(AdjMat, Subcorticalcortical_ROIs, Subcortical_vox
     	 the subcortical voxel
     Subcorticalcortical_Targets_corr: 
     	key is the subcortical voxel index, and values of arrays of correlatin coefficeint between subcortical voxel and cortical ROI,
-    	ranked by the strength	 
+    	THIS IS NOT RANKED!! 
     ------
     Example usage
     ------
@@ -145,7 +145,7 @@ def parcel_subcortical_network(AdjMat, Subcorticalcortical_ROIs, Subcortical_vox
 	    # rank the cortical ROI number by highest to lowerst r value, then save to a dictionary where the voxel number is the key 
 	    Subcorticalcortical_Targets[int(Subcorticalcortical_ROIs[i_Subcortical])] = Cortical_ROIs[index]
 	    Subcortical_ParcelCI[int(Subcorticalcortical_ROIs[i_Subcortical])] = Cortical_CI[index]
-	    Subcorticalcortical_Targets_corr[int(Subcorticalcortical_ROIs[i_Subcortical])]  = r_vec[index]
+	    Subcorticalcortical_Targets_corr[int(Subcorticalcortical_ROIs[i_Subcortical])]  = r_vec
 
 	return Subcorticalcortical_Targets, Subcortical_ParcelCI, Subcorticalcortical_Targets_corr
 

@@ -1,5 +1,6 @@
 #from brain_graphs import *
 from FuncParcel import *
+from scipy.stats.mstats import zscore as zscore
 
 #### paths and data
 AvgMat_path = '/home/despoB/connectome-thalamus/AvgMatrices'
@@ -19,39 +20,14 @@ MGH_thalamocor_adj = np.loadtxt(Parcel_path+'/MGH_Gordon_333_thalamocortical_pco
 MGH_Cortical_targets, MGH_Cortical_nontargets, MGH_cost_thresholds = map_subcortical_cortical_targets(MGH_thalamocor_adj, Cortical_ROIs, Thalamus_voxels)
 #NKI_Cortical_targets, NKI_Cortical_nontargets, NKI_cost_thresholds = map_subcortical_cortical_targets(NKI_thalamocor_adj, Cortical_ROIs, Thalamus_voxels)
 
-# lets intersect the two dataset to find reliable targets... and non-targets....
-Cortical_targets={}
-Cortical_nontargets ={}
-for i in Thalamus_voxels:
-	Cortical_targets[i] = np.intersect1d(NKI_Cortical_targets[15,i], MGH_Cortical_targets[15,i])
-	Cortical_nontargets[i] = np.intersect1d(NKI_Cortical_nontargets[15,i], MGH_Cortical_nontargets[15,i])
 
-save_object(Cortical_targets, path_to_data_folder +'/Cortical_targets')
-save_object(Cortical_nontargets, path_to_data_folder +'/Cortical_nontargets')
-
-#### do a count for each ROI, how many thalamic voxels it connects, save result to nifti
-targets = np.zeros(0, dtype='int')
-for v in Cortical_targets.itervalues():
-	targets=np.concatenate((targets,v))
-np.savetxt(path_to_data_folder+'/targets_across_costs.txt', targets)
-
-# save to nifti
-Cortical_ROI_target_count = np.zeros(len(Cortical_ROIs), dtype='int')
-for i, roi in enumerate(Cortical_ROIs):
-	Cortical_ROI_target_count[i] = np.sum(targets == roi)
-
-atlas_path = path_to_ROIs+'/Craddock_300_cortical.nii.gz' 
-image_path = Parcel_path +'/MGH+NKI_cortical_roi_target_count.nii.gz' 
-make_image(atlas_path, image_path, Cortical_ROIs, Cortical_ROI_target_count)
-
-
-
-
-## get AN, MD, PuM, intralaminar cortical targets
+#### get AN, MD, PuM, intralaminar cortical targets
 AN_vox = np.loadtxt(path_to_ROIs + '/Morel_AN_indices')
 MD_vox = np.loadtxt(path_to_ROIs + '/Morel_MD_indices')
 PuM_vox = np.loadtxt(path_to_ROIs + '/Morel_PuM_indices')
 Intralaminar_vox = np.loadtxt(path_to_ROIs + '/Morel_intralaminar_indices')
+CL_vox = np.loadtxt(path_to_ROIs + '/Morel_CL_indices')
+VL_vox = np.loadtxt(path_to_ROIs + '/Morel_VL_indices')
 
 def map_vox_target(voxlist, targetlist):
 	targets = np.zeros(0, dtype='int')
@@ -69,3 +45,34 @@ targets = map_vox_target(PuM_vox, MGH_Cortical_targets)
 np.savetxt(path_to_ROIs + '/Morel_PuM_targets', targets)
 targets = map_vox_target(Intralaminar_vox, MGH_Cortical_targets)
 np.savetxt(path_to_ROIs + '/Morel_intralaminar_targets', targets)
+targets = map_vox_target(CL_vox, MGH_Cortical_targets)
+np.savetxt(path_to_ROIs + '/Morel_CL_targets', targets)
+targets = map_vox_target(VL_vox, MGH_Cortical_targets)
+np.savetxt(path_to_ROIs + '/Morel_VL_targets', targets)
+
+
+### cal average con strength between nuclei and cortical networks
+
+MGHadjmat = np.loadtxt('/home/despoB/connectome-thalamus/Thalamic_parcel/MGH_Gordon_ConsesnsusCI_thalamocortical_pcorr_avemat')
+# load subcortical voxel info
+Thalamus_voxel_coordinate = np.loadtxt('/home/despoB/connectome-thalamus/ROIs/thalamus_voxels_ijk_indices', dtype = int)
+
+subcorticalcortical_ROIs = np.loadtxt('/home/despoB/connectome-thalamus/ROIs/Cortical_CI_plus_thalamus_ROIs')
+subcortical_voxels = np.loadtxt('/home/despoB/connectome-thalamus/ROIs/thalamus_voxel_indices')
+cortical_ROIs =np.loadtxt('/home/despoB/connectome-thalamus/ROIs/Gordon_Network_consensusCI')
+Cortical_CI = np.loadtxt('/home/despoB/connectome-thalamus/ROIs/Gordon_Network_consensusCI')
+
+#call function
+_, _, tha_cor_str, = parcel_subcortical_network(MGHadjmat, subcorticalcortical_ROIs, \
+            subcortical_voxels, cortical_ROIs, Cortical_CI)
+
+#loop through voxels
+def get_vox_str(voxlist, targetlist):
+	targets = np.zeros(10, dtype='int')
+	for i, vox in enumerate(voxlist):
+		if vox !=0:
+			targets = targets + targetlist[vox]
+	targets = targets/len(voxlist)		
+	return targets
+
+

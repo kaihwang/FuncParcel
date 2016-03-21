@@ -1,5 +1,5 @@
 #scrip to analyze thalamus nodal proerties
-from brain_graphs import *
+#from brain_graphs import *
 from FuncParcel import *
 
 #### setup
@@ -9,7 +9,7 @@ Adjmat_path = '/home/despoB/connectome-thalamus/NotBackedUp/AdjMatrices'
 path_to_ROIs = '/home/despoB/connectome-thalamus/ROIs'
 path_to_data_folder = '/home/despoB/kaihwang/Rest/Graph'
 
-Thalamus_CIs = np.loadtxt(Parcel_path + '/Thalamus_clusters_cortical_CI')
+Thalamus_CIs = np.loadtxt(Parcel_path + '/MGH_Thalamus_WTA_CIs')
 Cortical_CI = np.loadtxt(path_to_ROIs + '/Gordon_consensus_CI')
 Cortical_plus_thalamus_CI = np.append(Cortical_CI, Thalamus_CIs)
 Cortical_ROIs_positions = np.arange(0,len(Cortical_CI),1)
@@ -96,11 +96,11 @@ def group_nodal_role(Datasets):
 
 
 if __name__ == "__main__":
-subject = sys.stdin.read().strip('\n')	
-subject_nodal_role(subject)
+#subject = sys.stdin.read().strip('\n')	
+#subject_nodal_role(subject)
 
 ### group averaged
-# Datasets =['MGH_', 'NKI_645_', 'NKI_1400_'] 
-# group_nodal_role(Datasets)
+	Datasets =	['MGH_', 'NKI_645_', 'NKI_1400_'] 
+	group_nodal_role(Datasets)
 
 

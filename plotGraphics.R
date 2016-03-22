@@ -91,6 +91,26 @@ for (v in Variables_to_plot){
 
 #### patient stuff
 setwd('~/Google Drive/Projects/Thalamus-Rest/')
+# plot patient lesion extent
+Variables_to_plot <- c('S1', 'S2', 'S3', 'S4') #'NNC', 'BNWR', 'bcc' 'WMD'
+
+for (v in Variables_to_plot){
+  PT_Data <-read.csv('Patient_locaition.csv', header=TRUE)
+  pData <- PT_Data[PT_Data$Patient==v,]
+  pData <- pData[pData$Atlas == 'Functional',]
+  pt_plot <-ggplot(data=pData, aes(x=Location, y=Size))
+  pt_plot <- pt_plot  + geom_bar(stat="identity") + theme_classic(base_size = 10) + theme( axis.title.x=element_blank()) + ylab(bquote('Size ('~mm^2*')'))
+  plot(pt_plot)
+  ggsave(filename = paste(v,'_pt_loc_functional.pdf', sep=''), plot = pt_plot, units = c("in"),width=3, height=1.5) 
+  
+  pData <- PT_Data[PT_Data$Patient==v,]
+  pData <- pData[pData$Atlas == 'Morel',]
+  pt_plot <-ggplot(data=pData, aes(x=Location, y=Size))
+  pt_plot <- pt_plot  + geom_bar(stat="identity") + theme_classic(base_size = 10) + theme( axis.title.x=element_blank())+ ylab(bquote('Size ('~mm^2*')'))
+  plot(pt_plot)
+  ggsave(filename = paste(v,"_pt_loc_morel.pdf", sep=''), plot = pt_plot,units = c("in"),width=3,  height=1.5)
+}
+
 #plot patient
 PT_Data = read.csv('Patient_Q_v_PC.csv', header=TRUE)
 pt_q_plot <- ggplot(data = PT_Data, aes(x=factor(SubjID), y=Q.Diff))
@@ -105,6 +125,9 @@ pt_pc_plot <- pt_pc_plot + ylim( 0, 80)
 pt_pc_plot <- pt_pc_plot + labs(x= "Patients", y = "Lesioned voxel's mean PC") + theme_grey(base_size = 10)+ theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black")) 
 ggsave(filename = "pt_pc_plot.pdf", plot = pt_pc_plot, units = c("in"),width=3, height=3) 
 plot(pt_pc_plot)
+
+
+
 
 
 #### AN, MD, PuM, Intra network stregnth 

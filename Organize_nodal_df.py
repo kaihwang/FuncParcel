@@ -20,28 +20,20 @@ Thalamus_CIs = np.loadtxt(Parcel_path+'MGH_Thalamus_WTA_CIs')
 Thalamus_voxels = np.loadtxt(path_to_ROIs+'thalamus_voxel_indices', dtype=int)
 Thalamus_ana_parcel = np.loadtxt(Parcel_path+'fsl_thalamus_ana_parcel') # this is diffusion based parcel from FSL
 Morel_parcel = np.loadtxt(Parcel_path+'Morel_parcel') # this is histology based parcel of the Morel atlas
-Cortical_ROIs = np.loadtxt(path_to_ROIs+'Craddock_300_cortical_ROIs', dtype=int)
-Cortical_CI = np.loadtxt(path_to_ROIs+'/Cortical_CI', dtype='int')
+Cortical_ROIs = np.loadtxt(path_to_ROIs+'Gordon_333', dtype=int)
+Cortical_CI = np.loadtxt(path_to_ROIs+'/Gordon_consensus_CI')
 Cog_component = np.loadtxt(Parcel_path+'yeo_flex')
-#Cortical_CI = int(np.array(Cortical_CI))
+Cortical_Cog_component = np.loadtxt(Parcel_path+'cortical_cog')
 
 #PC
-Tha_PC = pickle.load(open(path_to_data_folder+'MGH_Tha_PCs', "rb"))
-Cortical_PC = pickle.load(open(path_to_data_folder+'Cortical_PCs', "rb"))
-
+PCs = pickle.load(open(path_to_graph+'MGH_avemat_tha_nodal_pcorr_PCs', "rb"))
 #NNCs
-NNCs = pickle.load(open(path_to_data_folder+'MGH_NNCs', "rb"))
-
+NNCs = pickle.load(open(path_to_graph+'MGH_avemat_tha_nodal_pcorr_NNCs', "rb"))
 #WMDs
-Tha_WMD = pickle.load(open(path_to_data_folder+'MGH_Tha_WMDs', "rb"))
-Cortical_WMD = pickle.load(open(path_to_data_folder+'Cortical_WMDs', "rb"))
-
+WMDs = pickle.load(open(path_to_graph+'MGH_avemat_tha_nodal_pcorr_WMDs', "rb"))
 #BNWR
-Tha_BNWR = pickle.load(open(path_to_data_folder+'MGH_Tha_BNWR', "rb"))
-Cortical_BNWR = pickle.load(open(path_to_data_folder+'Cortical_BNWR', "rb"))
+BNWRs = pickle.load(open(path_to_graph+'MGH_avemat_tha_nodal_pcorr_BNWRs', "rb"))
 
-#BCC
-#bcc = pickle.load(open(path_to_graph+'MGH_bcc', "rb"))
 
 
 ################################################################
@@ -150,16 +142,17 @@ Cortical_df = pd.DataFrame(columns=('ROI', 'Functional Network'))
 #Cortical_df['ROI'] = Cortical_ROIs
 Cortical_df['Functional Network'] = Cortical_CI
 
+Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==0] = 'Other'
 Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==1] = 'DF'
-Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==2] = 'mO'
+Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==2] = 'CO'
 Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==3] = 'SM'
 Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==4] = 'FP'
-Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==5] = 'sFP'
-Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==6] = 'mT'
-Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==7] = 'T'
-Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==8] = 'latO'
-Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==9] = 'CO'
-Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==0] = 'Other' 
+Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==5] = 'latO'
+Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==6] = 'mO'
+Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==7] = 'mT'
+Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==8] = 'T'
+Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==9] = 'sFT'
+Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==12] = 'T' 
 
 ##########################################
 ###### populate data
@@ -167,20 +160,21 @@ Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==0] = '
 
 
 #nodal roles
-Thalamus_df['PC'] = Tha_PC[320:]/13.5  #take out cortical ones, normalize by max PC
-Thalamus_df['WMD'] = Tha_WMD[320:]/15 
-Thalamus_df['NNC'] = NNCs[320:]/15 
-Thalamus_df['BNWR'] = Tha_BNWR[320:]/15
+Thalamus_df['PC'] = PCs[333:]/100  #convert from percentage to raw score
+Thalamus_df['WMD'] = WMDs[333:]/100 
+Thalamus_df['NNC'] = NNCs[333:]/100
+Thalamus_df['BNWR'] = BNWRs[333:]/100
 Thalamus_df['cog'] = Cog_component
 
-Cortical_df['PC'] = Cortical_PC[0:320]/13.5  #take out cortical ones, normalize by max PC
-Cortical_df['WMD'] = Cortical_WMD[0:320]/15 
-Cortical_df['NNC'] = NNCs[0:320]/15 
-Cortical_df['BNWR'] = Cortical_BNWR[0:320]/15
+Cortical_df['PC'] = PCs[0:333]/100  #take out cortical ones, normalize by max PC
+Cortical_df['WMD'] = WMDs[0:333]/100 
+Cortical_df['NNC'] = NNCs[0:333]/100 
+Cortical_df['BNWR'] = BNWRs[0:333]/100
+Cortical_df['cog'] = Cortical_Cog_component
 
 Cortical_df['Classification'] = 'Cortical \nNone Hubs'
-Cortical_df['Classification'].loc[Cortical_df['PC'] > .63] = 'Cortical \nConnector Hubs'
-Cortical_df['Classification'].loc[Cortical_df['WMD'] > .63] = 'Cortical \nProvincial Hubs'
+Cortical_df['Classification'].loc[Cortical_df['PC'] > .67] = 'Cortical \nConnector Hubs'
+Cortical_df['Classification'].loc[Cortical_df['WMD'] > 1] = 'Cortical \nProvincial Hubs'
 ################################################################
 ####### thalamo-cortical target's nodal role for each thalamus voxel
 ################################################################

@@ -66,30 +66,30 @@ for patient in thalamic_patients:
 ###### Load adj mats for all subjects, in 3d array ROIxROIxsubject
 ################################################################
 
-AdjMat_Files = glob.glob(path_to_adjmat + 'MGH*Gordon_333_cortical_corrmat')
-Control_AdjMats = np.loadtxt(AdjMat_Files[0])
-#Control_AdjMats = zscore(Control_AdjMats, axis = None)
-for f in AdjMat_Files[1:]:
+# AdjMat_Files = glob.glob(path_to_adjmat + 'MGH*Gordon_333_cortical_corrmat')
+# Control_AdjMats = np.loadtxt(AdjMat_Files[0])
+# #Control_AdjMats = zscore(Control_AdjMats, axis = None)
+# for f in AdjMat_Files[1:]:
 
-	M = np.loadtxt(f)
-	#M = zscore(M, axis = None)
-	Control_AdjMats = np.dstack((Control_AdjMats,M))
+# 	M = np.loadtxt(f)
+# 	#M = zscore(M, axis = None)
+# 	Control_AdjMats = np.dstack((Control_AdjMats,M))
 
-save_object(Control_AdjMats, path_to_data_folder +'/Control_AdjMats_Gordon')
+# save_object(Control_AdjMats, path_to_data_folder +'/Control_AdjMats_Gordon')
 
 
-AdjMat_Files = glob.glob(path_to_adjmat + 'Tha*Gordon_333_cortical_corrmat')
-Patient_AdjMats = np.loadtxt(AdjMat_Files[0])
-Patient_AdjMats = np.nan_to_num(Patient_AdjMats)
-#Patient_AdjMats = zscore(Patient_AdjMats, axis = None)
-for f in AdjMat_Files[1:]:
+# AdjMat_Files = glob.glob(path_to_adjmat + 'Tha*Gordon_333_cortical_corrmat')
+# Patient_AdjMats = np.loadtxt(AdjMat_Files[0])
+# Patient_AdjMats = np.nan_to_num(Patient_AdjMats)
+# #Patient_AdjMats = zscore(Patient_AdjMats, axis = None)
+# for f in AdjMat_Files[1:]:
 
-	M = np.loadtxt(f)
-	M = np.nan_to_num(M)
-	#M = zscore(M, axis = None)
-	Patient_AdjMats = np.dstack((Patient_AdjMats,M))
+# 	M = np.loadtxt(f)
+# 	M = np.nan_to_num(M)
+# 	#M = zscore(M, axis = None)
+# 	Patient_AdjMats = np.dstack((Patient_AdjMats,M))
 
-save_object(Patient_AdjMats, path_to_data_folder +'/Patient_AdjMats_Gordon')
+# save_object(Patient_AdjMats, path_to_data_folder +'/Patient_AdjMats_Gordon')
 #np.dstack((a,a)).shape
 
 ################################################################
@@ -126,30 +126,30 @@ for s in range(0, np.shape(Control_AdjMats)[2]):
 		tmp_df.set_value(i, 'CO_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 2))
 		tmp_df.set_value(i, 'SM_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 3))
 		tmp_df.set_value(i, 'FP_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 4))
-		tmp_df.set_value(i, 'OP_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 5))
-		tmp_df.set_value(i, 'V_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 6))
-		tmp_df.set_value(i, 'RS_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 7))
-		tmp_df.set_value(i, 'ATTN_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 9))
+		tmp_df.set_value(i, 'latO_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 5))
+		tmp_df.set_value(i, 'mO_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 6))
+		tmp_df.set_value(i, 'mT_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 7))
+		tmp_df.set_value(i, 'sFP_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 9))
 		tmp_df.set_value(i, 'T_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 12))
 
 		tmp_df.set_value(i, 'left_DF_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 1))
 		tmp_df.set_value(i, 'left_CO_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 2))
 		tmp_df.set_value(i, 'left_SM_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 3))
 		tmp_df.set_value(i, 'left_FP_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 4))
-		tmp_df.set_value(i, 'left_OP_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 5))
-		tmp_df.set_value(i, 'left_V_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 6))
-		tmp_df.set_value(i, 'left_RS_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 7))
-		tmp_df.set_value(i, 'left_ATTN_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 9))
+		tmp_df.set_value(i, 'left_latO_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 5))
+		tmp_df.set_value(i, 'left_mO_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 6))
+		tmp_df.set_value(i, 'left_mT_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 7))
+		tmp_df.set_value(i, 'left_sFP_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 9))
 		tmp_df.set_value(i, 'left_T_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 12))
 
 		tmp_df.set_value(i, 'right_DF_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 1))
 		tmp_df.set_value(i, 'right_CO_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 2))
 		tmp_df.set_value(i, 'right_SM_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 3))
 		tmp_df.set_value(i, 'right_FP_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 4))
-		tmp_df.set_value(i, 'right_OP_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 5))
-		tmp_df.set_value(i, 'right_V_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 6))
-		tmp_df.set_value(i, 'right_RS_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 7))
-		tmp_df.set_value(i, 'right_ATTN_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 9))
+		tmp_df.set_value(i, 'right_latO_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 5))
+		tmp_df.set_value(i, 'right_mO_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 6))
+		tmp_df.set_value(i, 'right_mT_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 7))
+		tmp_df.set_value(i, 'right_sFP_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 9))
 		tmp_df.set_value(i, 'right_T_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 12))
 
 	control_df = control_df.append(tmp_df)
@@ -175,30 +175,30 @@ for s in range(0, np.shape(Patient_AdjMats)[2]):
 		tmp_df.set_value(i, 'CO_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 2))
 		tmp_df.set_value(i, 'SM_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 3))
 		tmp_df.set_value(i, 'FP_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 4))
-		tmp_df.set_value(i, 'OP_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 5))
-		tmp_df.set_value(i, 'V_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 6))
-		tmp_df.set_value(i, 'RS_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 7))
-		tmp_df.set_value(i, 'ATTN_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 9))
+		tmp_df.set_value(i, 'latO_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 5))
+		tmp_df.set_value(i, 'mO_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 6))
+		tmp_df.set_value(i, 'mT_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 7))
+		tmp_df.set_value(i, 'sFP_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 9))
 		tmp_df.set_value(i, 'T_Q', cal_modularity_community(bct.threshold_proportional(M, p), Cortical_CI, 12))
 
 		tmp_df.set_value(i, 'left_DF_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 1))
 		tmp_df.set_value(i, 'left_CO_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 2))
 		tmp_df.set_value(i, 'left_SM_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 3))
 		tmp_df.set_value(i, 'left_FP_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 4))
-		tmp_df.set_value(i, 'left_OP_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 5))
-		tmp_df.set_value(i, 'left_V_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 6))
-		tmp_df.set_value(i, 'left_RS_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 7))
-		tmp_df.set_value(i, 'left_ATTN_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 9))
+		tmp_df.set_value(i, 'left_latO_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 5))
+		tmp_df.set_value(i, 'left_mO_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 6))
+		tmp_df.set_value(i, 'left_mT_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 7))
+		tmp_df.set_value(i, 'left_sFP_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 9))
 		tmp_df.set_value(i, 'left_T_Q', cal_modularity_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions], 12))
 
 		tmp_df.set_value(i, 'right_DF_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 1))
 		tmp_df.set_value(i, 'right_CO_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 2))
 		tmp_df.set_value(i, 'right_SM_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 3))
 		tmp_df.set_value(i, 'right_FP_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 4))
-		tmp_df.set_value(i, 'right_OP_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 5))
-		tmp_df.set_value(i, 'right_V_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 6))
-		tmp_df.set_value(i, 'right_RS_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 7))
-		tmp_df.set_value(i, 'right_ATTN_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 9))
+		tmp_df.set_value(i, 'right_latO_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 5))
+		tmp_df.set_value(i, 'right_mO_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 6))
+		tmp_df.set_value(i, 'right_mT_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 7))
+		tmp_df.set_value(i, 'right_sFP_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 9))
 		tmp_df.set_value(i, 'right_T_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 12))
 
 
@@ -211,11 +211,11 @@ Patient_df['R-L_Q'] = Patient_df['right_Q'] - Patient_df['left_Q']
 control_df['R-L_Q'] = control_df['right_Q'] - control_df['left_Q']
 control_df['L-R_Q'] = control_df['left_Q'] - control_df['right_Q']
 
-Patient_df['L-R_V_Q'] = Patient_df['left_V_Q'] - Patient_df['right_V_Q']
-Patient_df['R-L_V_Q'] = Patient_df['right_V_Q'] - Patient_df['left_V_Q']
+Patient_df['L-R_mO_Q'] = Patient_df['left_mO_Q'] - Patient_df['right_mO_Q']
+Patient_df['R-L_mO_Q'] = Patient_df['right_mO_Q'] - Patient_df['left_mO_Q']
 
-control_df['R-L_V_Q'] = control_df['right_V_Q'] - control_df['left_V_Q']
-control_df['L-R_V_Q'] = control_df['left_V_Q'] - control_df['right_V_Q']
+control_df['R-L_mO_Q'] = control_df['right_mO_Q'] - control_df['left_mO_Q']
+control_df['L-R_mO_Q'] = control_df['left_mO_Q'] - control_df['right_mO_Q']
 
 Patient_df['L-R_DF_Q'] = Patient_df['left_DF_Q'] - Patient_df['right_DF_Q']
 Patient_df['R-L_DF_Q'] = Patient_df['right_DF_Q'] - Patient_df['left_DF_Q']
@@ -241,29 +241,29 @@ Patient_df['R-L_FP_Q'] = Patient_df['right_FP_Q'] - Patient_df['left_FP_Q']
 control_df['R-L_FP_Q'] = control_df['right_FP_Q'] - control_df['left_FP_Q']
 control_df['L-R_FP_Q'] = control_df['left_FP_Q'] - control_df['right_FP_Q']
 
-Patient_df['L-R_OP_Q'] = Patient_df['left_OP_Q'] - Patient_df['right_OP_Q']
-Patient_df['R-L_OP_Q'] = Patient_df['right_OP_Q'] - Patient_df['left_OP_Q']
+Patient_df['L-R_latO_Q'] = Patient_df['left_latO_Q'] - Patient_df['right_latO_Q']
+Patient_df['R-L_latO_Q'] = Patient_df['right_latO_Q'] - Patient_df['left_latO_Q']
 
-control_df['R-L_OP_Q'] = control_df['right_OP_Q'] - control_df['left_OP_Q']
-control_df['L-R_OP_Q'] = control_df['left_OP_Q'] - control_df['right_OP_Q']
+control_df['R-L_latO_Q'] = control_df['right_latO_Q'] - control_df['left_latO_Q']
+control_df['L-R_latO_Q'] = control_df['left_latO_Q'] - control_df['right_latO_Q']
 
-Patient_df['L-R_V_Q'] = Patient_df['left_V_Q'] - Patient_df['right_V_Q']
-Patient_df['R-L_V_Q'] = Patient_df['right_V_Q'] - Patient_df['left_V_Q']
+Patient_df['L-R_mO_Q'] = Patient_df['left_mO_Q'] - Patient_df['right_mO_Q']
+Patient_df['R-L_mO_Q'] = Patient_df['right_mO_Q'] - Patient_df['left_mO_Q']
 
-control_df['R-L_V_Q'] = control_df['right_V_Q'] - control_df['left_V_Q']
-control_df['L-R_V_Q'] = control_df['left_V_Q'] - control_df['right_V_Q']
+control_df['R-L_mO_Q'] = control_df['right_mO_Q'] - control_df['left_mO_Q']
+control_df['L-R_mO_Q'] = control_df['left_mO_Q'] - control_df['right_mO_Q']
 
-Patient_df['L-R_RS_Q'] = Patient_df['left_RS_Q'] - Patient_df['right_RS_Q']
-Patient_df['R-L_RS_Q'] = Patient_df['right_RS_Q'] - Patient_df['left_RS_Q']
+Patient_df['L-R_mT_Q'] = Patient_df['left_mT_Q'] - Patient_df['right_mT_Q']
+Patient_df['R-L_mT_Q'] = Patient_df['right_mT_Q'] - Patient_df['left_mT_Q']
 
-control_df['R-L_RS_Q'] = control_df['right_RS_Q'] - control_df['left_RS_Q']
-control_df['L-R_RS_Q'] = control_df['left_RS_Q'] - control_df['right_RS_Q']
+control_df['R-L_mT_Q'] = control_df['right_mT_Q'] - control_df['left_mT_Q']
+control_df['L-R_mT_Q'] = control_df['left_mT_Q'] - control_df['right_mT_Q']
 
-Patient_df['L-R_ATTN_Q'] = Patient_df['left_ATTN_Q'] - Patient_df['right_ATTN_Q']
-Patient_df['R-L_ATTN_Q'] = Patient_df['right_ATTN_Q'] - Patient_df['left_ATTN_Q']
+Patient_df['L-R_sFP_Q'] = Patient_df['left_sFP_Q'] - Patient_df['right_sFP_Q']
+Patient_df['R-L_sFP_Q'] = Patient_df['right_sFP_Q'] - Patient_df['left_sFP_Q']
 
-control_df['R-L_ATTN_Q'] = control_df['right_ATTN_Q'] - control_df['left_ATTN_Q']
-control_df['L-R_ATTN_Q'] = control_df['left_ATTN_Q'] - control_df['right_ATTN_Q']
+control_df['R-L_sFP_Q'] = control_df['right_sFP_Q'] - control_df['left_sFP_Q']
+control_df['L-R_sFP_Q'] = control_df['left_sFP_Q'] - control_df['right_sFP_Q']
 
 Patient_df['L-R_T_Q'] = Patient_df['left_T_Q'] - Patient_df['right_T_Q']
 Patient_df['R-L_T_Q'] = Patient_df['right_T_Q'] - Patient_df['left_T_Q']
@@ -275,199 +275,171 @@ control_df['L-R_T_Q'] = control_df['left_T_Q'] - control_df['right_T_Q']
 Patient_df.to_csv(path_to_data_folder + '/patient_df.csv', index = False)
 control_df.to_csv(path_to_data_folder + '/control_df.csv', index = False)
 
-def cal_modularity_w_imposed_community(M, CI):
-	Total_weight = M.sum()
-	Q=0.0
-	for i in np.unique(CI):
-		Within_weight = np.sum(M[CI==i,:][:,CI==i])
-		Within_weight_ratio = Within_weight / Total_weight
-		Between_weight = 0.0
-		for j in np.unique(CI):
-			if i !=j:
-				Between_weight += (np.sum(M[CI==i,:][:,CI==j]) / Total_weight)
-		Between_weight_ratio = (Between_weight)**2
-		Q += (Within_weight_ratio - Between_weight_ratio)
-	return Q
-
-def cal_modularity_community(M, CI, targetCI):
-	Total_weight = M.sum()
-	Q=0.0
-	for i in np.unique(targetCI):
-		Within_weight = np.sum(M[CI==i,:][:,CI==i])
-		Within_weight_ratio = Within_weight / Total_weight
-		Between_weight = 0.0
-		for j in np.unique(CI):
-			if i !=j:
-				Between_weight += (np.sum(M[CI==i,:][:,CI==j]) / Total_weight)
-		Between_weight_ratio = (Between_weight)**2
-		Q += (Within_weight_ratio - Between_weight_ratio)
-	return Q
-
 
 
 ################################################################
 ###### Create patient data dataframe
 ################################################################
 
-Control_AdjMats = pickle.load(open('/home/despoB/connectome-thalamus/AvgMatrices/Control_AdjMats', "rb"))
-Cortical_targets = pickle.load(open(path_to_data_folder +'/Cortical_targets', "rb"))
-Cortical_nontargets = pickle.load(open(path_to_data_folder +'/Cortical_nontargets', "rb"))
+# Control_AdjMats = pickle.load(open('/home/despoB/connectome-thalamus/AvgMatrices/Control_AdjMats', "rb"))
+# Cortical_targets = pickle.load(open(path_to_data_folder +'/Cortical_targets', "rb"))
+# Cortical_nontargets = pickle.load(open(path_to_data_folder +'/Cortical_nontargets', "rb"))
 
-Tha_PC = pickle.load(open(path_to_data_folder+'/Tha_PCs', "rb"))
-Tha_WMD = pickle.load(open(path_to_data_folder+'/Tha_WMDs', "rb"))
-Tha_BNWR = pickle.load(open(path_to_data_folder+'/Tha_BNWR', "rb"))
+# Tha_PC = pickle.load(open(path_to_data_folder+'/Tha_PCs', "rb"))
+# Tha_WMD = pickle.load(open(path_to_data_folder+'/Tha_WMDs', "rb"))
+# Tha_BNWR = pickle.load(open(path_to_data_folder+'/Tha_BNWR', "rb"))
 
-patient_df = pd.DataFrame()
-for patient in thalamic_patients:
-	Patient_adjmat = np.loadtxt(path_to_adjmat + 'Tha_' + patient + '_Craddock_300_cortical_corrmat' )
+# patient_df = pd.DataFrame()
+# for patient in thalamic_patients:
+# 	Patient_adjmat = np.loadtxt(path_to_adjmat + 'Tha_' + patient + '_Craddock_300_cortical_corrmat' )
 
-	tmp_df = pd.DataFrame()
-	#tmp_df = pd.DataFrame(columns=('SubjID', 'Voxel', 'CI', 'PC', 'WMD', 'BNCR', \ #strange issue with indexing... 
-	#	'Target_total_Weight', 'nonTarget_total_Weight', \
-	#	'Target_total_Weight_bn', 'nonTarget_total_Weight_wn', \
-	#	'Target_total_Weight_wn', 'nonTarget_total_Weight_wn', \
-	#	'Target_connected_Weight', 'nonTarget_connected_Weight', \
-	#	'Target_connected_Weight_bn', 'nonTarget_connected_Weight_bn', \
-	#	'Target_connected_Weight_wn', 'nonTarget_connected_Weight_wn', ))
+# 	tmp_df = pd.DataFrame()
+# 	#tmp_df = pd.DataFrame(columns=('SubjID', 'Voxel', 'CI', 'PC', 'WMD', 'BNCR', \ #strange issue with indexing... 
+# 	#	'Target_total_Weight', 'nonTarget_total_Weight', \
+# 	#	'Target_total_Weight_bn', 'nonTarget_total_Weight_wn', \
+# 	#	'Target_total_Weight_wn', 'nonTarget_total_Weight_wn', \
+# 	#	'Target_connected_Weight', 'nonTarget_connected_Weight', \
+# 	#	'Target_connected_Weight_bn', 'nonTarget_connected_Weight_bn', \
+# 	#	'Target_connected_Weight_wn', 'nonTarget_connected_Weight_wn', ))
 
-	for i, v in enumerate(Lesioned_voxels[patient]):
-		tmp_df.set_value(i, 'SubjID', patient)
-		tmp_df.set_value(i, 'Voxel', v)
-		tmp_df.set_value(i, 'CI', Thalamus_CIs[Thalamus_voxels==v])
-		tmp_df.set_value(i, 'PC', Tha_PC[Thalamus_voxels==v]/13.5)
-		tmp_df.set_value(i, 'WMD', Tha_WMD[Thalamus_voxels==v]/15.)
-		tmp_df.set_value(i, 'BNCR', Tha_BNWR[Thalamus_voxels==v]/15.)
+# 	for i, v in enumerate(Lesioned_voxels[patient]):
+# 		tmp_df.set_value(i, 'SubjID', patient)
+# 		tmp_df.set_value(i, 'Voxel', v)
+# 		tmp_df.set_value(i, 'CI', Thalamus_CIs[Thalamus_voxels==v])
+# 		tmp_df.set_value(i, 'PC', Tha_PC[Thalamus_voxels==v]/13.5)
+# 		tmp_df.set_value(i, 'WMD', Tha_WMD[Thalamus_voxels==v]/15.)
+# 		tmp_df.set_value(i, 'BNCR', Tha_BNWR[Thalamus_voxels==v]/15.)
 
-		#logical position vecotros for targets and nontargets
-		target_pos = np.in1d(Cortical_ROIs,Cortical_targets[v])
-		nontarget_pos =  np.in1d(Cortical_ROIs,Cortical_nontargets[v])	
+# 		#logical position vecotros for targets and nontargets
+# 		target_pos = np.in1d(Cortical_ROIs,Cortical_targets[v])
+# 		nontarget_pos =  np.in1d(Cortical_ROIs,Cortical_nontargets[v])	
 
-		#total weight
-		tmp_df.set_value(i, 'Target_total_weight', \
-			(np.nanmean(Patient_adjmat[target_pos,:]) - \
-				np.nanmean(Control_AdjMats[target_pos,:,:])) / np.nanstd(Control_AdjMats[target_pos,:,:]))
-		tmp_df.set_value(i, 'nonTarget_total_weight', \
-			(np.nanmean(Patient_adjmat[nontarget_pos,:]) - \
-				np.nanmean(Control_AdjMats[nontarget_pos,:,:])) / np.nanstd(Control_AdjMats[nontarget_pos,:,:]))
+# 		#total weight
+# 		tmp_df.set_value(i, 'Target_total_weight', \
+# 			(np.nanmean(Patient_adjmat[target_pos,:]) - \
+# 				np.nanmean(Control_AdjMats[target_pos,:,:])) / np.nanstd(Control_AdjMats[target_pos,:,:]))
+# 		tmp_df.set_value(i, 'nonTarget_total_weight', \
+# 			(np.nanmean(Patient_adjmat[nontarget_pos,:]) - \
+# 				np.nanmean(Control_AdjMats[nontarget_pos,:,:])) / np.nanstd(Control_AdjMats[nontarget_pos,:,:]))
 
-		#total weight bn
-		tmp_df.set_value(i, 'Target_total_weight_bn', \
-			(np.nanmean(Patient_adjmat[target_pos,:][:,Cortical_CI != Thalamus_CIs[Thalamus_voxels == v]]) - \
-				np.nanmean(Control_AdjMats[target_pos,:,:][:,Cortical_CI != Thalamus_CIs[Thalamus_voxels == v],:])) \
-			/ np.nanstd(Control_AdjMats[target_pos,:,:][:,Cortical_CI != Thalamus_CIs[Thalamus_voxels == v],:]))
-		tmp_df.set_value(i, 'nonTarget_total_weight_bn', \
-			(np.nanmean(Patient_adjmat[nontarget_pos,:][:,Cortical_CI != Thalamus_CIs[Thalamus_voxels == v]]) - \
-				np.nanmean(Control_AdjMats[nontarget_pos,:,:][:,Cortical_CI != Thalamus_CIs[Thalamus_voxels == v],:])) \
-			/ np.nanstd(Control_AdjMats[nontarget_pos,:,:][:,Cortical_CI != Thalamus_CIs[Thalamus_voxels == v],:]))
+# 		#total weight bn
+# 		tmp_df.set_value(i, 'Target_total_weight_bn', \
+# 			(np.nanmean(Patient_adjmat[target_pos,:][:,Cortical_CI != Thalamus_CIs[Thalamus_voxels == v]]) - \
+# 				np.nanmean(Control_AdjMats[target_pos,:,:][:,Cortical_CI != Thalamus_CIs[Thalamus_voxels == v],:])) \
+# 			/ np.nanstd(Control_AdjMats[target_pos,:,:][:,Cortical_CI != Thalamus_CIs[Thalamus_voxels == v],:]))
+# 		tmp_df.set_value(i, 'nonTarget_total_weight_bn', \
+# 			(np.nanmean(Patient_adjmat[nontarget_pos,:][:,Cortical_CI != Thalamus_CIs[Thalamus_voxels == v]]) - \
+# 				np.nanmean(Control_AdjMats[nontarget_pos,:,:][:,Cortical_CI != Thalamus_CIs[Thalamus_voxels == v],:])) \
+# 			/ np.nanstd(Control_AdjMats[nontarget_pos,:,:][:,Cortical_CI != Thalamus_CIs[Thalamus_voxels == v],:]))
 
-		#total weight wn
-		tmp_df.set_value(i, 'Target_total_weight_wn', \
-			(np.nanmean(Patient_adjmat[target_pos,:][:,Cortical_CI == Thalamus_CIs[Thalamus_voxels == v]]) - \
-				np.nanmean(Control_AdjMats[target_pos,:,:][:,Cortical_CI == Thalamus_CIs[Thalamus_voxels == v],:])) \
-			/ np.nanstd(Control_AdjMats[target_pos,:,:][:,Cortical_CI == Thalamus_CIs[Thalamus_voxels == v],:]))
-		tmp_df.set_value(i, 'nonTarget_total_weight_wn', \
-			(np.nanmean(Patient_adjmat[nontarget_pos,:][:,Cortical_CI == Thalamus_CIs[Thalamus_voxels == v]]) - \
-				np.nanmean(Control_AdjMats[nontarget_pos,:,:][:,Cortical_CI == Thalamus_CIs[Thalamus_voxels == v],:])) \
-			/ np.nanstd(Control_AdjMats[nontarget_pos,:,:][:,Cortical_CI == Thalamus_CIs[Thalamus_voxels == v],:]))
+# 		#total weight wn
+# 		tmp_df.set_value(i, 'Target_total_weight_wn', \
+# 			(np.nanmean(Patient_adjmat[target_pos,:][:,Cortical_CI == Thalamus_CIs[Thalamus_voxels == v]]) - \
+# 				np.nanmean(Control_AdjMats[target_pos,:,:][:,Cortical_CI == Thalamus_CIs[Thalamus_voxels == v],:])) \
+# 			/ np.nanstd(Control_AdjMats[target_pos,:,:][:,Cortical_CI == Thalamus_CIs[Thalamus_voxels == v],:]))
+# 		tmp_df.set_value(i, 'nonTarget_total_weight_wn', \
+# 			(np.nanmean(Patient_adjmat[nontarget_pos,:][:,Cortical_CI == Thalamus_CIs[Thalamus_voxels == v]]) - \
+# 				np.nanmean(Control_AdjMats[nontarget_pos,:,:][:,Cortical_CI == Thalamus_CIs[Thalamus_voxels == v],:])) \
+# 			/ np.nanstd(Control_AdjMats[nontarget_pos,:,:][:,Cortical_CI == Thalamus_CIs[Thalamus_voxels == v],:]))
 		
-		#logical positional vectors for targets and non targets that are the same CI as the thalamic voxel
-		target_wn_pos = np.in1d(Cortical_ROIs,Cortical_targets[v]) & (Cortical_CI == Thalamus_CIs[Thalamus_voxels == v])
-		nontarget_wn_pos = np.in1d(Cortical_ROIs,Cortical_nontargets[v]) & (Cortical_CI == Thalamus_CIs[Thalamus_voxels == v])
+# 		#logical positional vectors for targets and non targets that are the same CI as the thalamic voxel
+# 		target_wn_pos = np.in1d(Cortical_ROIs,Cortical_targets[v]) & (Cortical_CI == Thalamus_CIs[Thalamus_voxels == v])
+# 		nontarget_wn_pos = np.in1d(Cortical_ROIs,Cortical_nontargets[v]) & (Cortical_CI == Thalamus_CIs[Thalamus_voxels == v])
 
-		#logical positional vectors for targets and non targets that are not the same CI as the thalamic voxel
-		target_bn_pos = np.in1d(Cortical_ROIs,Cortical_targets[v]) & (Cortical_CI != Thalamus_CIs[Thalamus_voxels == v])
-		nontarget_bn_pos = np.in1d(Cortical_ROIs,Cortical_nontargets[v]) & (Cortical_CI != Thalamus_CIs[Thalamus_voxels == v])
+# 		#logical positional vectors for targets and non targets that are not the same CI as the thalamic voxel
+# 		target_bn_pos = np.in1d(Cortical_ROIs,Cortical_targets[v]) & (Cortical_CI != Thalamus_CIs[Thalamus_voxels == v])
+# 		nontarget_bn_pos = np.in1d(Cortical_ROIs,Cortical_nontargets[v]) & (Cortical_CI != Thalamus_CIs[Thalamus_voxels == v])
 
-		## extract the adj matrices using the positional vectors
-		padj_t_tmp = Patient_adjmat[target_pos,:][:,target_pos]		
-		padj_nt_tmp = Patient_adjmat[nontarget_pos,:][:,nontarget_pos]	
+# 		## extract the adj matrices using the positional vectors
+# 		padj_t_tmp = Patient_adjmat[target_pos,:][:,target_pos]		
+# 		padj_nt_tmp = Patient_adjmat[nontarget_pos,:][:,nontarget_pos]	
 
-		cadj_t_tmp = Control_AdjMats[target_pos,:,:][:,target_pos,:]
-		cadj_nt_tmp = Control_AdjMats[nontarget_pos,:,:][:,nontarget_pos,:]
+# 		cadj_t_tmp = Control_AdjMats[target_pos,:,:][:,target_pos,:]
+# 		cadj_nt_tmp = Control_AdjMats[nontarget_pos,:,:][:,nontarget_pos,:]
 
-		padj_t_wn_tmp = Patient_adjmat[target_wn_pos,:][:,target_wn_pos]		
-		padj_nt_wn_tmp = Patient_adjmat[nontarget_wn_pos,:][:,nontarget_wn_pos]	
+# 		padj_t_wn_tmp = Patient_adjmat[target_wn_pos,:][:,target_wn_pos]		
+# 		padj_nt_wn_tmp = Patient_adjmat[nontarget_wn_pos,:][:,nontarget_wn_pos]	
 
-		cadj_t_wn_tmp = Control_AdjMats[target_wn_pos,:,:][:,target_wn_pos,:]
-		cadj_nt_wn_tmp = Control_AdjMats[nontarget_wn_pos,:,:][:,nontarget_wn_pos,:]
+# 		cadj_t_wn_tmp = Control_AdjMats[target_wn_pos,:,:][:,target_wn_pos,:]
+# 		cadj_nt_wn_tmp = Control_AdjMats[nontarget_wn_pos,:,:][:,nontarget_wn_pos,:]
 
-		padj_t_bn_tmp = Patient_adjmat[target_bn_pos,:][:,target_bn_pos]		
-		padj_nt_bn_tmp = Patient_adjmat[nontarget_bn_pos,:][:,nontarget_bn_pos]	
+# 		padj_t_bn_tmp = Patient_adjmat[target_bn_pos,:][:,target_bn_pos]		
+# 		padj_nt_bn_tmp = Patient_adjmat[nontarget_bn_pos,:][:,nontarget_bn_pos]	
 
-		cadj_t_bn_tmp = Control_AdjMats[target_bn_pos,:,:][:,target_bn_pos,:]
-		cadj_nt_bn_tmp = Control_AdjMats[nontarget_bn_pos,:,:][:,nontarget_bn_pos,:]
+# 		cadj_t_bn_tmp = Control_AdjMats[target_bn_pos,:,:][:,target_bn_pos,:]
+# 		cadj_nt_bn_tmp = Control_AdjMats[nontarget_bn_pos,:,:][:,nontarget_bn_pos,:]
 
-		#target_connected_weight
-		#only get upper triangle, get indices for that
-		a = np.triu_indices(sum(target_pos),1)[0]
-		b = np.triu_indices(sum(target_pos),1)[1]
-		c = np.triu_indices(sum(nontarget_pos),1)[0]
-		d = np.triu_indices(sum(nontarget_pos),1)[1]
+# 		#target_connected_weight
+# 		#only get upper triangle, get indices for that
+# 		a = np.triu_indices(sum(target_pos),1)[0]
+# 		b = np.triu_indices(sum(target_pos),1)[1]
+# 		c = np.triu_indices(sum(nontarget_pos),1)[0]
+# 		d = np.triu_indices(sum(nontarget_pos),1)[1]
 
-		if any(a) and any(b):
-			tmp_df.set_value(i, 'Target_connected_weight', (np.mean(padj_t_tmp[a,b]) - np.mean(cadj_t_tmp[a,b,:])) \
-			/ np.std(cadj_t_tmp[a,b,:]))
-		else:
-			tmp_df.set_value(i, 'Target_connected_weight', 0)
+# 		if any(a) and any(b):
+# 			tmp_df.set_value(i, 'Target_connected_weight', (np.mean(padj_t_tmp[a,b]) - np.mean(cadj_t_tmp[a,b,:])) \
+# 			/ np.std(cadj_t_tmp[a,b,:]))
+# 		else:
+# 			tmp_df.set_value(i, 'Target_connected_weight', 0)
 
-		if any(c) and any(d):	
-			tmp_df.set_value(i, 'nonTarget_connected_weight', (np.mean(padj_nt_tmp[c,d]) - np.mean(cadj_nt_tmp[c,d,:])) \
-			/ np.std(cadj_nt_tmp[c,d,:]))
-		else:
-			tmp_df.set_value(i, 'nonTarget_connected_weight', 0)
+# 		if any(c) and any(d):	
+# 			tmp_df.set_value(i, 'nonTarget_connected_weight', (np.mean(padj_nt_tmp[c,d]) - np.mean(cadj_nt_tmp[c,d,:])) \
+# 			/ np.std(cadj_nt_tmp[c,d,:]))
+# 		else:
+# 			tmp_df.set_value(i, 'nonTarget_connected_weight', 0)
 
-		#target_connected_weight_bn
-		a = np.triu_indices(sum(target_bn_pos),1)[0]
-		b = np.triu_indices(sum(target_bn_pos),1)[1]
-		c = np.triu_indices(sum(nontarget_bn_pos),1)[0]
-		d = np.triu_indices(sum(nontarget_bn_pos),1)[1]
+# 		#target_connected_weight_bn
+# 		a = np.triu_indices(sum(target_bn_pos),1)[0]
+# 		b = np.triu_indices(sum(target_bn_pos),1)[1]
+# 		c = np.triu_indices(sum(nontarget_bn_pos),1)[0]
+# 		d = np.triu_indices(sum(nontarget_bn_pos),1)[1]
 
-		if any(a) and any(b):
-			tmp_df.set_value(i, 'Target_connected_weight_bn', (np.mean(padj_t_bn_tmp[a,b]) - np.mean(cadj_t_bn_tmp[a,b,:])) \
-			/ np.std(cadj_t_bn_tmp[a,b,:]))
-		else: 
-			tmp_df.set_value(i, 'Target_connected_weight_bn', 0)
+# 		if any(a) and any(b):
+# 			tmp_df.set_value(i, 'Target_connected_weight_bn', (np.mean(padj_t_bn_tmp[a,b]) - np.mean(cadj_t_bn_tmp[a,b,:])) \
+# 			/ np.std(cadj_t_bn_tmp[a,b,:]))
+# 		else: 
+# 			tmp_df.set_value(i, 'Target_connected_weight_bn', 0)
 
-		if any(c) and any(d):	
-			tmp_df.set_value(i, 'nonTarget_connected_weight_bn', (np.mean(padj_nt_bn_tmp[c,d]) - np.mean(cadj_nt_bn_tmp[c,d,:])) \
-			/ np.std(cadj_nt_bn_tmp[c,d,:]))
-		else:
-			tmp_df.set_value(i, 'nonTarget_connected_weight_bn', 0)
+# 		if any(c) and any(d):	
+# 			tmp_df.set_value(i, 'nonTarget_connected_weight_bn', (np.mean(padj_nt_bn_tmp[c,d]) - np.mean(cadj_nt_bn_tmp[c,d,:])) \
+# 			/ np.std(cadj_nt_bn_tmp[c,d,:]))
+# 		else:
+# 			tmp_df.set_value(i, 'nonTarget_connected_weight_bn', 0)
 
-		#target_connected_weight_wn
-		a = np.triu_indices(sum(target_wn_pos),1)[0]
-		b = np.triu_indices(sum(target_wn_pos),1)[1]
-		c = np.triu_indices(sum(nontarget_wn_pos),1)[0]
-		d = np.triu_indices(sum(nontarget_wn_pos),1)[1]
+# 		#target_connected_weight_wn
+# 		a = np.triu_indices(sum(target_wn_pos),1)[0]
+# 		b = np.triu_indices(sum(target_wn_pos),1)[1]
+# 		c = np.triu_indices(sum(nontarget_wn_pos),1)[0]
+# 		d = np.triu_indices(sum(nontarget_wn_pos),1)[1]
 
-		if any(a) and any(b):
-			tmp_df.set_value(i, 'Target_connected_weight_wn', (np.mean(padj_t_wn_tmp[a,b]) - np.mean(cadj_t_wn_tmp[a,b,:])) \
-			/ np.std(cadj_t_wn_tmp[a,b,:]))
-		else:
-			tmp_df.set_value(i, 'Target_connected_weight_wn', 0)
+# 		if any(a) and any(b):
+# 			tmp_df.set_value(i, 'Target_connected_weight_wn', (np.mean(padj_t_wn_tmp[a,b]) - np.mean(cadj_t_wn_tmp[a,b,:])) \
+# 			/ np.std(cadj_t_wn_tmp[a,b,:]))
+# 		else:
+# 			tmp_df.set_value(i, 'Target_connected_weight_wn', 0)
 
-		if any(c) and any(d):	
-			tmp_df.set_value(i, 'nonTarget_connected_weight_wn', (np.mean(padj_nt_wn_tmp[c,d]) - np.mean(cadj_nt_wn_tmp[c,d,:])) \
-			/ np.std(cadj_nt_wn_tmp[c,d,:]))
-		else:
-			tmp_df.set_value(i, 'nonTarget_connected_weight_wn', 0)
+# 		if any(c) and any(d):	
+# 			tmp_df.set_value(i, 'nonTarget_connected_weight_wn', (np.mean(padj_nt_wn_tmp[c,d]) - np.mean(cadj_nt_wn_tmp[c,d,:])) \
+# 			/ np.std(cadj_nt_wn_tmp[c,d,:]))
+# 		else:
+# 			tmp_df.set_value(i, 'nonTarget_connected_weight_wn', 0)
 
-	patient_df = patient_df.append(tmp_df)		
+# 	patient_df = patient_df.append(tmp_df)		
 
 
 
-###### save
-patient_df['CI'].loc[patient_df['CI'] ==1] = 'Default'
-patient_df['CI'].loc[patient_df['CI'] ==2] = 'Visual'
-patient_df['CI'].loc[patient_df['CI'] ==3] = 'Somatomotor'
-patient_df['CI'].loc[patient_df['CI'] ==4] = 'Fronto-parietal'
-patient_df['CI'].loc[patient_df['CI'] ==5] = 'Attention'
-patient_df['CI'].loc[patient_df['CI'] ==6] = 'Cingulo-opercular'
-patient_df['CI'].loc[patient_df['CI'] ==7] = 'Temporal'
-patient_df['CI'].loc[patient_df['CI'] ==8] = 'Cingulo-parietal'
-patient_df['CI'].loc[patient_df['CI'] ==9] = 'Sailency'
+# ###### save
+# patient_df['CI'].loc[patient_df['CI'] ==1] = 'Default'
+# patient_df['CI'].loc[patient_df['CI'] ==2] = 'Visual'
+# patient_df['CI'].loc[patient_df['CI'] ==3] = 'Somatomotor'
+# patient_df['CI'].loc[patient_df['CI'] ==4] = 'Fronto-parietal'
+# patient_df['CI'].loc[patient_df['CI'] ==5] = 'Attention'
+# patient_df['CI'].loc[patient_df['CI'] ==6] = 'Cingulo-opercular'
+# patient_df['CI'].loc[patient_df['CI'] ==7] = 'Temporal'
+# patient_df['CI'].loc[patient_df['CI'] ==8] = 'Cingulo-parietal'
+# patient_df['CI'].loc[patient_df['CI'] ==9] = 'Sailency'
 
-patient_df.to_csv(path_to_data_folder + '/patient_df.csv', index = False)
+# patient_df.to_csv(path_to_data_folder + '/patient_df.csv', index = False)
 
 
 

@@ -99,14 +99,14 @@ for (v in Variables_to_plot){
   pData <- PT_Data[PT_Data$Patient==v,]
   pData <- pData[pData$Atlas == 'Functional',]
   pt_plot <-ggplot(data=pData, aes(x=Location, y=Size))
-  pt_plot <- pt_plot  + geom_bar(stat="identity") + theme_classic(base_size = 10) + theme( axis.title.x=element_blank()) + ylab(bquote('Size ('~mm^2*')'))
+  pt_plot <- pt_plot  + geom_bar(stat="identity") + theme_classic(base_size = 10) + theme( axis.title.x=element_blank()) + ylab(bquote('Lesion Size ('~mm^2*')'))
   plot(pt_plot)
   ggsave(filename = paste(v,'_pt_loc_functional.pdf', sep=''), plot = pt_plot, units = c("in"),width=3, height=1.5) 
   
   pData <- PT_Data[PT_Data$Patient==v,]
   pData <- pData[pData$Atlas == 'Morel',]
   pt_plot <-ggplot(data=pData, aes(x=Location, y=Size))
-  pt_plot <- pt_plot  + geom_bar(stat="identity") + theme_classic(base_size = 10) + theme( axis.title.x=element_blank())+ ylab(bquote('Size ('~mm^2*')'))
+  pt_plot <- pt_plot  + geom_bar(stat="identity") + theme_classic(base_size = 10) + theme( axis.title.x=element_blank())+ ylab(bquote('Lesion Size ('~mm^2*')'))
   plot(pt_plot)
   ggsave(filename = paste(v,"_pt_loc_morel.pdf", sep=''), plot = pt_plot,units = c("in"),width=3,  height=1.5)
 }

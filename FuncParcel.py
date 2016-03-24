@@ -903,3 +903,32 @@ def sort_CIs(Thalamo_ParcelCIs, Thalamus_voxels):
 		Thalamus_CIs[i] = Thalamo_ParcelCIs[thalamus_voxel_index][0]
 	Thalamus_CIs = Thalamus_CIs.astype(int)
 	return Thalamus_CIs
+
+
+def cal_modularity_w_imposed_community(M, CI):
+	Total_weight = M.sum()
+	Q=0.0
+	for i in np.unique(CI):
+		Within_weight = np.sum(M[CI==i,:][:,CI==i])
+		Within_weight_ratio = Within_weight / Total_weight
+		Between_weight = 0.0
+		for j in np.unique(CI):
+			if i !=j:
+				Between_weight += (np.sum(M[CI==i,:][:,CI==j]) / Total_weight)
+		Between_weight_ratio = (Between_weight)**2
+		Q += (Within_weight_ratio - Between_weight_ratio)
+	return Q
+
+def cal_modularity_community(M, CI, targetCI):
+	Total_weight = M.sum()
+	Q=0.0
+	for i in np.unique(targetCI):
+		Within_weight = np.sum(M[CI==i,:][:,CI==i])
+		Within_weight_ratio = Within_weight / Total_weight
+		Between_weight = 0.0
+		for j in np.unique(CI):
+			if i !=j:
+				Between_weight += (np.sum(M[CI==i,:][:,CI==j]) / Total_weight)
+		Between_weight_ratio = (Between_weight)**2
+		Q += (Within_weight_ratio - Between_weight_ratio)
+	return Q

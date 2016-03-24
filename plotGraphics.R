@@ -92,21 +92,21 @@ for (v in Variables_to_plot){
 #### patient stuff
 setwd('~/Google Drive/Projects/Thalamus-Rest/')
 # plot patient lesion extent
-Variables_to_plot <- c('S1', 'S2', 'S3', 'S4') #'NNC', 'BNWR', 'bcc' 'WMD'
+Variables_to_plot <- c('S1', 'S2', 'S3', 'S4')
 
 for (v in Variables_to_plot){
   PT_Data <-read.csv('Patient_locaition.csv', header=TRUE)
   pData <- PT_Data[PT_Data$Patient==v,]
   pData <- pData[pData$Atlas == 'Functional',]
   pt_plot <-ggplot(data=pData, aes(x=Location, y=Size))
-  pt_plot <- pt_plot  + geom_bar(stat="identity") + theme_classic(base_size = 10) + theme( axis.title.x=element_blank()) + ylab(bquote('Lesion Size ('~mm^2*')'))
+  pt_plot <- pt_plot  + geom_bar(stat="identity") + theme_classic(base_size = 10) + theme( axis.title.x=element_blank()) + ylab(bquote('Lesion Size ('~mm^3*')'))
   plot(pt_plot)
   ggsave(filename = paste(v,'_pt_loc_functional.pdf', sep=''), plot = pt_plot, units = c("in"),width=3, height=1.5) 
   
   pData <- PT_Data[PT_Data$Patient==v,]
   pData <- pData[pData$Atlas == 'Morel',]
   pt_plot <-ggplot(data=pData, aes(x=Location, y=Size))
-  pt_plot <- pt_plot  + geom_bar(stat="identity") + theme_classic(base_size = 10) + theme( axis.title.x=element_blank())+ ylab(bquote('Lesion Size ('~mm^2*')'))
+  pt_plot <- pt_plot  + geom_bar(stat="identity") + theme_classic(base_size = 10) + theme( axis.title.x=element_blank())+ ylab(bquote('Lesion Size ('~mm^3*')'))
   plot(pt_plot)
   ggsave(filename = paste(v,"_pt_loc_morel.pdf", sep=''), plot = pt_plot,units = c("in"),width=3,  height=1.5)
 }

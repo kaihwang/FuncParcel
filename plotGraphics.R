@@ -25,7 +25,16 @@ volplot <- volplot + stat_density(aes(ymax = ..density..,  ymin = -..density.. )
 volplot <- volplot + facet_grid(. ~ Classification) + coord_flip() + theme_grey(base_size = 10)
 volplot <- volplot  + xlim(0,1) + theme( axis.title.x=element_blank(),axis.ticks.x=element_blank(),axis.text.x=element_blank(), axis.text = element_text(colour = "black")) 
 plot(volplot)
-ggsave(filename = 'PC_classification.pdf', plot = volplot, units = c("in"),width=6.5, height=1.7,dpi=300) 
+ggsave(filename = 'PC_classification_density.pdf', plot = volplot, units = c("in"),width=6.5, height=3,dpi=300) 
+
+## try boxplot for Mark
+
+
+Thalamus_boxplot <- ggplot(data = Thalamus_plus_cortical_data, aes(x=Classification, y=PC)) + geom_boxplot(outlier.colour = NULL,fill = "grey80") 
+Thalamus_boxplot <- Thalamus_boxplot + theme_grey(base_size = 10)  + theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black"))
+Thalamus_boxplot <- Thalamus_boxplot + ylim( 0, 1) 
+plot(Thalamus_boxplot)
+ggsave(filename = 'PC_classification_box.pdf', plot = Thalamus_boxplot, units = c("in"),width=6.5, height=3,dpi=300) 
 
 #WMD
 volplot <- ggplot(data = Thalamus_plus_cortical_data, aes(x=WMD))

@@ -57,23 +57,44 @@ PC = np.loadtxt('//Volumes/neuro/Rest/Thalamic_parcel/roipc')
 from matplotlib import cm
 for i, coord in enumerate(coords):
 	if coord[0] > 0:
-		brain.add_foci(coord, map_surface="white", color=cm.spring(int(PC[i]/100*255))[0:3])
+		if PC[i] > 61:
+			brain.add_foci(coord, map_surface="white", color=cm.jet(int(PC[i]/100*255))[0:3])
 
 
 ###### to visualize cortical ROI wmd values
 subject_id = "fsaverage"
 subjects_dir = os.environ["SUBJECTS_DIR"]
 
-brain = Brain("fsaverage", "rh", "inflated", views=['lat', 'med'], background="white")
+brain = Brain("fsaverage", "lh", "inflated", views=['lat', 'med'], background="white")
 #brain = Brain("fsaverage", "rh", "inflated", background="white")
 coords = np.loadtxt('/Volumes/neuro/Rest/ROIs/Gordon_coordinates')
 wmd = np.loadtxt('//Volumes/neuro/Rest/Thalamic_parcel/wmdroi')
 
 from matplotlib import cm
 for i, coord in enumerate(coords):
-	if coord[0] > 0:
-		brain.add_foci(coord, map_surface="white", color=cm.spring(int((wmd[i]/100+2.1)/4*255))[0:3])
+	if coord[0] < 0:
+		if wmd[i] > 80:
+			brain.add_foci(coord, map_surface="white", color=cm.jet(int((wmd[i]/100+2.1)/4*255))[0:3])
 
+
+
+### to visualize hubs
+subject_id = "fsaverage"
+subjects_dir = os.environ["SUBJECTS_DIR"]
+
+brain = Brain("fsaverage", "rh", "inflated", views=['lat', 'med'], background="white")
+coords = np.loadtxt('/Volumes/neuro/Rest/ROIs/Gordon_coordinates')
+PC = np.loadtxt('//Volumes/neuro/Rest/Thalamic_parcel/roipc')
+wmd = np.loadtxt('//Volumes/neuro/Rest/Thalamic_parcel/wmdroi')
+
+for i, coord in enumerate(coords):
+	if coord[0] > 0:
+		if wmd[i] > 80:
+			brain.add_foci(coord, map_surface="white", color='indigo')
+		if 	PC[i] > 61:
+			brain.add_foci(coord, map_surface="white", color='darkgreen')
+		if (wmd[i] > 61) & (PC[i] > 80):
+			brain.add_foci(coord, map_surface="white", color='gold')	
 
 
 #### to visualize AN, MD, PuM, Intra ROI target

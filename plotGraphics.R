@@ -23,14 +23,14 @@ Thalamus_plus_cortical_data$Classification <-factor(Thalamus_plus_cortical_data$
 #PC, try boxplot for Mark
 Thalamus_boxplot <- ggplot(data = Thalamus_plus_cortical_data, aes(x=Classification, y=PC)) + geom_boxplot(outlier.colour = NULL,outlier.shape = NA,fill = "grey80") 
 Thalamus_boxplot <- Thalamus_boxplot + theme_grey(base_size = 8)  + theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black"))
-Thalamus_boxplot <- Thalamus_boxplot + ylim( 0, 1) 
+Thalamus_boxplot <- Thalamus_boxplot + ylim( 0, 1) + geom_hline(aes(yintercept=.61), colour="#990000", linetype="dashed")
 plot(Thalamus_boxplot)
 ggsave(filename = 'PC_classification_box.pdf', plot = Thalamus_boxplot, units = c("in"),width=4, height=2,dpi=300) 
 
 #WMD
 Thalamus_boxplot <- ggplot(data = Thalamus_plus_cortical_data, aes(x=Classification, y=WMD)) + geom_boxplot(outlier.colour = NULL,outlier.shape = NA,fill = "grey80") 
 Thalamus_boxplot <- Thalamus_boxplot + theme_grey(base_size = 8)  + theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black"))
-Thalamus_boxplot <- Thalamus_boxplot + ylim( -4, 4) 
+Thalamus_boxplot <- Thalamus_boxplot + ylim( -4, 4) + geom_hline(aes(yintercept=.8), colour="#990000", linetype="dashed")
 plot(Thalamus_boxplot)
 ggsave(filename = 'WMD_classification_box.pdf', plot = Thalamus_boxplot, units = c("in"),width=4, height=2,dpi=300) 
 
@@ -51,35 +51,73 @@ Variables_to_plot <- c('WMD'  ) #'NNC', 'BNWR', 'bcc' 'WMD'
 
 for (v in Variables_to_plot){
   
-  boxplot <- ggplot(data = Thalamus_Data, aes_string(x="Functional.Network", y=v)) + geom_boxplot(outlier.colour = NULL,fill = "grey80", coef=3) 
+  boxplot <- ggplot(data = Thalamus_Data, aes_string(x="Functional.Network", y=v)) + geom_boxplot(outlier.colour = NULL, outlier.shape = NA, fill = "grey80", coef=3) 
   boxplot <- boxplot + theme_grey(base_size = 10)  + theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black"))
-  boxplot <- boxplot + ylim( -2, 4) +ggtitle("Thalamus Functional Atlas")
+  boxplot <- boxplot + ylim( -2, 4) +ggtitle("Thalamus Functional Atlas") + geom_hline(aes(yintercept=.8), colour="#990000", linetype="dashed")
   plot(boxplot)
   ggsave(filename = paste(v,'_tha_fn_box.pdf', sep=''), plot = boxplot, units = c("in"),width=3.4, height=1.5) 
   
   boxplot <- ggplot(data = Cortical_Data, aes_string(x="Functional.Network", y=v)) + geom_boxplot(outlier.colour = NULL,outlier.shape = NA,fill = "grey80") 
   boxplot <- boxplot + theme_grey(base_size = 10)  + theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black"))
-  boxplot <- boxplot + ylim( -2, 4) +ggtitle("Cortical ROIs")
+  boxplot <- boxplot + ylim( -2, 4) +ggtitle("Cortical ROIs") + geom_hline(aes(yintercept=.8), colour="#990000", linetype="dashed")
   plot(boxplot)
   ggsave(filename = paste(v,'_cortical_fn_box.pdf', sep=''), plot = boxplot, units = c("in"),width=3.4, height=1.5) 
   
   boxplot <- ggplot(data = Thalamus_Data, aes_string(x="Anatomical.Parcellations", y=v)) + geom_boxplot(outlier.colour = NULL,outlier.shape = NA,fill = "grey80") 
   boxplot <- boxplot + theme_grey(base_size = 10)  + theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black"))
-  boxplot <- boxplot + ylim( -2, 4) +ggtitle("Oxford-FSL Atlas") 
+  boxplot <- boxplot + ylim( -2, 4) +ggtitle("Oxford-FSL Atlas") + geom_hline(aes(yintercept=.8), colour="#990000", linetype="dashed")  
   plot(boxplot)
   ggsave(filename = paste(v,'_thalamus_an_box.pdf', sep=''), plot = boxplot, units = c("in"),width=2.85, height=1.5) 
   
   FO_Data <-Thalamus_Data[Thalamus_Data$Classification=='First Order \nThalamic Nuclei',] 
-  boxplot <- ggplot(data = FO_Data, aes_string(x="Morel.Parcellations", y=v)) + geom_boxplot(outlier.colour = NULL,outlier.shape = NA,fill = "grey80", coef=3) 
+  boxplot <- ggplot(data = FO_Data, aes_string(x="Morel.Parcellations", y=v)) + geom_boxplot(outlier.colour = NULL,outlier.shape = NA,fill = "grey80") 
   boxplot <- boxplot + theme_grey(base_size = 10)  + theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black"))
-  boxplot <- boxplot + ylim( -2, 4) +ggtitle("Morel Atlas (First Order Nuclei)") 
+  boxplot <- boxplot + ylim( -2, 4) +ggtitle("Morel Atlas (First Order Nuclei)") + geom_hline(aes(yintercept=.8), colour="#990000", linetype="dashed")
   plot(boxplot)
   ggsave(filename = paste(v,'_thalamus_fo_box.pdf', sep=''), plot = boxplot, units = c("in"),width=2.7, height=1.5) 
   
   HO_Data <-Thalamus_Data[Thalamus_Data$Classification=='Higher Order \nThalamic Nuclei',] 
   boxplot <- ggplot(data = HO_Data, aes_string(x="Morel.Parcellations", y=v)) + geom_boxplot(outlier.colour = NULL,outlier.shape = NA,fill = "grey80") 
   boxplot <- boxplot + theme_grey(base_size = 10)  + theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black"))
-  boxplot <- boxplot + ylim( -2, 4) +ggtitle("Morel Atlas (Higher Order Nuclei)") 
+  boxplot <- boxplot + ylim( -2, 4) +ggtitle("Morel Atlas (Higher Order Nuclei)") + geom_hline(aes(yintercept=.8), colour="#990000", linetype="dashed")
+  plot(boxplot)
+  ggsave(filename = paste(v,'_thalamus_ho_box.pdf', sep=''), plot = boxplot, units = c("in"),width=3.4, height=1.5) 
+  
+}  
+
+Variables_to_plot <- c('PC'  ) #'NNC', 'BNWR', 'bcc' 'WMD'
+
+for (v in Variables_to_plot){
+  
+  boxplot <- ggplot(data = Thalamus_Data, aes_string(x="Functional.Network", y=v)) + geom_boxplot(outlier.colour = NULL, outlier.shape = NA, fill = "grey80") 
+  boxplot <- boxplot + theme_grey(base_size = 10)  + theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black"))
+  boxplot <- boxplot + ylim( -2, 4) +ggtitle("Thalamus Functional Atlas") + geom_hline(aes(yintercept=.63), colour="#990000", linetype="dashed")
+  plot(boxplot)
+  ggsave(filename = paste(v,'_tha_fn_box.pdf', sep=''), plot = boxplot, units = c("in"),width=3.4, height=1.5) 
+  
+  boxplot <- ggplot(data = Cortical_Data, aes_string(x="Functional.Network", y=v)) + geom_boxplot(outlier.colour = NULL,outlier.shape = NA,fill = "grey80") 
+  boxplot <- boxplot + theme_grey(base_size = 10)  + theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black"))
+  boxplot <- boxplot + ylim( -2, 4) +ggtitle("Cortical ROIs") + geom_hline(aes(yintercept=.63), colour="#990000", linetype="dashed")
+  plot(boxplot)
+  ggsave(filename = paste(v,'_cortical_fn_box.pdf', sep=''), plot = boxplot, units = c("in"),width=3.4, height=1.5) 
+  
+  boxplot <- ggplot(data = Thalamus_Data, aes_string(x="Anatomical.Parcellations", y=v)) + geom_boxplot(outlier.colour = NULL,outlier.shape = NA,fill = "grey80") 
+  boxplot <- boxplot + theme_grey(base_size = 10)  + theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black"))
+  boxplot <- boxplot + ylim( -2, 4) +ggtitle("Oxford-FSL Atlas") + geom_hline(aes(yintercept=.63), colour="#990000", linetype="dashed")  
+  plot(boxplot)
+  ggsave(filename = paste(v,'_thalamus_an_box.pdf', sep=''), plot = boxplot, units = c("in"),width=2.85, height=1.5) 
+  
+  FO_Data <-Thalamus_Data[Thalamus_Data$Classification=='First Order \nThalamic Nuclei',] 
+  boxplot <- ggplot(data = FO_Data, aes_string(x="Morel.Parcellations", y=v)) + geom_boxplot(outlier.colour = NULL,outlier.shape = NA,fill = "grey80") 
+  boxplot <- boxplot + theme_grey(base_size = 10)  + theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black"))
+  boxplot <- boxplot + ylim( -2, 4) +ggtitle("Morel Atlas (First Order Nuclei)") + geom_hline(aes(yintercept=.63), colour="#990000", linetype="dashed")
+  plot(boxplot)
+  ggsave(filename = paste(v,'_thalamus_fo_box.pdf', sep=''), plot = boxplot, units = c("in"),width=2.7, height=1.5) 
+  
+  HO_Data <-Thalamus_Data[Thalamus_Data$Classification=='Higher Order \nThalamic Nuclei',] 
+  boxplot <- ggplot(data = HO_Data, aes_string(x="Morel.Parcellations", y=v)) + geom_boxplot(outlier.colour = NULL,outlier.shape = NA,fill = "grey80") 
+  boxplot <- boxplot + theme_grey(base_size = 10)  + theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black"))
+  boxplot <- boxplot + ylim( -2, 4) +ggtitle("Morel Atlas (Higher Order Nuclei)") + geom_hline(aes(yintercept=.63), colour="#990000", linetype="dashed")
   plot(boxplot)
   ggsave(filename = paste(v,'_thalamus_ho_box.pdf', sep=''), plot = boxplot, units = c("in"),width=3.4, height=1.5) 
   
@@ -113,27 +151,33 @@ PT_Data = read.csv('Patient_Q_v_PC.csv', header=TRUE)
 pt_q_plot <- ggplot(data = PT_Data, aes(x=factor(SubjID), y=Q.Diff))
 pt_q_plot <- pt_q_plot + geom_bar(stat = "identity")
 pt_q_plot <- pt_q_plot + labs(x= "Patients", y = "Hemispheric Difference \n in Modularity") + theme_classic(base_size = 10)+ theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black"))
-ggsave(filename = "pt_q_plot.pdf", plot = pt_q_plot, units = c("in"),width=2.15, height=2) 
+ggsave(filename = "pt_q_plot.pdf", plot = pt_q_plot, units = c("in"),width=1.5, height=2) 
 plot(pt_q_plot)
 
 pt_pc_plot <- ggplot(data = PT_Data, aes(x=factor(SubjID), y=Lesioned.PC))
 pt_pc_plot <- pt_pc_plot + geom_bar(stat = "identity") 
-pt_pc_plot <- pt_pc_plot + ylim( 0, 80) 
+pt_pc_plot <- pt_pc_plot + ylim( 0, 1) 
 pt_pc_plot <- pt_pc_plot + labs(x= "Patients", y = "Lesioned voxel's mean PC") + theme_classic(base_size = 10)+ theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black")) 
-ggsave(filename = "pt_pc_plot.pdf", plot = pt_pc_plot, units = c("in"),width=2.15, height=2) 
+ggsave(filename = "pt_pc_plot.pdf", plot = pt_pc_plot, units = c("in"),width=1.5, height=2) 
 plot(pt_pc_plot)
 
 
+pt_pc_plot <- ggplot(data = PT_Data, aes(x=factor(SubjID), y=Lesioned.WMD))
+pt_pc_plot <- pt_pc_plot + geom_bar(stat = "identity") 
+pt_pc_plot <- pt_pc_plot + ylim( 0, 2) 
+pt_pc_plot <- pt_pc_plot + labs(x= "Patients", y = "Lesioned voxel's mean WMD") + theme_classic(base_size = 10)+ theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black")) 
+ggsave(filename = "pt_WMD_plot.pdf", plot = pt_pc_plot, units = c("in"),width=1.5, height=2) 
+plot(pt_pc_plot)
 
 #### AN, MD, PuM, Intra network stregnth 
 setwd('~/Google Drive/Projects/Thalamus-Rest/')
 CI_colors <- c("#6B006C", "red","yellow","cyan","blue", "brown", "#0E6E6C", "#008100", "pink")
 Nuclei_Data <- read.csv('NucleiNetworkStrength.csv')
-Variables_to_plot <- c('MD', 'PuM', 'VL', 'An', 'LGN', 'LP', 'IL'  )
+Variables_to_plot <- c('MD', 'PuM', 'VL', 'An', 'LGN', 'LP', 'IL', 'VA','VM'  )
 for (v in Variables_to_plot){
   plot_Data <- Nuclei_Data[Nuclei_Data$Nuclei==v,] 
-  n_plot <- ggplot(data = plot_Data, aes(x=factor(Network), y=Connectivity.Strength))
-  n_plot <- n_plot + geom_bar(stat = "identity", aes(fill=Network)) + labs(y = "Z-Score") + theme_classic(base_size = 8)
+  n_plot <- ggplot(data = plot_Data, aes(x=factor(Network), y=Connectivity.Porportion))
+  n_plot <- n_plot + geom_bar(stat = "identity", aes(fill=Network)) + labs(y = "% of Total \nConnectivity Weight") + theme_classic(base_size = 8)
   n_plot <- n_plot +scale_fill_manual(values=CI_colors ) 
   n_plot <- n_plot + theme(axis.title.x=element_blank(), axis.ticks.x=element_blank(), axis.text.x=element_blank(), axis.text = element_text(colour = "black"), legend.position="none")
   ggsave(filename = paste(v,'_plot.pdf', sep=''), plot = n_plot, units = c("in"),width=1.5, height=1.25) 

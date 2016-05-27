@@ -173,8 +173,9 @@ Cortical_df['BNWR'] = BNWRs[0:333]/100
 Cortical_df['cog'] = Cortical_Cog_component
 
 Cortical_df['Classification'] = 'Cortical \nNon Hubs'
-Cortical_df['Classification'].loc[Cortical_df['PC'] > .61] = 'Cortical \nConnector Hubs'
 Cortical_df['Classification'].loc[Cortical_df['WMD'] > .8] = 'Cortical \nProvincial Hubs'
+Cortical_df['Classification'].loc[Cortical_df['PC'] > .61] = 'Cortical \nConnector Hubs'
+#Cortical_df['Classification'].loc[Cortical_df['WMD'] > .8] = 'Cortical \nProvincial Hubs'
 ################################################################
 ####### thalamo-cortical target's nodal role for each thalamus voxel
 ################################################################

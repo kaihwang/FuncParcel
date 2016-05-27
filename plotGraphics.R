@@ -21,16 +21,22 @@ X_order <- c('First Order \nThalamic Nuclei','Higher Order \nThalamic Nuclei',"C
 Thalamus_plus_cortical_data$Classification <-factor(Thalamus_plus_cortical_data$Classification, levels=X_order)
 
 #PC, try boxplot for Mark
-Thalamus_boxplot <- ggplot(data = Thalamus_plus_cortical_data, aes(x=Classification, y=PC)) + geom_boxplot(outlier.colour = NULL,outlier.shape = NA,fill = "grey80") 
+Thalamus_plus_cortical_data_1<- Thalamus_plus_cortical_data
+levels(Thalamus_plus_cortical_data_1$Classification) <-c('First Order \nThalamic Nuclei','Higher Order \nThalamic Nuclei',"Cortical \nConnector Hubs", "Cortical \nNon Connector Hubs", "Cortical \nNon Connector Hubs")
+Thalamus_boxplot <- ggplot(data = Thalamus_plus_cortical_data_1, aes(x=Classification, y=PC)) + geom_boxplot(outlier.colour = NULL,outlier.shape = NA,fill = "grey80") 
 Thalamus_boxplot <- Thalamus_boxplot + theme_grey(base_size = 8)  + theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black"))
-Thalamus_boxplot <- Thalamus_boxplot + ylim( 0, 1) + geom_hline(aes(yintercept=.61), colour="#990000", linetype="dashed")
+Thalamus_boxplot <- Thalamus_boxplot + ylim( 0, 1) 
 plot(Thalamus_boxplot)
 ggsave(filename = 'PC_classification_box.pdf', plot = Thalamus_boxplot, units = c("in"),width=4, height=2,dpi=300) 
 
 #WMD
-Thalamus_boxplot <- ggplot(data = Thalamus_plus_cortical_data, aes(x=Classification, y=WMD)) + geom_boxplot(outlier.colour = NULL,outlier.shape = NA,fill = "grey80") 
+Thalamus_plus_cortical_data_2<- Thalamus_plus_cortical_data
+levels(Thalamus_plus_cortical_data_2$Classification) <-c('First Order \nThalamic Nuclei','Higher Order \nThalamic Nuclei',"Cortical \nNon Provincial Hubs", "Cortical \nProvincial Hubs", "Cortical \nNon Provincial Hubs")
+X_order <- c('First Order \nThalamic Nuclei','Higher Order \nThalamic Nuclei',"Cortical \nProvincial Hubs", "Cortical \nNon Provincial Hubs")
+Thalamus_plus_cortical_data_2$Classification <-factor(Thalamus_plus_cortical_data_2$Classification, levels=X_order)
+Thalamus_boxplot <- ggplot(data = Thalamus_plus_cortical_data_2, aes(x=Classification, y=WMD)) + geom_boxplot(outlier.colour = NULL,outlier.shape = NA,fill = "grey80") 
 Thalamus_boxplot <- Thalamus_boxplot + theme_grey(base_size = 8)  + theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black"))
-Thalamus_boxplot <- Thalamus_boxplot + ylim( -4, 4) + geom_hline(aes(yintercept=.8), colour="#990000", linetype="dashed")
+Thalamus_boxplot <- Thalamus_boxplot + ylim( -4, 4) 
 plot(Thalamus_boxplot)
 ggsave(filename = 'WMD_classification_box.pdf', plot = Thalamus_boxplot, units = c("in"),width=4, height=2,dpi=300) 
 
@@ -157,7 +163,7 @@ plot(pt_q_plot)
 pt_pc_plot <- ggplot(data = PT_Data, aes(x=factor(SubjID), y=Lesioned.PC))
 pt_pc_plot <- pt_pc_plot + geom_bar(stat = "identity") 
 pt_pc_plot <- pt_pc_plot + ylim( 0, 1) 
-pt_pc_plot <- pt_pc_plot + labs(x= "Patients", y = "Lesioned voxel's mean PC") + theme_classic(base_size = 10)+ theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black")) 
+pt_pc_plot <- pt_pc_plot + labs(x= "Patients", y = "Mean PC (lesion)") + theme_classic(base_size = 10)+ theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black")) 
 ggsave(filename = "pt_pc_plot.pdf", plot = pt_pc_plot, units = c("in"),width=1.5, height=2) 
 plot(pt_pc_plot)
 
@@ -165,7 +171,7 @@ plot(pt_pc_plot)
 pt_pc_plot <- ggplot(data = PT_Data, aes(x=factor(SubjID), y=Lesioned.WMD))
 pt_pc_plot <- pt_pc_plot + geom_bar(stat = "identity") 
 pt_pc_plot <- pt_pc_plot + ylim( 0, 2) 
-pt_pc_plot <- pt_pc_plot + labs(x= "Patients", y = "Lesioned voxel's mean WMD") + theme_classic(base_size = 10)+ theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black")) 
+pt_pc_plot <- pt_pc_plot + labs(x= "Patients", y = "Mean WMD (lesion)") + theme_classic(base_size = 10)+ theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black")) 
 ggsave(filename = "pt_WMD_plot.pdf", plot = pt_pc_plot, units = c("in"),width=1.5, height=2) 
 plot(pt_pc_plot)
 
@@ -178,7 +184,7 @@ for (v in Variables_to_plot){
   plot_Data <- Nuclei_Data[Nuclei_Data$Nuclei==v,] 
   n_plot <- ggplot(data = plot_Data, aes(x=factor(Network), y=Connectivity.Porportion))
   n_plot <- n_plot + geom_bar(stat = "identity", aes(fill=Network)) + labs(y = "% of Total \nConnectivity Weight") + theme_classic(base_size = 8)
-  n_plot <- n_plot +scale_fill_manual(values=CI_colors ) 
+  n_plot <- n_plot +scale_fill_manual(values=CI_colors ) + geom_hline(aes(yintercept=11), colour="#990000", linetype="dashed")
   n_plot <- n_plot + theme(axis.title.x=element_blank(), axis.ticks.x=element_blank(), axis.text.x=element_blank(), axis.text = element_text(colour = "black"), legend.position="none")
   ggsave(filename = paste(v,'_plot.pdf', sep=''), plot = n_plot, units = c("in"),width=1.5, height=1.25) 
   plot(n_plot)

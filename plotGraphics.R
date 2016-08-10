@@ -23,11 +23,21 @@ Thalamus_plus_cortical_data$Classification <-factor(Thalamus_plus_cortical_data$
 #PC, try boxplot for Mark
 Thalamus_plus_cortical_data_1<- Thalamus_plus_cortical_data
 levels(Thalamus_plus_cortical_data_1$Classification) <-c('First Order \nThalamic Nuclei','Higher Order \nThalamic Nuclei',"Cortical \nConnector Hubs", "Cortical \nNon Connector Hubs", "Cortical \nNon Connector Hubs")
+
+
 Thalamus_boxplot <- ggplot(data = Thalamus_plus_cortical_data_1, aes(x=Classification, y=PC)) + geom_boxplot(outlier.colour = NULL,outlier.shape = NA,fill = "grey80") 
 Thalamus_boxplot <- Thalamus_boxplot + theme_grey(base_size = 8)  + theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black"))
 Thalamus_boxplot <- Thalamus_boxplot + ylim( 0, 1) 
 plot(Thalamus_boxplot)
 ggsave(filename = 'PC_classification_box.pdf', plot = Thalamus_boxplot, units = c("in"),width=4, height=2,dpi=300) 
+
+#PC kernal density
+CI_colors <- c("green", "blue","red")
+kplot <- ggplot(data = Thalamus_plus_cortical_data, aes(x = PC)) 
+kplot <-kplot + stat_density(aes( group = nodetype, fill = nodetype ),size=2, alpha=0.7, position="identity") 
+kplot <-kplot + theme_grey(base_size = 8) +scale_fill_manual(values=CI_colors ) + theme(legend.title = element_blank())
+plot(kplot)
+ggsave(filename = 'PC_classification_kernal.pdf', plot = kplot, units = c("in"),width=4, height=2,dpi=300) 
 
 #WMD
 Thalamus_plus_cortical_data_2<- Thalamus_plus_cortical_data
@@ -39,6 +49,13 @@ Thalamus_boxplot <- Thalamus_boxplot + theme_grey(base_size = 8)  + theme( axis.
 Thalamus_boxplot <- Thalamus_boxplot + ylim( -4, 4) 
 plot(Thalamus_boxplot)
 ggsave(filename = 'WMD_classification_box.pdf', plot = Thalamus_boxplot, units = c("in"),width=4, height=2,dpi=300) 
+
+#WMD kernal density
+kplot <- ggplot(data = Thalamus_plus_cortical_data, aes(x = WMD)) 
+kplot <-kplot + stat_density(aes( group = nodetype, fill = nodetype ),size=2, alpha=0.7, position="identity") 
+kplot <-kplot + theme_grey(base_size = 8) +scale_fill_manual(values=CI_colors ) + theme(legend.title = element_blank())
+plot(kplot)
+ggsave(filename = 'WMD_classification_kernal.pdf', plot = kplot, units = c("in"),width=4, height=2,dpi=300) 
 
 #CogFlex
 Thalamus_boxplot <- ggplot(data = Thalamus_plus_cortical_data, aes(x=Classification, y=cog)) + geom_boxplot(outlier.colour = NULL,outlier.shape = NA,fill = "grey80") 

@@ -39,6 +39,16 @@ kplot <-kplot + theme_grey(base_size = 8) +scale_fill_manual(values=CI_colors ) 
 plot(kplot)
 ggsave(filename = 'PC_classification_kernal.pdf', plot = kplot, units = c("in"),width=4, height=2,dpi=300) 
 
+#bPC kernal density
+CI_colors <- c("green", "blue","red")
+kplot <- ggplot(data = Thalamus_plus_cortical_data, aes(x = bPC)) 
+kplot <-kplot + stat_density(aes( group = nodetype, fill = nodetype ),size=2, alpha=0.7, position="identity") 
+kplot <-kplot + theme_grey(base_size = 8) +scale_fill_manual(values=CI_colors ) + theme(legend.title = element_blank())
+plot(kplot)
+ggsave(filename = 'bPC_classification_kernal.pdf', plot = kplot, units = c("in"),width=4, height=2,dpi=300) 
+
+
+
 #WMD
 Thalamus_plus_cortical_data_2<- Thalamus_plus_cortical_data
 levels(Thalamus_plus_cortical_data_2$Classification) <-c('First Order \nThalamic Nuclei','Higher Order \nThalamic Nuclei',"Cortical \nNon Provincial Hubs", "Cortical \nProvincial Hubs", "Cortical \nNon Provincial Hubs")

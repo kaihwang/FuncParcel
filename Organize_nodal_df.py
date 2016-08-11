@@ -27,6 +27,8 @@ Cortical_Cog_component = np.loadtxt(Parcel_path+'cortical_cog')
 
 #PC
 PCs = pickle.load(open(path_to_graph+'MGH_avemat_tha_nodal_pcorr_PCs', "rb"))
+bPCs = pickle.load(open(path_to_graph+'MGH_avemat_tha_nodal_pcorr_bPCs', "rb"))
+
 #NNCs
 NNCs = pickle.load(open(path_to_graph+'MGH_avemat_tha_nodal_pcorr_NNCs', "rb"))
 #WMDs
@@ -136,6 +138,7 @@ Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==29] = 'First O
 Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==30] = 'Higher Order \nThalamic Nuclei'
 Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==31] = 'Higher Order \nThalamic Nuclei'
 Thalamus_df['Classification'].loc[Thalamus_df['Classification'] ==32] = 'Higher Order \nThalamic Nuclei'
+Thalamus_df['nodetype'] = Thalamus_df['Classification']
 
 #cortical
 Cortical_df = pd.DataFrame(columns=('ROI', 'Functional Network'))
@@ -161,12 +164,14 @@ Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==12] = 
 
 #nodal roles
 Thalamus_df['PC'] = PCs[333:]/100  #convert from percentage to raw score
+Thalamus_df['bPC'] = bPCs[333:]/100
 Thalamus_df['WMD'] = WMDs[333:]/100 
 Thalamus_df['NNC'] = NNCs[333:]/100
 Thalamus_df['BNWR'] = BNWRs[333:]/100
 Thalamus_df['cog'] = Cog_component
 
 Cortical_df['PC'] = PCs[0:333]/100  #take out cortical ones, normalize by max PC
+Cortical_df['bPC'] = bPCs[0:333]/100
 Cortical_df['WMD'] = WMDs[0:333]/100 
 Cortical_df['NNC'] = NNCs[0:333]/100 
 Cortical_df['BNWR'] = BNWRs[0:333]/100
@@ -175,6 +180,8 @@ Cortical_df['cog'] = Cortical_Cog_component
 Cortical_df['Classification'] = 'Cortical \nNon Hubs'
 Cortical_df['Classification'].loc[Cortical_df['WMD'] > .8] = 'Cortical \nProvincial Hubs'
 Cortical_df['Classification'].loc[Cortical_df['PC'] > .61] = 'Cortical \nConnector Hubs'
+Cortical_df['nodetype'] = 'Cortical ROIs'
+
 #Cortical_df['Classification'].loc[Cortical_df['WMD'] > .8] = 'Cortical \nProvincial Hubs'
 ################################################################
 ####### thalamo-cortical target's nodal role for each thalamus voxel
@@ -210,6 +217,11 @@ Cortical_df['Classification'].loc[Cortical_df['PC'] > .61] = 'Cortical \nConnect
 # Thalamus_target_df['Associated System'].loc[Thalamus_target_df['Associated System'] ==8] = 'Cingulo-parietal'
 # Thalamus_target_df['Associated System'].loc[Thalamus_target_df['Associated System'] ==11] = 'Sailency'
 
+
+#do some sample distribution comparison
+from scipy import stats
+stats.ks_2samp(Thalamus_df['PC'], Cortical_df['PC'])
+stats.ks_2samp(Thalamus_df['WMD'], Cortical_df['WMD'])
 
 
 ################################################################

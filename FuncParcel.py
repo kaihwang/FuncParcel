@@ -501,6 +501,8 @@ def pcorr_subcortico_cortical_connectivity(subcortical_ts, cortical_ts):
 	# transpose so that column is ROI, this is because output from 3dNetcorr is row-based.
 	subcortical_ts = subcortical_ts.T
 	cortical_ts = cortical_ts.T
+	cortical_ts[np.isnan(cortical_ts)]=0
+	subcortical_ts[np.isnan(subcortical_ts)]=0
 
 	# check length of data
 	assert cortical_ts.shape[0] == subcortical_ts.shape[0]
@@ -776,6 +778,7 @@ def cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocortical_corrmat, Cor
 	Thalamocortical_corrmat[np.isnan(Thalamocortical_corrmat)] = 0
 	#PC
 	PCs = np.zeros(Cortical_plus_thalamus_CI.size)
+	bPCs = np.zeros(Cortical_plus_thalamus_CI.size)
 	#BNWR between network connectivity weight
 	BNWRs = np.zeros(Cortical_plus_thalamus_CI.size)
 	#get number of networks/communities connected
@@ -790,8 +793,13 @@ def cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocortical_corrmat, Cor
 		Par_adj[:,Cortical_ROIs_positions[Cortical_CI==0]]=0
 		Par_adj[Par_adj<c]=0
 
+		#binary
+		bPar_adj = Par_adj.copy()
+		bPar_adj = bPar_adj>c
+
 		#PC
 		PCs += bct.participation_coef(Par_adj, Cortical_plus_thalamus_CI)
+		bPCs += bct.participation_coef(bPar_adj, Cortical_plus_thalamus_CI)
 
 		#BNWR and NNCs
 		Tha_BNWR = np.zeros(Cortical_plus_thalamus_CI.size)
@@ -813,12 +821,17 @@ def cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocortical_corrmat, Cor
 	Cortical_adj[:,Cortical_CI==0]=0
 
 	Cortical_PCs = np.zeros(Cortical_CI.size)
+	Cortical_bPCs = np.zeros(Cortical_CI.size)
 	Cortical_BNWR = np.zeros(Cortical_CI.size)
 	Cortical_NNCs = np.zeros(Cortical_plus_thalamus_CI.size)
 	for ix, c in enumerate(np.arange(0.01,0.16, 0.01)):
 		M = bct.threshold_proportional(Cortical_adj, c, copy=True)
+		bM = M.copy()
+		bM = bM>0
+		
 		#PC
 		Cortical_PCs += bct.participation_coef(M, Cortical_CI)
+		Cortical_bPCs += bct.participation_coef(bM, Cortical_CI)
 
 		#BNWR and NNC
 		BNWR = np.zeros(Cortical_CI.size)
@@ -862,15 +875,17 @@ def cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocortical_corrmat, Cor
 	# organize output	
 	NNCs[Cortical_ROIs_positions] = Cortical_NNCs[Cortical_ROIs_positions]
 	BNWRs[Cortical_ROIs_positions] = Cortical_BNWR[Cortical_ROIs_positions]
-	PCs[Cortical_ROIs_positions] = Cortical_PCs[Cortical_ROIs_positions]	
+	PCs[Cortical_ROIs_positions] = Cortical_PCs[Cortical_ROIs_positions]
+	bPCs[Cortical_ROIs_positions] = Cortical_bPCs[Cortical_ROIs_positions]	
 	WMDs[Cortical_ROIs_positions] = Cortical_WMDs[Cortical_ROIs_positions]
 	# average across thresholds, convert into percentage
 	NNCs = (NNCs/15.0) * 100
 	BNWRs = (BNWRs/15.0) * 100
 	PCs = (PCs/13.5) * 100 #this is the thoretical upperbound
+	bPCs = (bPCs/13.5) * 100 #this is the thoretical upperbound
 	WMDs = (WMDs/15.0) * 100
  	
-	return PCs, BNWRs, NNCs, WMDs
+	return PCs, BNWRs, NNCs, WMDs, bPCs
 
 
 def cal_within_thalamus_nodal_roles(Thalamus_corrmat, Thalamus_CIs, Thalamus_voxel_positions):

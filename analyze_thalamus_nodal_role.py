@@ -71,9 +71,9 @@ def group_nodal_role(Datasets):
 		Thalamocor_adj = np.loadtxt(Parcel_path + '/' + dat + 'Gordon_333_thalamocortical_pcorr_avemat')
 		Cortical_adj = np.loadtxt(Parcel_path + '/' + dat + 'Gordon_333_cortical_avemat')
 
-		_, _, cost_thresholds = map_subcortical_cortical_targets(Thalamocor_adj, Cortical_ROIs, Thalamus_voxels)
+			
 
-		PCs, BNWRs, NNCs, WMDs = cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocor_adj, \
+		PCs, BNWRs, NNCs, WMDs, bPCs = cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocor_adj, \
 				Cortical_adj, \
 				Cortical_plus_thalamus_CI, \
 				Thalamus_CIs, \
@@ -94,6 +94,9 @@ def group_nodal_role(Datasets):
 		file_path = path_to_data_folder + '/%savemat_tha_nodal_pcorr_WMDs' %dat
 		save_object(WMDs, file_path)
 
+		file_path = path_to_data_folder + '/%savemat_tha_nodal_pcorr_bPCs' %dat
+		save_object(bPCs, file_path)
+
 
 if __name__ == "__main__":
 #subject = sys.stdin.read().strip('\n')	
@@ -101,6 +104,6 @@ if __name__ == "__main__":
 
 ### group averaged
 	Datasets =	['MGH_', 'NKI_645_', 'NKI_1400_'] 
+	#Datasets =	['MGH_'] 
 	group_nodal_role(Datasets)
-
 

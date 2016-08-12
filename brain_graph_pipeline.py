@@ -1,5 +1,4 @@
 #script to run Maxwell's brain graph algorithms
-# Nov 5, here try cluster individual's, then do consensus across subjects, and cluster group results
 
 from brain_graphs import *
 #from sklearn.metrics import normalized_mutual_info_score as nmi 
@@ -65,22 +64,21 @@ def cluster_on_grouped_ave_matrices(templates, min_costs, min_comm_sizes, min_we
 						make_image(atlas_path, image_path, ROI_list, graph.community.membership+1)
 
 
-def gen_indiv_graph(data_path, output_path, templates):
+def gen_indiv_graph(file_pattern, output_path, prefix):
 	''' generate individual graph outputs, and save consensus matrix'''
 
 	for roi_template in templates:
-		file_pattern = data_path + '/' + 'MGH*_Craddock_300_cortical*'# + roi_template + '*'
 		AdjMat_Files = glob.glob(file_pattern)
 
 		for s, f in enumerate(AdjMat_Files):
 			M = np.loadtxt(f)
 			graph = recursive_network_partition(matrix=M, min_cost=.01,max_cost=0.25, min_community_size=5 ,min_weight=2)
-			save_path = output_path + 'MGH_Craddock_300_full_' + str(s) +'_graph.output'
+			save_path = output_path + prefix + str(s) +'_graph.output'
 			save_object(graph, save_path)
 
-			concensus = community_matrix(graph.community.membership,5)
-			save_path = output_path + 'MGH_Craddock_300_full_' + str(s) +'_consensus'
-			np.savetxt(save_path, np.nan_to_num(concensus), fmt='%2.1f')
+			#concensus = community_matrix(graph.community.membership,5)
+			#save_path = output_path + 'MGH_Craddock_300_full_' + str(s) +'_consensus'
+			#np.savetxt(save_path, np.nan_to_num(concensus), fmt='%2.1f')
 
 
 def ave_consensus(file_pattern):
@@ -154,10 +152,11 @@ def write_group_consensus_cluste_results():
 	make_image(atlas_path, image_path, ROI_list, Gordon_CI)
 
 if __name__ == "__main__":
-	write_group_consensus_cluste_results()
-	
+	#write_group_consensus_cluste_results()
 
-
+	filepattern = '/home/despoB/kaihwang/Rest/NotBackedUp/ParMatrices/NKI*Gordon*1400*'
+	prefix = 'NKI_1400_'
+	gen_indiv_graph(filepattern, output_path, prefix)
 
 
 

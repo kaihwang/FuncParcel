@@ -38,7 +38,7 @@ Thalamus_voxel_positions = np.arange(len(Cortical_CI),len(Cortical_plus_thalamus
 path_to_lesion_masks = '/home/despoB/connectome-thalamus/Lesion_Masks/'
 path_to_adjmat = '/home/despoB/connectome-thalamus/NotBackedUp/AdjMatrices/'
 
-thalamic_patients = ['128', '163', '168', '176']
+thalamic_patients = ['163', '128', '168']  #163 is S1 (lesion on left), 128 is S2 (on left), 168 is S3 (on right)
 
 Partition_CIs = np.unique(Cortical_CI[Cortical_CI!=0])
 Network_names = ['DF', 'CO', 'SM', 'FP', 'latO', 'mO', 'mT', 'T', 'sFP', 'T']
@@ -93,6 +93,15 @@ for patient in thalamic_patients:
 #np.dstack((a,a)).shape
 
 ################################################################
+###### Analyze patient graph
+################################################################
+M_S1 = M = np.loadtxt('/home/despoB/kaihwang/Rest/NotBackedUp/ParMatrices/Tha_163_Gordon_333_cortical_corrmat')
+M_S2 = M = np.loadtxt('/home/despoB/kaihwang/Rest/NotBackedUp/ParMatrices/Tha_128_Gordon_333_cortical_corrmat')
+M_S3 = M = np.loadtxt('/home/despoB/kaihwang/Rest/NotBackedUp/ParMatrices/Tha_168_Gordon_333_cortical_corrmat')
+
+Patient_AdjMats = np.dstack((M_S1, M_S2, M_S3))
+
+################################################################
 ###### Look at changes in overal network modular structure
 ################################################################
 Gordon_right_ROI_positions = np.loadtxt(path_to_ROIs + '/Gordon_right_ROIs_positions')
@@ -100,7 +109,7 @@ Gordon_right_ROI_positions = Gordon_right_ROI_positions.astype(bool)
 Gordon_left_ROI_positions = np.loadtxt(path_to_ROIs + '/Gordon_left_ROIs_positions')
 Gordon_left_ROI_positions  = Gordon_left_ROI_positions.astype(bool)
 
-Patient_AdjMats = pickle.load(open(path_to_data_folder +'/Patient_AdjMats_Gordon', 'rb'))
+Patient_AdjMats = np.dstack((M_S1, M_S2, M_S3))#pickle.load(open(path_to_data_folder +'/Patient_AdjMats_Gordon', 'rb'))
 Control_AdjMats = pickle.load(open(path_to_data_folder +'/Control_AdjMats_Gordon', 'rb'))
 
 control_df = pd.DataFrame()
@@ -114,7 +123,7 @@ for s in range(0, np.shape(Control_AdjMats)[2]):
 	M = np.nan_to_num(Control_AdjMats[:,:,s].copy())
 
 	tmp_df = pd.DataFrame()
-	for i, p in enumerate(np.arange(0.02, 0.11, 0.01)):
+	for i, p in enumerate(np.arange(0.01, 0.16, 0.01)):
 		right_Q = bct.modularity_und(bct.threshold_proportional(right_M, p))[1]#cal_modularity_w_imposed_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions])
 		left_Q = bct.modularity_und(bct.threshold_proportional(left_M, p))[1]#cal_modularity_w_imposed_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions])
 
@@ -163,7 +172,7 @@ for s in range(0, np.shape(Patient_AdjMats)[2]):
 	M = np.nan_to_num(Patient_AdjMats[:,:,s].copy())
 
 	tmp_df = pd.DataFrame()
-	for i, p in enumerate(np.arange(0.02, 0.11, 0.01)):
+	for i, p in enumerate(np.arange(0.01, 0.16, 0.01)):
 		right_Q =  bct.modularity_und(bct.threshold_proportional(right_M, p))[1]#cal_modularity_w_imposed_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions])
 		left_Q =  bct.modularity_und(bct.threshold_proportional(left_M, p))[1]#cal_modularity_w_imposed_community(bct.threshold_proportional(left_M, p), Cortical_CI[Gordon_left_ROI_positions])
 
@@ -202,7 +211,7 @@ for s in range(0, np.shape(Patient_AdjMats)[2]):
 		tmp_df.set_value(i, 'right_T_Q', cal_modularity_community(bct.threshold_proportional(right_M, p), Cortical_CI[Gordon_right_ROI_positions], 12))
 
 
-	Patient_df = Patient_df.append(tmp_df)
+	Patient_df = Patient_df.append(tmp_df) 
 
 
 Patient_df['L-R_Q'] = Patient_df['left_Q'] - Patient_df['right_Q']
@@ -276,7 +285,46 @@ Patient_df.to_csv(path_to_data_folder + '/patient_df.csv', index = False)
 control_df.to_csv(path_to_data_folder + '/control_df.csv', index = False)
 
 
+##### cal Z-score
+def cal_z (pdf, cdf, metric):
+	z_score = (pdf[metric] -cdf.groupby(['Density']).aggregate(np.nanmean).reset_index()
+			[metric]) / cdf.groupby(['Density']).aggregate(np.nanstd).reset_index()[metric]
+	return z_score
 
+
+cal_z(Patient_df[Patient_df['SubjID']==0], control_df, ['L-R_Q']) #This is 163
+cal_z(Patient_df[Patient_df['SubjID']==1], control_df, ['L-R_Q']) #This is 128
+cal_z(Patient_df[Patient_df['SubjID']==2], control_df, ['R-L_Q']) #This is 168
+
+
+
+
+
+###### compare partitions
+M_S1 = M = np.loadtxt('/home/despoB/kaihwang/Rest/NotBackedUp/ParMatrices/Tha_163_Gordon_333_cortical_corrmat')
+M_S2 = M = np.loadtxt('/home/despoB/kaihwang/Rest/NotBackedUp/ParMatrices/Tha_128_Gordon_333_cortical_corrmat')
+M_S3 = M = np.loadtxt('/home/despoB/kaihwang/Rest/NotBackedUp/ParMatrices/Tha_168_Gordon_333_cortical_corrmat')
+from brain_graphs import *
+gS1_163 = recursive_network_partition(matrix=M_S1, min_cost=.01,max_cost=0.15, min_community_size=10 ,min_weight=2)#pickle.load(open('/home/despoB/connectome-thalamus/Graph/MGH_Gordon_333_163_graph.output', "rb"))
+gS2_128 = recursive_network_partition(matrix=M_S2, min_cost=.01,max_cost=0.15, min_community_size=10 ,min_weight=2)#pickle.load(open('/home/despoB/connectome-thalamus/Graph/MGH_Gordon_333_128_graph.output', "rb"))
+gS3_168 = recursive_network_partition(matrix=M_S3, min_cost=.01,max_cost=0.15, min_community_size=10 ,min_weight=2)#pickle.load(open('/home/despoB/connectome-thalamus/Graph/MGH_Gordon_333_168_graph.output', "rb"))
+path_to_ROIs = '/home/despoB/connectome-thalamus/ROIs'
+
+Cortical_CI = np.loadtxt(path_to_ROIs + '/Gordon_consensus_CI')
+
+from sklearn.metrics.cluster import adjusted_mutual_info_score as aNMI
+
+aNMI(Cortical_CI, gS1_163.community.membership) #.49
+aNMI(Cortical_CI, gS2_128.community.membership) #.40
+aNMI(Cortical_CI, gS3_168.community.membership) #.41
+
+nmi = []
+for s in np.arange(0,62):
+	fn = '/home/despoB/connectome-thalamus/Graph/NKI_1400_%s_graph.output' %s
+	g = pickle.load(open(fn, "rb"))
+	nmi += [aNMI(Cortical_CI, g.community.membership)]
+
+	
 ################################################################
 ###### Create patient data dataframe
 ################################################################

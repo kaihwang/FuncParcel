@@ -49,33 +49,45 @@ for i, coord in enumerate(coords):
 subject_id = "fsaverage"
 subjects_dir = os.environ["SUBJECTS_DIR"]
 
-brain = Brain("fsaverage", "rh", "inflated", views=['lat', 'med'], background="white")
-#brain = Brain("fsaverage", "rh", "inflated", background="white")
+brain = Brain("fsaverage", "lh", "inflated", views=['lat', 'med'], background="white")
+CIs = np.loadtxt('/Volumes/neuro/Rest/ROIs/Gordon_consensus_CI')
 coords = np.loadtxt('/Volumes/neuro/Rest/ROIs/Gordon_coordinates')
-PC = np.loadtxt('//Volumes/neuro/Rest/Thalamic_parcel/roipc')
+PC = np.loadtxt('//Volumes/neuro/Rest/Thalamic_parcel/roiPC')
+PC = PC/100
+PC[PC>0.8] = 1
+#PC[PC<0.3] = 0
+PC = PC/0.9
 
 from matplotlib import cm
 for i, coord in enumerate(coords):
-	if coord[0] > 0:
-		if PC[i] > 61:
-			brain.add_foci(coord, map_surface="white", color=cm.jet(int(PC[i]/100*255))[0:3])
+	if CIs[i] != 0:
+		if coord[0] < 0:
+			brain.add_foci(coord, map_surface="white", color=cm.inferno(int(PC[i]*255))[0:3])
 
+# save 1 image
+brain.save_image("pc_lat.tiff")
 
 ###### to visualize cortical ROI wmd values
 subject_id = "fsaverage"
 subjects_dir = os.environ["SUBJECTS_DIR"]
 
 brain = Brain("fsaverage", "lh", "inflated", views=['lat', 'med'], background="white")
-#brain = Brain("fsaverage", "rh", "inflated", background="white")
+CIs = np.loadtxt('/Volumes/neuro/Rest/ROIs/Gordon_consensus_CI')
 coords = np.loadtxt('/Volumes/neuro/Rest/ROIs/Gordon_coordinates')
-wmd = np.loadtxt('//Volumes/neuro/Rest/Thalamic_parcel/wmdroi')
+WMD = np.loadtxt('//Volumes/neuro/Rest/Thalamic_parcel/roiWMD')
+WMD = WMD/100
+WMD = WMD+1.5
+WMD[WMD<0] =0
+WMD = WMD/3
+WMD[WMD>1] = 1
 
 from matplotlib import cm
 for i, coord in enumerate(coords):
-	if coord[0] < 0:
-		if wmd[i] > 80:
-			brain.add_foci(coord, map_surface="white", color=cm.jet(int((wmd[i]/100+2.1)/4*255))[0:3])
-
+	if CIs[i] != 0:
+		if coord[0] < 0:
+			#if wmd[i] > 80:
+			brain.add_foci(coord, map_surface="white", color=cm.bwr(int(WMD[i]*255))[0:3])
+brain.save_image("WMD_lat.tiff")
 
 
 ### to visualize hubs

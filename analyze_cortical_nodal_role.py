@@ -24,6 +24,9 @@ ROIs = np.append(Cortical_ROIs, Thalamus_voxels)
 Cortical_adj  = average_corrmat('/home/despoB/kaihwang/Rest/NotBackedUp/ParMatrices/MGH*_Gordon_333_cortical_corrmat', np_txt=True, pickle_object=False)
 
 Cortical_adj[np.isnan(Cortical_adj)] = 0  
+#Cortical_adj[Cortical_CI == 8, Cortical_CI ==13] = 0
+#Cortical_adj[Cortical_CI == 13, Cortical_CI ==8] = 0 
+
 Cortical_PCs = []#np.zeros(Cortical_CI.size)
 Cortical_bPCs = []#np.zeros(Cortical_CI.size)
 Cortical_BNWRs = []#np.zeros(Cortical_CI.size)
@@ -75,8 +78,9 @@ save_object(mean_Cortical_PC, file_path)
 file_path = path_to_data_folder + '/MGH_avemat_cortical_nodal_corr_meanWMDs' 
 save_object(mean_Cortical_WMD, file_path)
 
-
-
+#this is for pysurfer visualization
+np.savetxt('/home/despoB/kaihwang/Rest/Thalamic_parcel/roiWMD', mean_Cortical_WMD)
+np.savetxt('/home/despoB/kaihwang/Rest/Thalamic_parcel/roiPC', mean_Cortical_PC)
 
 
 

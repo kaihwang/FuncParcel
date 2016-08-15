@@ -1,3 +1,5 @@
+# for calculating pcorr
+
 import sys
 from FuncParcel import *
 from functools import partial
@@ -5,20 +7,18 @@ from multiprocessing import Pool
 from itertools import product
 import time
 
-#pool = Pool(4)
-
 # script to do partial corr
 
 subject = sys.stdin.read().strip('\n')
 
-ts_path = '/home/despoB/connectome-thalamus/NotBackedUp/TS/'
+ts_path = '/home/despoB/connectome-thalamus/NotBackedUp/TS/MGH_'
 
-pcorr_path = '/home/despoB/connectome-thalamus/Partial_CorrMats/'
+pcorr_path = '/home/despoB/kaihwang/Rest/NotBackedUp/ParMatrices/'
 
-fn = ts_path + subject + 'Thalamus_indices_TS_000.netts'
+fn = ts_path + subject + '_Ses1_Thalamus_WTA_TS_000.netts'#'Thalamus_indices_TS_000.netts'
 thalamus_ts = np.loadtxt(fn)
 
-ROIs = ['MGH_Gordon_333_consensus_CI'] #'Craddock_300_cortical' 'Cortical_CI', 'Cortical_ROIs' 'Craddock_300_cortical' Gordon_333_cortical
+ROIs = ['_Ses1_Gordon_333_cortical'] #'Craddock_300_cortical' 'Cortical_CI', 'Cortical_ROIs' 'Craddock_300_cortical' Gordon_333_cortical
 for roi in ROIs:
 	fn = ts_path + subject + roi + '_TS_000.netts' 
 	cortical_roi_ts = np.loadtxt(fn)
@@ -34,7 +34,7 @@ for roi in ROIs:
 
 	pcorr_mat = pcorr_subcortico_cortical_connectivity(thalamus_ts, cortical_roi_ts)
 	
-	fn = pcorr_path + subject + roi + '_pcorr_mat'
+	fn = pcorr_path + 'MGH_' + subject + roi +'_ThaWTA'+ '_pcorr_mat'
 	#np.savetxt(fn, pcorr_mat, fmt='%.4f')
 	save_object(pcorr_mat, fn)
 

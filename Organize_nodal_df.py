@@ -25,10 +25,10 @@ Cortical_CI = np.loadtxt(path_to_ROIs+'/Gordon_consensus_CI')
 Cog_component = np.loadtxt(Parcel_path+'yeo_flex')
 Cortical_Cog_component = np.loadtxt(Parcel_path+'cortical_cog')
 
+##thalamus nodal metrics
 #PC
 PCs = pickle.load(open(path_to_graph+'MGH_avemat_tha_nodal_pcorr_PCs', "rb"))
 bPCs = pickle.load(open(path_to_graph+'MGH_avemat_tha_nodal_pcorr_bPCs', "rb"))
-
 #NNCs
 NNCs = pickle.load(open(path_to_graph+'MGH_avemat_tha_nodal_pcorr_NNCs', "rb"))
 #WMDs
@@ -36,7 +36,9 @@ WMDs = pickle.load(open(path_to_graph+'MGH_avemat_tha_nodal_pcorr_WMDs', "rb"))
 #BNWR
 BNWRs = pickle.load(open(path_to_graph+'MGH_avemat_tha_nodal_pcorr_BNWRs', "rb"))
 
-
+##Cortical ROI nodal metrics (used a seaparates script to caluclated those.. faster)
+Cortical_PCs = pickle.load(open(path_to_graph+'MGH_avemat_cortical_nodal_corr_meanPCs', "rb"))
+Cortical_WMDs = pickle.load(open(path_to_graph+'MGH_avemat_cortical_nodal_corr_meanWMDs', "rb"))
 
 ################################################################
 ###### create Dataframe
@@ -163,23 +165,23 @@ Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==12] = 
 
 
 #nodal roles
-Thalamus_df['PC'] = PCs[333:]/100  #convert from percentage to raw score
+Thalamus_df['PC'] = PCs[333:]/100  #orignal files were times by 100 easier to save to nifiti.....
 Thalamus_df['bPC'] = bPCs[333:]/100
 Thalamus_df['WMD'] = WMDs[333:]/100 
-Thalamus_df['NNC'] = NNCs[333:]/100
-Thalamus_df['BNWR'] = BNWRs[333:]/100
+#Thalamus_df['NNC'] = NNCs[333:]/100 #not analyzing thse metrics for now
+#Thalamus_df['BNWR'] = BNWRs[333:]/100
 Thalamus_df['cog'] = Cog_component
 
-Cortical_df['PC'] = PCs[0:333]/100  #take out cortical ones, normalize by max PC
+Cortical_df['PC'] = Cortical_PCs[0:333]/100  
 Cortical_df['bPC'] = bPCs[0:333]/100
-Cortical_df['WMD'] = WMDs[0:333]/100 
-Cortical_df['NNC'] = NNCs[0:333]/100 
-Cortical_df['BNWR'] = BNWRs[0:333]/100
+Cortical_df['WMD'] = Cortical_WMDs[0:333]/100 
+#Cortical_df['NNC'] = NNCs[0:333]/100 
+#Cortical_df['BNWR'] = BNWRs[0:333]/100
 Cortical_df['cog'] = Cortical_Cog_component
 
 Cortical_df['Classification'] = 'Cortical \nNon Hubs'
-Cortical_df['Classification'].loc[Cortical_df['WMD'] > .8] = 'Cortical \nProvincial Hubs'
-Cortical_df['Classification'].loc[Cortical_df['PC'] > .61] = 'Cortical \nConnector Hubs'
+Cortical_df['Classification'].loc[Cortical_df['WMD'] > 1.04] = 'Cortical \nProvincial Hubs'
+Cortical_df['Classification'].loc[Cortical_df['PC'] > .64] = 'Cortical \nConnector Hubs'
 Cortical_df['nodetype'] = 'Cortical ROIs'
 
 #Cortical_df['Classification'].loc[Cortical_df['WMD'] > .8] = 'Cortical \nProvincial Hubs'
@@ -220,8 +222,9 @@ Cortical_df['nodetype'] = 'Cortical ROIs'
 
 #do some sample distribution comparison
 from scipy import stats
-stats.ks_2samp(Thalamus_df['PC'], Cortical_df['PC'])
-stats.ks_2samp(Thalamus_df['WMD'], Cortical_df['WMD'])
+stats.ks_2samp(Thalamus_df[Thalamus_df['Classification']!='Unclassified']['PC'], Cortical_df['PC'])
+stats.ks_2samp(Thalamus_df[Thalamus_df['Classification']!='Unclassified']['WMD'], Cortical_df['WMD'])
+stats.ks_2samp(Thalamus_df[Thalamus_df['Classification']!='Unclassified']['cog'], Cortical_df['cog'])
 
 
 ################################################################

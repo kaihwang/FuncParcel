@@ -861,8 +861,8 @@ def cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocortical_corrmat, Cor
 
 		#return mean and degree 
 		for CI in np.unique(Cortical_CI):
-			Cortical_wm_mean[ix+1, CI] = np.nanmean(np.sum(M[Cortical_CI==CI,:],1))
-			Cortical_wm_std[ix+1, CI] = np.nanstd(np.sum(M[Cortical_CI==CI,:],1))
+			Cortical_wm_mean[ix+1, CI] = np.nanmean(np.sum(bM[Cortical_CI==CI,:],1))
+			Cortical_wm_std[ix+1, CI] = np.nanstd(np.sum(bM[Cortical_CI==CI,:],1))
 
 		#thalamic WMD, threshold by density
 		M = bct.weight_conversion(bct.threshold_absolute(Thalamocortical_corrmat, cost_thresholds[ix], copy=True), 'binarize')	

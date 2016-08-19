@@ -25,6 +25,7 @@ path_to_ROIs = '/home/despoB/connectome-thalamus/ROIs'
 Cortical_CI = np.loadtxt(path_to_ROIs + '/Gordon_consensus_CI')
 Cortical_ROIs = np.loadtxt(path_to_ROIs+'/Gordon_333', dtype = int)
 Output_path = '/home/despoB/kaihwang/Rest/Graph/'
+Data_path='/home/despoB/kaihwang/Rest/NotBackedUp/ParMatrices/'
 
 #organiz for func parcel
 Thalamus_Parcels = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9])
@@ -44,7 +45,6 @@ Parcel_positions = [Morel_Thalamus_parcel_positions, func_Thalamus_parcel_positi
 
 def run_TRSE():
 	## run TRSE
-	TRSE_Data_path='/home/despoB/kaihwang/Rest/NotBackedUp/ParMatrices/'
 	subj = np.loadtxt('/home/despoB/kaihwang/bin/FC_Scripts/trse_subjects')
 	Conditions = ['Cat', 'FH', 'HF', 'Both']
 
@@ -53,13 +53,12 @@ def run_TRSE():
 		subject = subject.astype("int")
 		for condition in Conditions:
 			for roi, CI, pos in zip (ROIs, CIs, Parcel_positions) :
-				meanPC, _= cal_parcel_graph(TRSE_Data_path, subject, condition, roi, Cortical_ROIs, pos, CI)
+				meanPC, _= cal_parcel_graph(Data_path, subject, condition, roi, Cortical_ROIs, pos, CI)
 				fn = Output_path + str(subject) + '_' + roi + '_' + condition + '_' +'meanPC'
 				np.savetxt(fn, meanPC)
 
 def run_TDSigEI():
 	## run TDSigEI
-	TD_Data_path='/home/despoB/kaihwang/Rest/NotBackedUp/ParMatrices/'
 	subj = np.loadtxt('/home/despoB/kaihwang/bin/FC_Scripts/TDSigEI_subj')
 	Conditions = ['FH', 'HF', 'Fp', 'Hp']
 
@@ -67,13 +66,12 @@ def run_TDSigEI():
 		subject = subject.astype("int")
 		for condition in Conditions:
 			for roi, CI, pos in zip (ROIs, CIs, Parcel_positions) :
-				meanPC, _= cal_parcel_graph(TD_Data_path,  subject, condition, roi, Cortical_ROIs, pos, CI)
+				meanPC, _= cal_parcel_graph(Data_path,  subject, condition, roi, Cortical_ROIs, pos, CI)
 				fn = Output_path + str(subject) + '_' + roi + '_' + condition + '_' +'meanPC'
 				np.savetxt(fn, meanPC)	
 
 def run_HCP():
 	## run HCP
-	Data_path='/home/despoB/kaihwang/Rest/NotBackedUp/ParMatrices/'
 	subj = np.loadtxt('/home/despoB/kaihwang/bin/FC_Scripts/hcp_subj')
 	ROIs = ['Morel', 'Thalamus_WTA']
 	

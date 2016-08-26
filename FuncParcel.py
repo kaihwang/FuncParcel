@@ -634,7 +634,7 @@ def map_subcortical_cortical_targets(corrmat, Cortical_ROIs, Subcortical_voxels)
 	Parameters
 	----
 	corrmat: adj matrix in numpy format, the cortical ROIs first, then concatnated by subcortical voxels
-	Cortical_ROIs : list of cortical ROIs
+	Cortical_ROIs : list of cortical ROIs. NOTE THIS IS LIST OF ROI LABEL BUT NOT INDICES!!
 	Subcortical_voxels : list of subcortical voxels
 
 	It will return a dictionary of cortical_targets
@@ -930,6 +930,7 @@ def sort_CIs(Thalamo_ParcelCIs, Thalamus_voxels):
 
 
 def cal_modularity_w_imposed_community(M, CI):
+	''' calculate modularity with a imposed community structure'''
 	Total_weight = M.sum()
 	Q=0.0
 	for i in np.unique(CI):
@@ -944,6 +945,7 @@ def cal_modularity_w_imposed_community(M, CI):
 	return Q
 
 def cal_modularity_community(M, CI, targetCI):
+	''' calculate modularity with for a specific community'''
 	Total_weight = M.sum()
 	Q=0.0
 	for i in np.unique(targetCI):

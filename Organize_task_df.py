@@ -7,13 +7,13 @@ import pickle
 #common variables
 path_to_data_folder = '/home/despoB/kaihwang/bin/FuncParcel/Data/'
 Data_path='/home/despoB/kaihwang/Rest/Graph/'
-ROIs = ['Morel_LPI', 'Thalamus_WTA_LPI']
+ROIs = ['Gordon_plus_Morel_LPI', 'Gordon_plus_thalamus_WTA_LPI']
 Morel_ind = {'VM':348, 'VA':347, 'VP':346, 'LGN': 345, 'PuA':344, 'PuL':343, 'PuI':342, 'PuM':341, 'Po':340, 'MGN':339, 'IL':338, 'LP':337, 'MD':336,'VL':335,'AN':334}
 Func_ind ={'sFP':341, 'T':340, 'mT':339, 'mO':338, 'latO':337, 'FP':336, 'SM':335, 'CO':334, 'DM':333}
 INDEX = [Morel_ind, Func_ind]
 
 # load behav data from Courtney
-def organize_TRSE_beta():
+def organize_TRSE():
 	RT_df = pd.read_csv(path_to_data_folder+'bseries_trse_RT.csv')
 	Accu_df = pd.read_csv(path_to_data_folder+'bseries_trse_Accu.csv')
 	TRSE_Conditions = ['Cat', 'FH', 'HF', 'Both']
@@ -35,7 +35,7 @@ def organize_TRSE_beta():
 	Accu_df.to_csv(path_to_data_folder+'bseries_trse_Accu.csv')
 
 
-def organize_TD():	
+def organize_TDSigEI():	
 	df = pd.read_csv(path_to_data_folder+'TDSigEI_behav.csv')
 	TD_Conditions = ['FH', 'HF', 'Fp', 'Hp']
 	for condition in TD_Conditions:
@@ -90,27 +90,34 @@ def organize_HCP():
 	for condition in HCP_Conditions:
 		df[condition] = np.nan
 		for s in df['sub']:
-			df.loc[df['sub']==s, condition] = get_HCP_task_performance(str(s),condition)
-
+			try:
+				df.loc[df['sub']==s, condition] = get_HCP_task_performance(str(s),condition)
+			except:
+				df.loc[df['sub']==s, condition] = np.nan	
+				
 		for roi, ind in zip(ROIs,INDEX):
 
 			for key in ind:
 				df[condition+'_'+key] = 0
 
 			for s in df['sub']:
-				pc = np.loadtxt(Data_path+str(s)+'_'+roi+'_'+condition+'_meanPC')
+				try:
+					pc = np.loadtxt(Data_path+str(s)+'_'+roi+'_'+condition+'_meanPC')
+				except:
+					pc = [np.nan]*500
 
 				for key in ind:		
 					df.loc[df['sub']==s, condition+'_'+key] = pc[ind[key]] 
-	df.to_csv(path_to_data_folder+'HCP_behav.csv'
+	
+	df.to_csv(path_to_data_folder+'HCP_behav.csv')
 
 
 
 if __name__ == "__main__":
 
-	#organize_TD()
-	#organize_TRSE_beta()
-	organize_HCP()
+	#organize_TDSigEI()
+	organize_TRSE()
+	#organize_HCP()
 
 
 

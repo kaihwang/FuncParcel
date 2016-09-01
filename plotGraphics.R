@@ -259,10 +259,18 @@ for (v in Variables_to_plot){
 
 
 ### patient stuff
+setwd('/Volumes/neuro/bin/FuncParcel/Data/')
+Data = read.csv('Q_df.csv', header=TRUE)
+mData <-melt(Data,id=c('SubjID','Density','PC.Damage.Score'))
+levels(mData$variable) <-c('Whole \nBrain','Lesioned \nHemisphere',"Intact \nHemisphere")
+qplot <- ggplot(data = mData, aes(x=Density, y=value, color =SubjID)) + geom_line(size=1.5) + ylim(-6.5,0) + facet_wrap(~variable)
+qplot <- qplot + ylab('Q (z-score)') + scale_colour_discrete(name  ="Patient") + theme_grey(base_size = 10)                                                              
+plot(qplot)
+ggsave(filename ='Q.pdf', plot = qplot, units = c("in"),width=4.5, height=1.7) 
+
 setwd('~/Google Drive/Projects/Thalamus-Rest/')
 # plot patient lesion extent
 Variables_to_plot <- c('S1', 'S2', 'S3', 'S4')
-
 for (v in Variables_to_plot){
   PT_Data <-read.csv('Patient_locaition.csv', header=TRUE)
   
@@ -281,30 +289,7 @@ for (v in Variables_to_plot){
   ggsave(filename = paste(v,"_pt_loc_morel.pdf", sep=''), plot = pt_plot,units = c("in"),width=2,  height=1.5)
 }
 
-#plot patient
-PT_Data = read.csv('Patient_Q_v_PC.csv', header=TRUE)
-pt_q_plot <- ggplot(data = PT_Data, aes(x=Density, y=Q.Diff, color = factor(SubjID)))
-pt_q_plot <- pt_q_plot + geom_line(size=2) 
-pt_q_plot <- pt_q_plot + labs(x= "Patients", y = "Hemispheric Difference \n in Modularity") + theme_classic(base_size = 10)+ theme( legend.title = element_blank(), axis.text = element_text(colour = "black"))
-pt_q_plot <- pt_q_plot + xlab('Density')
-plot(pt_q_plot)
-ggsave(filename = "pt_q_plot.pdf", plot = pt_q_plot, units = c("in"),width=3, height=2) 
-
-
-#pt_pc_plot <- ggplot(data = PT_Data, aes(x=factor(SubjID), y=Lesioned.PC))
-#pt_pc_plot <- pt_pc_plot + geom_bar(stat = "identity") 
-#pt_pc_plot <- pt_pc_plot + ylim( 0, 1) 
-#pt_pc_plot <- pt_pc_plot + labs(x= "Patients", y = "Mean PC (lesion)") + theme_classic(base_size = 10)+ theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black")) 
-#ggsave(filename = "pt_pc_plot.pdf", plot = pt_pc_plot, units = c("in"),width=1.5, height=2) 
-#plot(pt_pc_plot)
-
-#pt_pc_plot <- ggplot(data = PT_Data, aes(x=factor(SubjID), y=Lesioned.WMD))
-#pt_pc_plot <- pt_pc_plot + geom_bar(stat = "identity") 
-#pt_pc_plot <- pt_pc_plot + ylim( 0, 2) 
-#pt_pc_plot <- pt_pc_plot + labs(x= "Patients", y = "Mean WMD (lesion)") + theme_classic(base_size = 10)+ theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black")) 
-#ggsave(filename = "pt_WMD_plot.pdf", plot = pt_pc_plot, units = c("in"),width=1.5, height=2) 
-#plot(pt_pc_plot)
-
+#plot patient v control NMI
 NMIDATA <- read.csv('NMI.csv', header = TRUE)
 NMIplot <- ggplot(data=NMIDATA, aes(x=Group, y=NMI, color = Group)) +geom_point(size=2) + scale_colour_manual(values=c("Black","DarkGreen", "Blue","#888888")) 
 NMIplot <- NMIplot + theme_grey(base_size = 8) + labs(y="Adjusted NMI") 

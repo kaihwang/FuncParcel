@@ -34,16 +34,22 @@ def average_corrmat(file_path, np_txt=False, pickle_object=True):
 	'''
 	# Averaging
 	AdjMat_Files = glob.glob(file_path)
+	
+	if np_txt:
+		M = np.loadtxt(AdjMat_Files[0])
+	if pickle_object:
+		M = pickle.load(open(f, "rb"))
+	
+	M_Sum =np.zeros(M.shape)
 
-	M_Sum =[]
 	for f in AdjMat_Files:
 		if np_txt:
 			M = np.loadtxt(f)
 		if pickle_object:
 			M = pickle.load(open(f, "rb"))
-		M_Sum += [M]
+		M_Sum = M_Sum + M
 
-	AdjMat = np.nanmean(M_Sum, axis=0) #sum(M_Sum)/len(AdjMat_Files)
+	AdjMat = M_Sum/len(AdjMat_Files)
 	#np.savetxt('/home/despoB/kaihwang/Rest/Striatum_parcel/StriatalCorticalAveMat', AdjMat)
 	return AdjMat
 

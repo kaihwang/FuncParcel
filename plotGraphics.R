@@ -30,16 +30,25 @@ Thalamus_boxplot <- ggplot(data = Thalamus_plus_cortical_data_1, aes(x=Classific
 Thalamus_boxplot <- Thalamus_boxplot + theme_grey(base_size = 8)  + theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black"))
 Thalamus_boxplot <- Thalamus_boxplot + ylim( 0, 1) 
 plot(Thalamus_boxplot)
-ggsave(filename = 'PC_classification_box.pdf', plot = Thalamus_boxplot, units = c("in"),width=4, height=2,dpi=300) 
+#ggsave(filename = 'PC_classification_box.pdf', plot = Thalamus_boxplot, units = c("in"),width=4, height=2,dpi=300) 
 
 #PC kernal density
 CI_colors <- c("blue", "red","yellow")
 kplot <- ggplot(data = Thalamus_plus_cortical_data, aes(x = PC)) 
 kplot <-kplot + stat_density(aes( group = nodetype, fill = nodetype ),size=2, alpha=0.7, position="identity") 
 kplot <-kplot + theme_grey(base_size = 8) +scale_fill_manual(values=CI_colors ) + theme(legend.position="none") #+ theme(legend.title = element_blank())
-kplot <-kplot + coord_cartesian(ylim=c(0,4.5)) + ylab("Kernel Density")
+kplot <-kplot + coord_cartesian(ylim=c(0,7),xlim=c(0,1)) +ylab("Kernel Density") + xlab("PC (partial correlations)")
 plot(kplot)
 ggsave(filename = 'PC_classification_kernal.pdf', plot = kplot, units = c("in"),width=2.3, height=2,dpi=300) 
+
+#PC kernal contrast full and partial
+CI_colors <- c("blue", "red","yellow")
+kplot <- ggplot(data = Thalamus_plus_cortical_data, aes(x = fPC)) 
+kplot <-kplot + stat_density(aes( group = nodetype, fill = nodetype ),size=2, alpha=0.7, position="identity") 
+kplot <-kplot + theme_grey(base_size = 8) +scale_fill_manual(values=CI_colors ) + theme(legend.position="none") #+ theme(legend.title = element_blank())
+kplot <-kplot + coord_cartesian(ylim=c(0,7),xlim=c(0,1)) + ylab("Kernel Density") + xlab("PC (full correlations)")
+plot(kplot)
+ggsave(filename = 'fPC_classification_kernal.pdf', plot = kplot, units = c("in"),width=2.3, height=2,dpi=300) 
 
 #bPC kernal density
 #CI_colors <- c("green", "blue","red")
@@ -67,7 +76,7 @@ kplot <-kplot + geom_vline(xintercept=0.68, color = "#008100", size=1, linetype=
 kplot <-kplot + geom_vline(xintercept=0.83, color = "pink", size=1, linetype="F1")
 kplot <- kplot + coord_cartesian(ylim=c(0,5))
 plot(kplot)
-ggsave(filename = 'PC_pacel_kernal.pdf', plot = kplot, units = c("in"),width=2.8, height=2,dpi=300)
+#ggsave(filename = 'PC_pacel_kernal.pdf', plot = kplot, units = c("in"),width=2.8, height=2,dpi=300)
 
 #WMD boxplot
 Thalamus_plus_cortical_data_2<- Thalamus_plus_cortical_data
@@ -78,16 +87,24 @@ Thalamus_boxplot <- ggplot(data = Thalamus_plus_cortical_data_2, aes(x=Classific
 Thalamus_boxplot <- Thalamus_boxplot + theme_grey(base_size = 8)  + theme( axis.title.x=element_blank(), legend.position="none", axis.text = element_text(colour = "black"))
 Thalamus_boxplot <- Thalamus_boxplot + ylim( -4, 4) 
 plot(Thalamus_boxplot)
-ggsave(filename = 'WMD_classification_box.pdf', plot = Thalamus_boxplot, units = c("in"),width=4, height=2,dpi=300) 
+#ggsave(filename = 'WMD_classification_box.pdf', plot = Thalamus_boxplot, units = c("in"),width=4, height=2,dpi=300) 
 
 #WMD kernal density
 CI_colors <-c("blue", "red","yellow")
 kplot <- ggplot(data = Thalamus_plus_cortical_data, aes(x = WMD)) 
 kplot <-kplot + stat_density(aes( group = nodetype, fill = nodetype ),size=2, alpha=0.7, position="identity") 
 kplot <-kplot + theme_grey(base_size = 8) +scale_fill_manual(values=CI_colors ) + theme(legend.position="none")
-kplot <-kplot + coord_cartesian(ylim=c(0,.42), xlim=c( -4.2, 8.2))   + ylab("Kernel Density")
+kplot <-kplot + coord_cartesian(ylim=c(0,.6), xlim=c( -4.2, 8.2))   + ylab("Kernel Density") + xlab("WMD (partial correlations)")
 plot(kplot)
 ggsave(filename = 'WMD_classification_kernal.pdf', plot = kplot, units = c("in"),width=2.3, height=2,dpi=300) 
+
+CI_colors <-c("blue", "red","yellow")
+kplot <- ggplot(data = Thalamus_plus_cortical_data, aes(x = fWMD)) 
+kplot <-kplot + stat_density(aes( group = nodetype, fill = nodetype ),size=2, alpha=0.7, position="identity") 
+kplot <-kplot + theme_grey(base_size = 8) +scale_fill_manual(values=CI_colors ) + theme(legend.position="none")
+kplot <-kplot + coord_cartesian(ylim=c(0,.6), xlim=c( -4.2, 8.2))   + ylab("Kernel Density") + xlab("WMD (full correlations)")
+plot(kplot)
+ggsave(filename = 'fWMD_classification_kernal.pdf', plot = kplot, units = c("in"),width=2.3, height=2,dpi=300) 
 
 #WMD kernal density for each func network, plus "stick" for thalamic parcel
 CI_colors <- c("#6B006C", "red","pink","cyan","blue", "brown", "#0E6E6C", "#008100", "yellow")
@@ -310,7 +327,7 @@ for (v in Variables_to_plot){
   n_plot <- n_plot + geom_bar(stat = "identity", aes(fill=Network)) + labs(y = "% of Total \nConnectivity Weight") + theme_classic(base_size = 8)
   n_plot <- n_plot +scale_fill_manual(values=CI_colors ) + geom_hline(aes(yintercept=11), colour="#990000", linetype="dashed")
   n_plot <- n_plot + theme(axis.title.x=element_blank(), axis.ticks.x=element_blank(), axis.text.x=element_blank(), axis.text = element_text(colour = "black"), legend.position="none")
-  ggsave(filename = paste(v,'_plot.pdf', sep=''), plot = n_plot, units = c("in"),width=1.5, height=1.25) 
+  ggsave(filename = paste(v,'_plot.pdf', sep=''), plot = n_plot, units = c("in"),width=1.25, height=1) 
   plot(n_plot)
 }
 

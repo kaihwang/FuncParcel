@@ -964,3 +964,40 @@ def cal_modularity_community(M, CI, targetCI):
 		Between_weight_ratio = (Between_weight)**2
 		Q += (Within_weight_ratio - Between_weight_ratio)
 	return Q
+
+def matrix_to_igraph(matrix,cost,binary=False,check_tri=True,interpolation='midpoint',normalize=False,mst=False):
+	'''use igrpah function to build graphs'''
+	matrix = threshold(matrix,cost,binary,check_tri,interpolation,normalize,mst)
+	g = Graph.Weighted_Adjacency(matrix.tolist(),mode=ADJ_UNDIRECTED,attr="weight")
+	print 'Matrix converted to graph with density of: ' + str(g.density())
+	if np.diff([cost,g.density()])[0] > .005:
+		print 'Density not %s! Did you want: ' %(cost)+ str(g.density()) + ' ?' 
+	return g
+
+
+def threshold(matrix,cost,binary=False,check_tri=True,interpolation='midpoint',normalize=False,mst=False):
+	'''threshold function from Maxwell'''
+	matrix[np.isnan(matrix)] = 0.0
+	matrix[matrix<0.0] = 0.0
+	np.fill_diagonal(matrix,0.0)
+	c_cost_int = 100-(cost*100)
+	if check_tri == True:
+		if np.sum(np.triu(matrix)) == 0.0 or np.sum(np.tril(matrix)) == 0.0:
+			c_cost_int = 100.-((cost/2.)*100.)
+	if c_cost_int > 0:
+		if mst == False:
+			matrix[matrix<np.percentile(matrix,c_cost_int,interpolation=interpolation)] = 0.
+		else:
+			matrix = np.tril(matrix,-1)
+			mst = minimum_spanning_tree(matrix*-1)*-1
+			mst = mst.toarray()
+			mst = mst.transpose() + mst
+			matrix = matrix.transpose() + matrix
+			a = matrix<np.percentile(matrix,c_cost_int,interpolation=interpolation)
+			b = mst==0.0
+			matrix[(matrix<np.percentile(matrix,c_cost_int,interpolation=interpolation)) & (mst==0.0)] = 0.
+	if binary == True:
+		matrix[matrix>0] = 1
+	if normalize == True:
+		matrix = matrix/np.sum(matrix)
+	return matrix

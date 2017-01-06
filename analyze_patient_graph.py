@@ -2,7 +2,6 @@
 from __future__ import division, print_function
 #from brain_graphs import *
 from FuncParcel import *
-import matplotlib.pylab as plt
 from scipy.stats.mstats import zscore as zscore
 from brain_graphs import *
 
@@ -37,7 +36,7 @@ Thalamus_voxel_positions = np.arange(len(Cortical_CI),len(Cortical_plus_thalamus
 #Cortical_nontargets= pickle.load(open(path_to_data_folder +'/Cortical_nontargets', "rb"))
 
 path_to_lesion_masks = '/home/despoB/connectome-thalamus/Lesion_Masks/'
-path_to_adjmat = '/home/despoB/connectome-thalamus/NotBackedUp/AdjMatrices/'
+path_to_adjmat = '/home/despoB/connectome-thalamus/NotBackedUp/ParMatrices/'
 
 thalamic_patients = ['176', '128', '168', '163']  #S1-4
 
@@ -48,33 +47,37 @@ Network_names = ['DF', 'CO', 'SM', 'FP', 'latO', 'mO', 'mT', 'T', 'sFP', 'T']
 ###### look at each subject's lesioned voxel distribution
 ################################################################
 
-#load lesioned voxels indices
-Lesioned_voxels = {}
-for patient in thalamic_patients:
-	Lesioned_voxels[patient] = np.loadtxt(path_to_lesion_masks+ patient+'_lesioned_voxels', dtype='int')
 
-PC = pickle.load(open('/home/despoB/kaihwang/Rest/Graph/MGH_avemat_tha_nodal_pcorr_PCs','rb')) 
+def map_lesions():
+	'''find where the lesions are'''
+	#load lesioned voxels indices
+	Lesioned_voxels = {}
+	for patient in thalamic_patients:
+		Lesioned_voxels[patient] = np.loadtxt(path_to_lesion_masks+ patient+'_lesioned_voxels', dtype='int')
 
-Lesioned_PC = {}
-for patient in thalamic_patients:
-	Lesioned_PC[patient] = np.sum(PC[:,333:][:,np.in1d(Thalamus_voxels, Lesioned_voxels[patient])],axis=1)[::-1]
+	PC = pickle.load(open('/home/despoB/kaihwang/Rest/Graph/MGH_avemat_tha_nodal_pcorr_PCs','rb')) 
 
-Lesioned_CIs = {}
-Lesioned_Morel = {}
-Lesioned_FSL = {}
-for patient in thalamic_patients:
-	Lesioned_CIs[patient] = Thalamus_CIs[np.in1d(Thalamus_voxels, Lesioned_voxels[patient])]
-	Lesioned_Morel[patient] = Thalamus_Morel[np.in1d(Thalamus_voxels, Lesioned_voxels[patient])]
-	Lesioned_FSL[patient] = Thalamus_FSL[np.in1d(Thalamus_voxels, Lesioned_voxels[patient])]
+	Lesioned_PC = {}
+	for patient in thalamic_patients:
+		Lesioned_PC[patient] = np.sum(PC[:,333:][:,np.in1d(Thalamus_voxels, Lesioned_voxels[patient])],axis=1)[::-1]
 
+	Lesioned_CIs = {}
+	Lesioned_Morel = {}
+	Lesioned_FSL = {}
+	for patient in thalamic_patients:
+		Lesioned_CIs[patient] = Thalamus_CIs[np.in1d(Thalamus_voxels, Lesioned_voxels[patient])]
+		Lesioned_Morel[patient] = Thalamus_Morel[np.in1d(Thalamus_voxels, Lesioned_voxels[patient])]
+		Lesioned_FSL[patient] = Thalamus_FSL[np.in1d(Thalamus_voxels, Lesioned_voxels[patient])]
+	return Lesioned_CIs, Lesioned_Morel, Lesioned_FSL	
 
+map_lesions()
 
 ################################################################
 ###### Organize adj mats for all subjects, in 3d array ROIxROIxsubject
 ################################################################
 
 def pool_control_adjmats():
-	AdjMat_Files = glob.glob(path_to_adjmat + 'MGH*Gordon_333_cortical_corrmat')
+	AdjMat_Files = glob.glob(path_to_adjmat + 'MGH*cortical*corrmat')
 	Control_AdjMats = np.loadtxt(AdjMat_Files[0])
 	#Control_AdjMats = zscore(Control_AdjMats, axis = None)
 	for f in AdjMat_Files[1:]:
@@ -93,8 +96,74 @@ def pool_patient_adjmats():
 	Patient_AdjMats = np.dstack((M_S1, M_S2, M_S3, M_S4))
 	return Patient_AdjMats
 
-#Control_AdjMats = save_control_adjmats()
+#Control_AdjMats = pool_control_adjmats()
 #Patient_AdjMats = pool_patient_adjmats()
+
+
+
+################################################################
+###### Analyze patient graph, Look at changes in between network connectivity weight
+################################################################
+
+#zscore matrices 
+def zscore_control_adjmats():
+	AdjMat_Files = glob.glob(path_to_adjmat + 'MGH*cortical*corrmat')
+	Control_AdjMats = np.loadtxt(AdjMat_Files[0])
+	#Control_AdjMats = zscore(Control_AdjMats, axis = None)
+	for f in AdjMat_Files[1:]:
+
+		M = zscore(np.loadtxt(f), None)
+		#M = zscore(M, axis = None)
+		Control_AdjMats = np.dstack((Control_AdjMats,M))
+	#save_object(Control_AdjMats, path_to_data_folder +'/Control_AdjMats_Gordon')
+	return Control_AdjMats
+
+def zscore_patient_adjmats():
+	M_S1 = zscore(np.loadtxt('/home/despoB/kaihwang/Rest/NotBackedUp/ParMatrices/Tha_176_Gordon_333_cortical_corrmat'),None)
+	M_S2 = zscore(np.loadtxt('/home/despoB/kaihwang/Rest/NotBackedUp/ParMatrices/Tha_128_Gordon_333_cortical_corrmat'), None)
+	M_S3 = zscore(np.loadtxt('/home/despoB/kaihwang/Rest/NotBackedUp/ParMatrices/Tha_168_Gordon_333_cortical_corrmat'), None)
+	M_S4 = zscore(np.loadtxt('/home/despoB/kaihwang/Rest/NotBackedUp/ParMatrices/Tha_163_Gordon_333_cortical_corrmat'), None)
+	Patient_AdjMats = np.dstack((M_S1, M_S2, M_S3, M_S4))
+	return Patient_AdjMats
+
+Control_AdjMats = zscore_control_adjmats()
+Patient_AdjMats = zscore_patient_adjmats()
+
+
+# calculate patient zscore of weights
+def cal_z_score_between_weight():
+	Patient_ww = {}
+	for s, p in enumerate(thalamic_patients):
+
+		p_sum = 0
+		c_sum = np.zeros(np.shape(Control_AdjMats)[2])
+		for ci in np.unique(Lesioned_CIs[p]):
+			p_sum += np.nansum(Patient_AdjMats[np.in1d(Cortical_CI,ci),:,s][:,np.in1d(Cortical_CI,ci)])  #within module
+			c_sum += np.nansum(Control_AdjMats[np.in1d(Cortical_CI,ci),:,:][:,np.in1d(Cortical_CI,ci)],(0,1))
+			#c_std += np.nanstd(np.sum(Control_AdjMats[np.in1d(Cortical_CI,ci),:,:][:,np.in1d(Cortical_CI,ci,invert=True)],(0,1)))
+		c_mean = np.nanmean(c_sum)
+		c_std = np.nanstd(c_sum)
+		Patient_ww[p] = (p_sum - c_mean)/c_std
+	return Patient_ww
+
+
+def cal_z_score_between_weight():
+	Patient_bw = {}
+	for s, p in enumerate(thalamic_patients):
+
+		p_sum = 0
+		c_sum = np.zeros(np.shape(Control_AdjMats)[2])
+		for ci in np.unique(Lesioned_CIs[p]):
+			p_sum += np.nansum(Patient_AdjMats[np.in1d(Cortical_CI,ci),:,s][:,np.in1d(Cortical_CI,ci,invert=True)])  #between module
+			c_sum += np.nansum(Control_AdjMats[np.in1d(Cortical_CI,ci),:,:][:,np.in1d(Cortical_CI,ci,invert=True)],(0,1))
+			#c_std += np.nanstd(np.sum(Control_AdjMats[np.in1d(Cortical_CI,ci),:,:][:,np.in1d(Cortical_CI,ci,invert=True)],(0,1)))
+		c_mean = np.nanmean(c_sum)
+		c_std = np.nanstd(c_sum)
+		Patient_bw[p] = (p_sum - c_mean)/c_std
+	return Patient_bw
+
+cal_z_score_within_weight()		
+cal_z_score_between_weight()
 
 ################################################################
 ###### Analyze patient graph, Look at changes in overal network modular structure

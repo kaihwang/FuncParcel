@@ -289,14 +289,20 @@ ggsave(filename ='Q.pdf', plot = qplot, units = c("in"),width=4.5, height=1.7)
 
 setwd('~/Google Drive/Projects/Thalamus-Rest/')
 
+### only plot Q change for whole hemisphere
+Data<-mData[mData$variable=='Whole \nBrain',]
+qplot <- ggplot(data = Data, aes(x=Density, y=value, color =SubjID)) + geom_line(size=1.5) + ylim(-6.5,0) 
+qplot <- qplot + ylab('Whole brain modularity \nchange (z-score)') + scale_colour_discrete(name  ="Patient") + theme_grey(base_size = 10)                                                              
+plot(qplot)
+ggsave(filename ='Q.pdf', plot = qplot, units = c("in"),width=3, height=1.7) 
 
 ### Conn Change
 Data = read.csv('patient_conn.csv', header=TRUE)
 levels(Data$variable) <-c('Between \nNetwork','Within \nNetwork')
 plot <- ggplot(data=Data, aes(x=Patient, y=Connectivity.Change)) + geom_bar(stat="identity", aes(fill=Patient)) + facet_wrap(~variable) 
-plot <- plot + theme_grey(base_size = 10) + theme( axis.title.x=element_blank()) + ylab('Connectivity change \n(z-score)') 
+plot <- plot + theme_grey(base_size = 10)  + ylab('Connectivity change \n(z-score)')
 plot(plot)
-ggsave(filename ='patient_between_within_weight.pdf', plot = plot, units = c("in"),width=3, height=1.55) 
+ggsave(filename ='patient_between_within_weight.pdf', plot = plot, units = c("in"),width=4, height=1.7) 
 ### location
 # plot patient lesion extent
 Variables_to_plot <- c('S1', 'S2', 'S3', 'S4')

@@ -928,6 +928,7 @@ def cal_within_thalamus_nodal_roles(Thalamus_corrmat, Thalamus_CIs, Thalamus_vox
 	return within_Tha_PCs_percentage, within_Tha_WMDs_percentage
 
 def sort_CIs(Thalamo_ParcelCIs, Thalamus_voxels):
+	''' assing a CI integer to each thalamus voxel'''
 	Thalamus_CIs = np.zeros(len(Thalamus_voxels))
 	for i, thalamus_voxel_index in enumerate(Thalamus_voxels):
 		Thalamus_CIs[i] = Thalamo_ParcelCIs[thalamus_voxel_index][0]
@@ -936,7 +937,7 @@ def sort_CIs(Thalamo_ParcelCIs, Thalamus_voxels):
 
 
 def cal_modularity_w_imposed_community(M, CI):
-	''' calculate modularity with a imposed community structure'''
+	''' calculate modularity of a network with a imposed community structure'''
 	Total_weight = M.sum()
 	Q=0.0
 	for i in np.unique(CI):
@@ -951,7 +952,7 @@ def cal_modularity_w_imposed_community(M, CI):
 	return Q
 
 def cal_modularity_community(M, CI, targetCI):
-	''' calculate modularity with for a specific community'''
+	''' calculate the modularity for for a specific community in a network'''
 	Total_weight = M.sum()
 	Q=0.0
 	for i in np.unique(targetCI):
@@ -966,7 +967,7 @@ def cal_modularity_community(M, CI, targetCI):
 	return Q
 
 def matrix_to_igraph(matrix,cost,binary=False,check_tri=True,interpolation='midpoint',normalize=False,mst=False):
-	'''use igrpah function to build graphs'''
+	'''use igrpah function to build graphs, will take a matrix and convert to igraph object'''
 	matrix = threshold(matrix,cost,binary,check_tri,interpolation,normalize,mst)
 	g = Graph.Weighted_Adjacency(matrix.tolist(),mode=ADJ_UNDIRECTED,attr="weight")
 	print 'Matrix converted to graph with density of: ' + str(g.density())
@@ -976,7 +977,7 @@ def matrix_to_igraph(matrix,cost,binary=False,check_tri=True,interpolation='midp
 
 
 def threshold(matrix,cost,binary=False,check_tri=True,interpolation='midpoint',normalize=False,mst=False):
-	'''threshold function from Maxwell'''
+	'''threshold function from Maxwell, to threshold adj matrix based on density'''
 	matrix[np.isnan(matrix)] = 0.0
 	matrix[matrix<0.0] = 0.0
 	np.fill_diagonal(matrix,0.0)

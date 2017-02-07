@@ -1,5 +1,6 @@
 import FuncParcel
 import numpy as np
+#Script for generating ave matrices
 
 #thalamocortical
 #MGH_Gordon_333_thalamocortical_pcorr_avemat = FuncParcel.average_corrmat('/home/despoB/connectome-thalamus/Partial_CorrMats/MGH*Gordon*cortical*')

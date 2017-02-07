@@ -2,7 +2,7 @@ from FuncParcel import *
 import pandas as pd
 #from ggplot import *
 import pickle
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from scipy.stats.mstats import zscore as zscore
 
 ################################################################
@@ -24,7 +24,7 @@ Cortical_CI = np.loadtxt(path_to_ROIs+'/Gordon_consensus_CI')
 Cog_component = np.loadtxt(Parcel_path+'yeo_flex')
 Cortical_Cog_component = np.loadtxt(Parcel_path+'cortical_cog')
 
-##thalamus nodal metrics
+##thalamus nodal metrics, from parcel correlations
 #PC
 PCs = pickle.load(open(path_to_graph+'MGH_avemat_tha_nodal_pcorr_meanPC', "rb"))
 bPCs = pickle.load(open(path_to_graph+'MGH_avemat_tha_nodal_pcorr_bPCs', "rb"))
@@ -38,6 +38,10 @@ WMDs = pickle.load(open(path_to_graph+'MGH_avemat_tha_nodal_pcorr_meanWMD', "rb"
 ##Cortical ROI nodal metrics (used a seaparates script to caluclated those.. faster)
 Cortical_PCs = pickle.load(open(path_to_graph+'MGH_avemat_cortical_nodal_corr_meanPCs', "rb"))
 Cortical_WMDs = pickle.load(open(path_to_graph+'MGH_avemat_cortical_nodal_corr_meanWMDs', "rb"))
+
+## this is data from full correlation matrices
+fPC = np.loadtxt('/home/despoB/connectome-thalamus/Thalamic_parcel/fPC')
+fWMD = np.loadtxt('/home/despoB/connectome-thalamus/Thalamic_parcel/fWMD')
 
 ################################################################
 ###### create Dataframe
@@ -163,6 +167,9 @@ Cortical_df['Functional Network'].loc[Cortical_df['Functional Network'] ==12] = 
 ##########################################
 
 
+
+
+
 #nodal roles
 Thalamus_df['PC'] = PCs[333:]/100  #orignal files were times by 100 easier to save to nifiti.....
 #Thalamus_df['bPC'] = bPCs[333:]/100
@@ -171,9 +178,14 @@ Thalamus_df['WMD'] = WMDs[333:]/100
 #Thalamus_df['BNWR'] = BNWRs[333:]/100
 Thalamus_df['cog'] = Cog_component
 
+Thalamus_df['fPC'] =fPC
+Thalamus_df['fWMD'] = fWMD
+
 Cortical_df['PC'] = Cortical_PCs[0:333]/100  
+Cortical_df['fPC'] = Cortical_PCs[0:333]/100  
 #Cortical_df['bPC'] = bPCs[0:333]/100
 Cortical_df['WMD'] = Cortical_WMDs[0:333]/100 
+Cortical_df['fWMD'] = Cortical_WMDs[0:333]/100 
 #Cortical_df['NNC'] = NNCs[0:333]/100 
 #Cortical_df['BNWR'] = BNWRs[0:333]/100
 Cortical_df['cog'] = Cortical_Cog_component

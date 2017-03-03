@@ -777,7 +777,7 @@ def cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocortical_corrmat, Cor
     Cortical_CI: A vector of network assignments for cortical ROIs 
     Cortical_ROIs_positions: a position vector indicating in the thalamocortical adj matrix which rows/columns are cortical ROIs
     Thalamus_voxel_posistions: a position vector indicating in the thalamocortical adj matrix which rows/columns are thalamic voxels
-    cost_thresholds: the thoresholds that can threshold the thalamocortical edges at density .01 to .15. For now this is hard coded
+    cost_thresholds: the thoresholds that can threshold the thalamocortical edges at density .01 to .15. 
 
 	return variables are graph metrics across thresholds (with "s"), or averaged across thresholds "mean"
 
@@ -867,15 +867,15 @@ def cal_thalamus_and_cortical_ROIs_nodal_properties(Thalamocortical_corrmat, Cor
 
 		#return mean and degree 
 		for CI in np.unique(Cortical_CI):
-			Cortical_wm_mean[ix+1, CI] = np.nanmean(np.sum(bM[Cortical_CI==CI,:],1))
-			Cortical_wm_std[ix+1, CI] = np.nanstd(np.sum(bM[Cortical_CI==CI,:],1))
+			Cortical_wm_mean[ix+1, CI] = np.nanmean(np.sum(bM[Cortical_CI==CI,:][:,Cortical_CI==CI],1))
+			Cortical_wm_std[ix+1, CI] = np.nanstd(np.sum(bM[Cortical_CI==CI,:][:,Cortical_CI==CI],1))
 
 		#thalamic WMD, threshold by density
 		M = bct.weight_conversion(bct.threshold_absolute(Thalamocortical_corrmat, cost_thresholds[ix], copy=True), 'binarize')	
 
 		tha_wmd = np.zeros(Cortical_plus_thalamus_CI.size)
 		for i in np.unique(Cortical_CI):
-			tha_wmd[Cortical_plus_thalamus_CI==i] = (np.sum(M[Cortical_plus_thalamus_CI==i][:, Cortical_ROIs_positions],1)\
+			tha_wmd[Cortical_plus_thalamus_CI==i] = (np.sum(M[Cortical_plus_thalamus_CI==i][:, Cortical_plus_thalamus_CI==i],1)\
 			- Cortical_wm_mean[ix+1,i])/Cortical_wm_std[ix+1,i]
 		tha_wmd = np.nan_to_num(tha_wmd)
 		WMDs += [tha_wmd]
@@ -968,11 +968,12 @@ def cal_modularity_community(M, CI, targetCI):
 
 def matrix_to_igraph(matrix,cost,binary=False,check_tri=True,interpolation='midpoint',normalize=False,mst=False):
 	'''use igrpah function to build graphs, will take a matrix and convert to igraph object'''
+
 	matrix = threshold(matrix,cost,binary,check_tri,interpolation,normalize,mst)
 	g = Graph.Weighted_Adjacency(matrix.tolist(),mode=ADJ_UNDIRECTED,attr="weight")
-	print 'Matrix converted to graph with density of: ' + str(g.density())
-	if np.diff([cost,g.density()])[0] > .005:
-		print 'Density not %s! Did you want: ' %(cost)+ str(g.density()) + ' ?' 
+	#print 'Matrix converted to graph with density of: ' + str(g.density())
+	#if np.diff([cost,g.density()])[0] > .005:
+	#	print 'Density not %s! Did you want:' %((cost)+ str(g.density())) + ' ?' 
 	return g
 
 

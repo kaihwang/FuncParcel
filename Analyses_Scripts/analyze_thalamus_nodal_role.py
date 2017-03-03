@@ -171,25 +171,57 @@ def group_fullcorr_vox():
 	
 	M = average_corrmat('MGH*Gordon_333_plus_thalamus_ROIs_corrmat', np_txt=True, pickle_object=False)
 	M[np.isnan(M)] = 0  
-	M[Thalamus_voxel_positions,:][:,Thalamus_voxel_positions] = 0	
+	M[Thalamus_voxel_positions,:][:,Thalamus_voxel_positions] = 0	#remove within thalamus connections
+
+	CorticalM = M[0:333,0:333].copy()
+	
+
+	### calculate PC
 	PCs = []
-	WMDs = []
 	for ix, c in enumerate(np.arange(0.01,0.16, 0.01)):
 		tM = bct.threshold_proportional(M, c, copy=True)
 		PCs += [bct.participation_coef(tM, Cortical_plus_thalamus_CI)]
-		WMDs += [bct.module_degree_zscore(tM, Cortical_plus_thalamus_CI)]
+
+	###calculate WMD
+	Cortical_wm_mean = {}
+	Cortical_wm_std = {}
+	Cortical_WMDs = []
+	WMDs = []
+	M[0:333,:][:,0:333] = 0 #take out cortical edges for WMD, use CorticalM for mean and sd for WMD
+
+	for ix, c in enumerate(np.arange(0.01,0.16, 0.01)):
+		
+		#threshold by density 
+		bM = bct.weight_conversion(bct.threshold_proportional(CorticalM, c, copy=True), 'binarize')
+		Cortical_WMDs += [bct.module_degree_zscore(bM, Cortical_CI)]
+
+		#return mean and degree 
+		for CI in np.unique(Cortical_CI):
+			Cortical_wm_mean[ix+1, CI] = np.nanmean(np.sum(bM[Cortical_CI==CI,:][:,Cortical_CI==CI],1))
+			Cortical_wm_std[ix+1, CI] = np.nanstd(np.sum(bM[Cortical_CI==CI,:][:,Cortical_CI==CI],1))
+
+		#thalamic WMD, threshold by density
+		tM = bct.weight_conversion(bct.threshold_proportional(M, c, copy=True), 'binarize')	
+
+		tha_wmd = np.zeros(Cortical_plus_thalamus_CI.size)
+		for i in np.unique(Cortical_CI):
+			tha_wmd[Cortical_plus_thalamus_CI==i] = (np.sum(tM[Cortical_plus_thalamus_CI==i][:, Cortical_plus_thalamus_CI==i],1)\
+			- Cortical_wm_mean[ix+1,i])/Cortical_wm_std[ix+1,i]
+		tha_wmd = np.nan_to_num(tha_wmd)
+		WMDs += [tha_wmd]	
+
 
 
 	pPC =  pickle.load(open('/home/despoB/connectome-thalamus/Graph/MGH_avemat_tha_nodal_pcorr_meanPC','rb'))
 	pWMD = pickle.load(open('/home/despoB/connectome-thalamus/Graph/MGH_avemat_tha_nodal_pcorr_meanWMD','rb'))
-	fPC = np.mean(PCs,axis=0)[Thalamus_voxel_positions]
+	fPC = np.mean(PCs,axis=0)[Thalamus_voxel_positions]/0.89 #divide by upper bound of 9 networks
 	fWMD = np.mean(WMDs,axis=0)[Thalamus_voxel_positions]
 
 	Morel_mask = np.loadtxt('/home/despoB/connectome-thalamus/Thalamic_parcel/morel_mask')
 	mask = Morel_mask > 0
 
 
-	return M, PCs, WMDs	
+	return M, fPC, fWMD, pPC, pWMD, mask	
 
 
 
